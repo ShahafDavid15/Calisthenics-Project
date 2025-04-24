@@ -1,0 +1,19 @@
+.app {
+  border: 5px solid blue;
+
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app main {
+  background: lightblue;
+  flex: 1;
+
+  /* width: 80%;
+  max-width: 1000px; */
+
+  width: min(80%, 1000px);
+  margin: auto;
+  text-align: center;
+}

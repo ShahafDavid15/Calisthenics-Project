@@ -1,0 +1,25 @@
+body {
+  position: relative;
+  min-height: 100vh;
+}
+
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  padding: 20px;
+}
+
+.myP {
+  color: red;
+}
+
+.footer p {
+  text-align: center;
+  color: green;
+}
+
+.footer span {
+  color: blue;
+  font-size: 4rem;
+}
