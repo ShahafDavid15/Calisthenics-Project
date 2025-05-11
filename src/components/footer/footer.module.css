@@ -1,6 +1,7 @@
 body {
   position: relative;
   min-height: 100vh;
+  background-color: rgb(205, 225, 197);
 }
 
 .footer {
@@ -16,10 +17,10 @@ body {
 
 .footer p {
   text-align: center;
-  color: green;
+  color: rgb(201, 58, 58);
 }
 
 .footer span {
-  color: blue;
-  font-size: 4rem;
+  color: rgb(201, 58, 58);
+  font-size: 2.5rem;
 }

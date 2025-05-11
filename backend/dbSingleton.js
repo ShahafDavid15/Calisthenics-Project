@@ -11,7 +11,7 @@ const dbSingleton = {
         host: "localhost",
         user: "root",
         password: "",
-        database: "task2node",
+        database: "calisthenics",
       });
 
       // Connect to the database

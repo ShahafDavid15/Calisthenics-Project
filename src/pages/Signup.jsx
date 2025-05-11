@@ -1,16 +1,22 @@
 import Header from "../components/header/Header";
 import Footer from "../components/footer/Footer";
 import NavBar from "../components/navbar/NavBar";
+import classes from "./signup.module.css";
 import { useState } from "react";
+import { Link } from "react-router-dom"; // הוספתי את ה־Link
 
 export default function Signup() {
-  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState(""); // הוספתי שדה לאישור סיסמה
 
   const handleSignup = () => {
-    if (name && email && password) {
-      alert("נרשמת בהצלחה!");
+    if (email && password && confirmPassword) {
+      if (password === confirmPassword) {
+        alert("נרשמת בהצלחה!");
+      } else {
+        alert("הסיסמה ואישור הסיסמה אינם תואמים");
+      }
     } else {
       alert("אנא מלא את כל השדות");
     }
@@ -22,18 +28,15 @@ export default function Signup() {
       <NavBar />
       <main className={classes.main}>
         <h1 className={classes.title}>יצירת חשבון</h1>
+
         <input
-          placeholder="שם מלא"
-          className={classes.input}
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-        <input
+          type="email"
           placeholder="אימייל"
           className={classes.input}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
+
         <input
           type="password"
           placeholder="סיסמה"
@@ -41,9 +44,24 @@ export default function Signup() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
+
+        <input
+          type="password"
+          placeholder="אשר סיסמה"
+          className={classes.input}
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+        />
+
         <button className={classes.button} onClick={handleSignup}>
           צור חשבון
         </button>
+
+        <p className={classes.redirectLink}>
+          <Link to="/" className={classes.link}>
+            כבר יש לך חשבון? התחבר כאן
+          </Link>
+        </p>
       </main>
       <Footer />
     </div>

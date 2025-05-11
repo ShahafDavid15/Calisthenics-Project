@@ -26,26 +26,29 @@
 }
 
 .inputContainer {
-  width: 180%;
+  width: 100%;
   max-width: 600px;
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-start;
   margin-bottom: 1.5rem;
 }
 
 .input {
-  width: 100%;
+  width: 20%;
   padding: 0.75rem 1rem;
   font-size: 1.2rem;
   border: 2px solid #9c9b9b;
   border-radius: 6px;
+  text-align: right;
+  margin-bottom: 1rem;
 }
 
 .button {
-  width: 180%;
+  width: 100%;
   max-width: 300px;
   padding: 0.75rem 1rem;
-   background-color: #4caf50;
+  background-color: #4caf50;
   color: white;
   font-size: 1.5rem;
   border: none;
@@ -55,7 +58,7 @@
 }
 
 .button:hover {
-   background-color: #4caf50;
+  background-color: #4caf50;
 }
 
 .link {

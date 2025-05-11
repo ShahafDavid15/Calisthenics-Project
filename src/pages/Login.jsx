@@ -20,31 +20,43 @@ export default function Login({ setUser }) {
   };
 
   return (
-    <div>
+    <div className={classes.container}>
       <Header />
       <NavBar />
-      <main className="main">
-        <h2 className="title">התחברות</h2>
-        <input
-          type="email"
-          placeholder="אימייל"
-          className="input"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <input
-          type="password"
-          placeholder="סיסמה"
-          className="input"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <button className="button" onClick={handleLogin}>
+      <main className={classes.main}>
+        <h2 className={classes.title}>התחברות</h2>
+
+        <div className={classes.inputContainer}>
+          <input
+            id="email"
+            type="email"
+            placeholder="אימייל"
+            className={classes.input}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </div>
+
+        <div className={classes.inputContainer}>
+          <input
+            id="password"
+            type="password"
+            placeholder="סיסמה"
+            className={classes.input}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </div>
+
+        <button className={classes.button} onClick={handleLogin}>
           התחבר
         </button>
-        <Link to="/signup" className="link">
-          אין לך חשבון? צור אחד
-        </Link>
+
+        <p>
+          <Link to="/signup" className={classes.link}>
+            אין לך חשבון? צור אחד
+          </Link>
+        </p>
       </main>
       <Footer />
     </div>
