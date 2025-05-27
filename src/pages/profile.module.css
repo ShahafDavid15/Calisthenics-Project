@@ -13,7 +13,7 @@
 }
 
 .title {
-  color: rgb(201, 58, 58);
+  color: #129990;
   font-size: 24px;
   margin-bottom: 20px;
 }
@@ -49,7 +49,7 @@ select.input {
 }
 
 .button {
-  background-color: #4caf50;
+  background-color: #129990;
   color: white;
   padding: 10px 20px;
   font-size: 16px;
@@ -62,23 +62,60 @@ select.input {
 }
 
 .button:hover {
-  background-color: #45a049;
+  background-color: #096b68;
 }
 
 .link {
   margin-top: 15px;
   text-decoration: none;
-  color: #007bff;
+  color: #129990;
   font-size: 14px;
 }
 
 .link:hover {
   text-decoration: underline;
+  background-color: #096b68;
 }
 
 .topLink {
-  margin-bottom: 10px;
+  display: block;
+  width: 100%;
+  max-width: 400px;
+  padding: 1rem;
+  font-size: 1.2rem;
+  color: #129990;
+  background-color: #fffbde;
+  text-align: center;
+  transition: all 0.3s ease;
   text-decoration: none;
-  color: #45a049;
-  font-size: 16px;
+  margin-top: 15px;
+}
+
+h1 {
+  text-align: center;
+}
+
+.topLink:hover {
+  color: #096b68;
+  text-decoration: underline;
+  transform: translateY(-3px);
+}
+
+.logoutButton {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background-color: #129990;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  text-decoration: none;
+  font-size: 12px;
+  cursor: pointer;
+  z-index: 1000;
+}
+
+.logoutButton:hover {
+  background-color: #096b68;
 }

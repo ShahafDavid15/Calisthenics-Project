@@ -11,7 +11,7 @@ export default function Footer() {
     <footer className={classes.footer}>
       <p className={classes.myP + " " + classes.temp}>
         {" "}
-        <span>&copy;</span> Shahaf David {date}
+        <span>&copy;</span> {date} Shahaf David
       </p>
     </footer>
   );

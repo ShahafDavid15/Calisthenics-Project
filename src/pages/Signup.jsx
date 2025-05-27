@@ -3,12 +3,12 @@ import Footer from "../components/footer/Footer";
 import NavBar from "../components/navbar/NavBar";
 import classes from "./signup.module.css";
 import { useState } from "react";
-import { Link } from "react-router-dom"; // הוספתי את ה־Link
+import { Link } from "react-router-dom";
 
 export default function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState(""); // הוספתי שדה לאישור סיסמה
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const handleSignup = () => {
     if (email && password && confirmPassword) {
@@ -23,35 +23,41 @@ export default function Signup() {
   };
 
   return (
-    <div className={classes.page}>
+    <div className={classes.container}>
       <Header />
       <NavBar />
       <main className={classes.main}>
-        <h1 className={classes.title}>יצירת חשבון</h1>
+        <h2 className={classes.title}>יצירת חשבון</h2>
 
-        <input
-          type="email"
-          placeholder="אימייל"
-          className={classes.input}
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
+        <div className={classes.inputContainer}>
+          <input
+            type="email"
+            placeholder="אימייל"
+            className={classes.input}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </div>
 
-        <input
-          type="password"
-          placeholder="סיסמה"
-          className={classes.input}
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
+        <div className={classes.inputContainer}>
+          <input
+            type="password"
+            placeholder="סיסמה"
+            className={classes.input}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </div>
 
-        <input
-          type="password"
-          placeholder="אשר סיסמה"
-          className={classes.input}
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-        />
+        <div className={classes.inputContainer}>
+          <input
+            type="password"
+            placeholder="אשר סיסמה"
+            className={classes.input}
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+          />
+        </div>
 
         <button className={classes.button} onClick={handleSignup}>
           צור חשבון

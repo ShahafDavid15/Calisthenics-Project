@@ -5,7 +5,7 @@ import classes from "./profile.module.css";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
-export default function Profile() {
+export default function Profile({ onLogout }) {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [phone, setPhone] = useState("");
@@ -36,6 +36,10 @@ export default function Profile() {
       <Header />
       <NavBar />
       <main className={classes.main}>
+        <button onClick={onLogout} className={classes.logoutButton}>
+          התנתקות
+        </button>
+
         <Link to="/home" className={classes.topLink}>
           חזור לדף הבית
         </Link>

@@ -5,27 +5,17 @@ import { Link } from "react-router-dom";
 import classes from "./home.module.css";
 import calisthenicsImg from "../images/Calisthenics.jpeg";
 
-export default function Home() {
+export default function Home({ onLogout }) {
   return (
     <div className={classes.container}>
       <Header />
       <NavBar />
 
-      {/* כפתור התנתקות */}
-      <Link to="/login" className={classes.logoutButton}>
+      <button onClick={onLogout} className={classes.logoutButton}>
         התנתקות
-      </Link>
+      </button>
 
       <main className={classes.main}>
-        <div className={classes.text}>
-          ברוכים הבאים לאתר אימוני הקליסטניקס!
-          <br />
-          כאן תוכלו ללמוד איך לשלוט בגוף שלכם ברמה הגבוהה ביותר ולהגיע לתוצאות
-          שלא חלמתם עליהן.
-          <br />
-          תוכלו לבחור את המסלול המתאים עבורכם בקטגוריית רכישת מנוי.
-        </div>
-
         <ul className={classes.linkList}>
           <li className={classes.linkItem}>
             <Link to="/profile" className={classes.link}>
@@ -48,6 +38,15 @@ export default function Home() {
             </Link>
           </li>
         </ul>
+
+        <div className={classes.text}>
+          !ברוכים הבאים לאתר אימוני הקליסטניקס
+          <br />
+          כאן תוכלו ללמוד איך לשלוט בגוף שלכם ברמה הגבוהה ביותר ולהגיע לתוצאות
+          שלא חלמתם עליהן
+          <br />
+          .תוכלו לבחור את המסלול המתאים עבורכם בקטגוריית רכישת מנוי
+        </div>
 
         <img
           src={calisthenicsImg}

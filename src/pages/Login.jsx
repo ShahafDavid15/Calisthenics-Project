@@ -58,6 +58,7 @@ export default function Login({ setUser }) {
           </Link>
         </p>
       </main>
+
       <Footer />
     </div>
   );

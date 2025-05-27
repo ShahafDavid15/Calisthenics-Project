@@ -3,54 +3,51 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 60vh;
+  min-height: 50vh;
   padding: 2rem;
-  background-color: rgb(205, 225, 197);
-  direction: rtl;
+  background-color: #fffbde;
 }
 
 .main {
-  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 2rem;
+  justify-content: flex-start;
+  padding: 1rem 2rem;
+  width: 100%;
 }
 
 .title {
   text-align: center;
-  font-size: 4rem;
-  margin-bottom: 2rem;
-  color: #333;
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: #129990;
 }
 
 .inputContainer {
   width: 100%;
-  max-width: 600px;
+  max-width: 300px;
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  margin-bottom: 1.5rem;
+  align-items: center;
+  margin-bottom: 1rem;
 }
 
 .input {
-  width: 20%;
-  padding: 0.75rem 1rem;
-  font-size: 1.2rem;
+  width: 100%;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
   border: 2px solid #9c9b9b;
   border-radius: 6px;
   text-align: right;
-  margin-bottom: 1rem;
 }
 
 .button {
   width: 100%;
-  max-width: 300px;
-  padding: 0.75rem 1rem;
-  background-color: #4caf50;
+  max-width: 250px;
+  padding: 0.5rem 1rem;
+  background-color: #90d1ca;
   color: white;
-  font-size: 1.5rem;
+  font-size: 1rem;
   border: none;
   border-radius: 6px;
   cursor: pointer;
@@ -58,16 +55,22 @@
 }
 
 .button:hover {
-  background-color: #4caf50;
+  background-color: #129990;
 }
 
 .link {
-  margin-top: 1.5rem;
-  color: #4caf50;
+  margin-top: 1rem;
+  color: #129990;
   text-decoration: none;
-  font-size: 1.5rem;
+  font-size: 1.2rem;
 }
 
 .link:hover {
   text-decoration: underline;
+}
+
+.redirectLink {
+  margin-top: 1rem;
+  text-align: center;
+  font-size: 1rem;
 }
