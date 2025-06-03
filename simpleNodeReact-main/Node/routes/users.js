@@ -15,6 +15,22 @@ router.get("/", (req, res) => {
   });
 });
 
+// GET user profile by user_id
+router.get("/:user_id", (req, res) => {
+  const { user_id } = req.params;
+  const query = `
+    SELECT user_id, username, first_name, last_name, phone, email, birth_date, gender
+    FROM users
+    WHERE user_id = ?
+  `;
+  db.query(query, [user_id], (err, results) => {
+    if (err) return res.status(500).json({ error: "DB error" });
+    if (results.length === 0)
+      return res.status(404).json({ error: "User not found" });
+    res.json(results[0]);
+  });
+});
+
 // POST add new user (registration)
 router.post("/", (req, res) => {
   const { username, password } = req.body;
@@ -83,41 +99,43 @@ router.post("/login", (req, res) => {
   });
 });
 
-// POST save or update user profile
+// POST update user profile in users table
 router.post("/profile", (req, res) => {
-  const { user_id, firstName, lastName, phone, email, birthDate, gender } =
+  const { username, firstName, lastName, phone, email, birthDate, gender } =
     req.body;
 
-  if (!user_id) {
-    return res.status(400).json({ error: "User ID is required" });
-  }
-
-  if (!firstName || !lastName || !phone || !email || !birthDate || !gender) {
+  if (
+    !username ||
+    !firstName ||
+    !lastName ||
+    !phone ||
+    !email ||
+    !birthDate ||
+    !gender
+  ) {
     return res.status(400).json({ error: "All profile fields are required" });
   }
 
   const query = `
-    INSERT INTO profiles (user_id, first_name, last_name, phone, email, birth_date, gender)
-    VALUES (?, ?, ?, ?, ?, ?, ?)
-    ON DUPLICATE KEY UPDATE
-      first_name = VALUES(first_name),
-      last_name = VALUES(last_name),
-      phone = VALUES(phone),
-      email = VALUES(email),
-      birth_date = VALUES(birth_date),
-      gender = VALUES(gender)
+    UPDATE users
+    SET first_name = ?, last_name = ?, phone = ?, email = ?, birth_date = ?, gender = ?
+    WHERE username = ?
   `;
 
   db.query(
     query,
-    [user_id, firstName, lastName, phone, email, birthDate, gender],
+    [firstName, lastName, phone, email, birthDate, gender, username],
     (err, result) => {
       if (err) {
         console.error("DB error:", err);
         return res.status(500).json({ error: "Database error" });
       }
 
-      res.status(200).json({ message: "Profile saved successfully" });
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      res.status(200).json({ message: "Profile updated successfully" });
     }
   );
 });

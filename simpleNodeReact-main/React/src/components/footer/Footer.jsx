@@ -1,4 +1,5 @@
 import classes from "./footer.module.css";
+import React from "react";
 
 /**
  * Footer component

@@ -1,9 +1,12 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, useHistory, useLocation } from "react-router-dom";
 import Header from "../components/header/Header";
 import Footer from "../components/footer/Footer";
 import NavBar from "../components/navbar/NavBar";
 import classes from "./login.module.css";
+import Cookies from "js-cookie";
+import React from "react";
+
 
 export default function Login({ setUser }) {
   const [username, setUsername] = useState("");
@@ -11,7 +14,7 @@ export default function Login({ setUser }) {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [showError, setShowError] = useState(false);
-  const navigate = useNavigate();
+  const history = useHistory();
   const location = useLocation();
 
   const isRegistration = location.pathname === "/signup";
@@ -42,11 +45,9 @@ export default function Login({ setUser }) {
       return false;
     }
 
-    if (isRegistration) {
-      if (password !== confirmPassword) {
-        setError("Passwords do not match");
-        return false;
-      }
+    if (isRegistration && password !== confirmPassword) {
+      setError("Passwords do not match");
+      return false;
     }
 
     return true;
@@ -76,7 +77,8 @@ export default function Login({ setUser }) {
       }
 
       setUser({ name: data.username, id: data.user_id });
-      navigate("/home");
+      Cookies.set("username", data.username);
+      history.push("/home");
     } catch (err) {
       setError("Connection error. Please check the connection to the server.");
       setShowError(true);
@@ -95,10 +97,7 @@ export default function Login({ setUser }) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          username,
-          password,
-        }),
+        body: JSON.stringify({ username, password }),
       });
 
       const data = await response.json();
@@ -113,7 +112,7 @@ export default function Login({ setUser }) {
         return;
       }
 
-      navigate("/");
+      history.push("/");
     } catch (err) {
       setError("Connection error. Please check the connection to the server.");
       setShowError(true);

@@ -5,6 +5,8 @@ import classes from "./profile.module.css";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import React from "react";
+
 
 export default function WorkoutEntry({ onLogout }) {
   const [selectedExercise, setSelectedExercise] = useState("");

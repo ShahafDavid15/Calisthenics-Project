@@ -4,6 +4,7 @@ import NavBar from "../components/navbar/NavBar";
 import { Link } from "react-router-dom";
 import classes from "./home.module.css";
 import calisthenicsImg from "../images/Calisthenics.jpeg";
+import React from "react";
 
 export default function Home({ onLogout }) {
   return (

@@ -1,4 +1,6 @@
 import classes from "./header.module.css";
+import React from "react";
+
 /**
  * description: Header component
  * @returns JSX of component

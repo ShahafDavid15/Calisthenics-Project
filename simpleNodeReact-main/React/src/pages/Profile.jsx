@@ -2,8 +2,10 @@ import Header from "../components/header/Header";
 import Footer from "../components/footer/Footer";
 import NavBar from "../components/navbar/NavBar";
 import classes from "./profile.module.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import Cookies from "js-cookie";
+import React from "react";
 
 export default function Profile({ onLogout }) {
   const [firstName, setFirstName] = useState("");
@@ -12,20 +14,72 @@ export default function Profile({ onLogout }) {
   const [email, setEmail] = useState("");
   const [birthDate, setBirthDate] = useState("");
   const [gender, setGender] = useState("");
+  const [username, setUserName] = useState("");
+  const [userId, setUserId] = useState(null);
+
+  useEffect(() => {
+    // נניח שאתה שומר את userId בקוקיז או צריך לקבל אותו בדרך כלשהי
+    const username = Cookies.get("username");
+    const user_id = Cookies.get("user_id"); // לדוגמה, צריך להוסיף בקוקיז את ה-user_id בכניסה
+    setUserName(username);
+    setUserId(user_id);
+
+    // אם תרצה לטעון פרטים קיימים מהשרת בעת טעינת הדף:
+    if (user_id) {
+      fetch(`/user/${user_id}`) // צריך להוסיף בשרת API GET לפי user_id שיחזיר את הפרטים
+        .then((res) => res.json())
+        .then((data) => {
+          setFirstName(data.first_name || "");
+          setLastName(data.last_name || "");
+          setPhone(data.phone || "");
+          setEmail(data.email || "");
+          setBirthDate(data.birth_date ? data.birth_date.slice(0, 10) : "");
+          setGender(data.gender || "");
+        });
+    }
+  }, []);
+
+  // פונקציה ששולחת את הפרטים לשרת לעדכון בטבלה users
+  const handleUpdate = async () => {
+    if (!username) {
+      alert("משתמש לא מזוהה");
+      return;
+    }
+
+    const userDetails = {
+      username,
+      firstName,
+      lastName,
+      phone,
+      email,
+      birthDate,
+      gender,
+    };
+    console.log(userDetails);
+    try {
+      const response = await fetch("api/users/profile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(userDetails),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert("הפרטים נשמרו בהצלחה!");
+      } else {
+        alert("שגיאה בשמירת הפרטים: " + (data.error || "לא ידוע"));
+      }
+    } catch (error) {
+      alert(error);
+      console.error(error);
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (firstName && lastName && phone && email && birthDate && gender) {
-      const userDetails = {
-        firstName,
-        lastName,
-        phone,
-        email,
-        birthDate,
-        gender,
-      };
-      console.log("פרטים שהוזנו:", userDetails);
-      alert("הפרטים נשמרו בהצלחה!");
+      handleUpdate();
     } else {
       alert("אנא מלא את כל השדות");
     }

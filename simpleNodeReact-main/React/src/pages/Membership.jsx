@@ -4,6 +4,8 @@ import NavBar from "../components/navbar/NavBar";
 import classes from "./membership.module.css";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import React from "react";
+
 
 export default function Subscription({ onLogout }) {
   const [selectedPlan, setSelectedPlan] = useState("");
