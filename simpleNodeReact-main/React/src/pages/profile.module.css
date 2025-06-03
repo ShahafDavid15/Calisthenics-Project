@@ -1,0 +1,121 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.main {
+  flex: 1;
+  padding: 5px 20px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.title {
+  color: #129990;
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.form {
+  width: 100%;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.inputContainer {
+  margin-bottom: 15px;
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  justify-content: center;
+}
+
+.input {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  text-align: right;
+}
+
+select.input {
+  padding: 10px;
+  font-size: 16px;
+}
+
+.button {
+  background-color: #129990;
+  color: white;
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 100%;
+  max-width: 400px;
+  margin-top: 10px;
+}
+
+.button:hover {
+  background-color: #096b68;
+}
+
+.link {
+  margin-top: 15px;
+  text-decoration: none;
+  color: #129990;
+  font-size: 14px;
+}
+
+.link:hover {
+  text-decoration: underline;
+  background-color: #096b68;
+}
+
+.topLink {
+  display: block;
+  width: 100%;
+  max-width: 400px;
+  padding: 1rem;
+  font-size: 1.2rem;
+  color: #129990;
+  background-color: #fffbde;
+  text-align: center;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  margin-top: 15px;
+}
+
+h1 {
+  text-align: center;
+}
+
+.topLink:hover {
+  color: #096b68;
+  text-decoration: underline;
+  transform: translateY(-3px);
+}
+
+.logoutButton {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background-color: #129990;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  text-decoration: none;
+  font-size: 12px;
+  cursor: pointer;
+  z-index: 1000;
+}
+
+.logoutButton:hover {
+  background-color: #096b68;
+}

@@ -1,0 +1,119 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+  padding: 2rem;
+  background-color: #fffbde;
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 1rem 2rem;
+  width: 100%;
+}
+
+.title {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: #129990;
+}
+
+.inputContainer {
+  width: 100%;
+  max-width: 300px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.input {
+  width: 100%;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  border: 2px solid #9c9b9b;
+  border-radius: 6px;
+  text-align: left;
+}
+
+.errorModel{
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.errorContent {
+  background-color: white;
+  padding: 20px;
+  border-radius: 5px;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  direction: rtl;
+}
+
+.errorContent h3 {
+  color: #e74c3c;
+  margin-top: 0;
+}
+
+.errorContent button:hover {
+  background-color: #2980b9;
+}
+
+.errorContent button {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+.button {
+  width: 100%;
+  max-width: 250px;
+  padding: 0.5rem 1rem;
+  background-color: #90d1ca;
+  color: white;
+  font-size: 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.button:hover {
+  background-color: #129990;
+}
+
+.link {
+  margin-top: 1rem;
+  color: #129990;
+  text-decoration: none;
+  font-size: 1.2rem;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+.redirectLink {
+  margin-top: 1rem;
+  text-align: center;
+  font-size: 1rem;
+}

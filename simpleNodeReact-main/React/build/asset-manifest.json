@@ -1,0 +1,14 @@
+{
+  "files": {
+    "main.css": "/static/css/main.aead818d.css",
+    "main.js": "/static/js/main.e99c7d23.js",
+    "static/media/Calisthenics.jpeg": "/static/media/Calisthenics.6e1981424541f0ba0a2b.jpeg",
+    "index.html": "/index.html",
+    "main.aead818d.css.map": "/static/css/main.aead818d.css.map",
+    "main.e99c7d23.js.map": "/static/js/main.e99c7d23.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.aead818d.css",
+    "static/js/main.e99c7d23.js"
+  ]
+}
