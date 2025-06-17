@@ -1,0 +1,216 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #fffbde;
+  direction: rtl;
+  padding: 2rem;
+}
+
+.tableContainer h3 {
+  text-align: center;
+  color: #096b68;
+}
+
+.main {
+  flex: 1;
+  padding: 5px 20px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.title {
+  color: #129990;
+  font-size: 24px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.inputContainer {
+  margin-bottom: 15px;
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  justify-content: center;
+}
+
+.input {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  text-align: right;
+}
+
+.button {
+  background-color: #129990;
+  color: white;
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 100%;
+  max-width: 400px;
+  margin-top: 10px;
+}
+
+.button:hover {
+  background-color: #096b68;
+}
+
+.logoutButton {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background-color: #129990;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  text-decoration: none;
+  font-size: 12px;
+  cursor: pointer;
+  z-index: 1000;
+  transition: background-color 0.3s ease;
+}
+
+.logoutButton:hover {
+  background-color: #096b68;
+}
+
+.topLink {
+  display: block;
+  width: 100%;
+  max-width: 400px;
+  padding: 1rem;
+  font-size: 1.2rem;
+  color: #129990;
+  background-color: #fffbde;
+  text-align: center;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  margin-top: 15px;
+}
+
+.topLink:hover {
+  color: #096b68;
+  text-decoration: underline;
+  transform: translateY(-3px);
+}
+
+.tableContainer {
+  margin-top: 30px;
+  overflow-x: auto;
+  width: 100%;
+}
+
+.table {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  border-collapse: collapse;
+  background-color: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.table th,
+.table td {
+  padding: 12px;
+  text-align: right;
+  border-bottom: 1px solid #ddd;
+  vertical-align: middle;
+}
+
+.table th {
+  background-color: #f5f5f5;
+  font-weight: bold;
+  color: #333;
+}
+
+.table tr:hover {
+  background-color: #f9f9f9;
+}
+
+.table td:last-child {
+  display: flex;
+  gap: 5px;
+  justify-content: center;
+}
+
+.actionButton {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
+}
+
+.updateButton {
+  background-color: #129990;
+  color: white;
+}
+
+.updateButton:hover {
+  background-color: #096b68;
+}
+
+.deleteButton {
+  background-color: #f44336;
+  color: white;
+}
+
+.deleteButton:hover {
+  background-color: #da190b;
+}
+
+.saveButton {
+  background-color: #129990;
+  color: white;
+}
+
+.saveButton:hover {
+  background-color: #096b68;
+}
+
+.cancelActionButton {
+  background-color: #f44336;
+  color: white;
+}
+
+.cancelActionButton:hover {
+  background-color: #da190b;
+}
+
+.inlineInput {
+  width: 100%;
+  padding: 6px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  box-sizing: border-box;
+}
+
+.table th.columnHeaderExercise {
+  padding-right: 35px;
+}
+
+.table th.columnHeaderRepetitions {
+  padding-left: 30px;
+}
+
+.table th.columnHeaderActions {
+  padding-right: 100px;
+}
+
+.table th.columnHeaderDate {
+  padding-right: 25px;
+}

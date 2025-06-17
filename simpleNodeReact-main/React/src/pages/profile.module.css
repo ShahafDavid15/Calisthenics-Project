@@ -52,12 +52,12 @@ select.input {
 
 /* --- Specific styling for LTR inputs (Email and Phone) --- */
 input[type="email"],
-input[type="tel"] { /* Added input[type="tel"] here */
+input[type="tel"] {
+  /* Added input[type="tel"] here */
   text-align: left;
   direction: ltr;
 }
 /* --- END Specific styling --- */
-
 
 .button {
   background-color: #129990;

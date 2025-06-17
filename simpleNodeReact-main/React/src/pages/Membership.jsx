@@ -11,18 +11,14 @@ export default function Membership({ onLogout }) {
   const [showError, setShowError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  // State to track the currently editing membership's ID
   const [editingMembershipId, setEditingMembershipId] = useState(null);
-  // State to hold the temporary data while editing
   const [currentEditData, setCurrentEditData] = useState({
     name: "",
     price: "",
     duration_days: "",
   });
 
-  // NEW: State to control visibility of the "Add New Membership" row
   const [showAddForm, setShowAddForm] = useState(false);
-  // NEW: State to hold data for the new membership being added
   const [newMembershipData, setNewMembershipData] = useState({
     name: "",
     price: "",
@@ -47,7 +43,6 @@ export default function Membership({ onLogout }) {
     }
   };
 
-  // NEW: handleAddSubmit will now be called when "הוסף" button in the table is clicked
   const handleAddSubmit = async () => {
     if (
       !newMembershipData.name ||
@@ -75,17 +70,15 @@ export default function Membership({ onLogout }) {
         throw new Error(`Failed to add membership: ${errorText}`);
       }
 
-      fetchMemberships(); // Re-fetch to update the table
-      setNewMembershipData({ name: "", price: "", duration_days: "" }); // Reset new form data
-      setShowAddForm(false); // Hide the add form row
+      fetchMemberships();
+      setNewMembershipData({ name: "", price: "", duration_days: "" });
+      setShowAddForm(false);
     } catch (error) {
       showErrorMessage(error.message);
     }
   };
 
-  // Function to start editing a membership
   const startEditing = (membership) => {
-    // If we're adding a new membership, cancel that first
     if (showAddForm) {
       setShowAddForm(false);
       setNewMembershipData({ name: "", price: "", duration_days: "" });
@@ -98,13 +91,11 @@ export default function Membership({ onLogout }) {
     });
   };
 
-  // Function to cancel editing
   const cancelEditing = () => {
     setEditingMembershipId(null);
     setCurrentEditData({ name: "", price: "", duration_days: "" });
   };
 
-  // Function to handle changes in the inline edit fields (for existing memberships)
   const handleEditChange = (e) => {
     const { name, value } = e.target;
     setCurrentEditData((prev) => ({
@@ -113,7 +104,6 @@ export default function Membership({ onLogout }) {
     }));
   };
 
-  // Function to handle changes in the new membership input fields
   const handleNewMembershipChange = (e) => {
     const { name, value } = e.target;
     setNewMembershipData((prev) => ({
@@ -141,8 +131,8 @@ export default function Membership({ onLogout }) {
         throw new Error(`Failed to update membership: ${errorText}`);
       }
 
-      fetchMemberships(); // Re-fetch to update the table
-      cancelEditing(); // Exit editing mode
+      fetchMemberships();
+      cancelEditing();
     } catch (error) {
       showErrorMessage(error.message);
     }
@@ -159,7 +149,7 @@ export default function Membership({ onLogout }) {
         throw new Error(`Failed to delete membership: ${errorText}`);
       }
 
-      fetchMemberships(); // Re-fetch to update the table
+      fetchMemberships();
     } catch (error) {
       showErrorMessage(error.message);
     }
@@ -170,14 +160,11 @@ export default function Membership({ onLogout }) {
     setShowError(true);
   };
 
-  // NEW: Function to toggle the add form visibility
   const toggleAddForm = () => {
-    // If we are currently editing an existing membership, cancel that first
     if (editingMembershipId) {
       cancelEditing();
     }
     setShowAddForm((prev) => !prev);
-    // Reset new form data when showing the form
     if (!showAddForm) {
       setNewMembershipData({ name: "", price: "", duration_days: "" });
     }
@@ -221,7 +208,6 @@ export default function Membership({ onLogout }) {
               {memberships.map((membership) => (
                 <tr key={membership.membership_id}>
                   {editingMembershipId === membership.membership_id ? (
-                    // Render input fields when in editing mode
                     <>
                       <td>
                         <input
@@ -266,7 +252,6 @@ export default function Membership({ onLogout }) {
                       </td>
                     </>
                   ) : (
-                    // Render static text when not in editing mode
                     <>
                       <td>{membership.name}</td>
                       <td>{membership.price} ₪</td>
@@ -274,13 +259,13 @@ export default function Membership({ onLogout }) {
                       <td>
                         <button
                           onClick={() => startEditing(membership)}
-                          className={classes.actionButton}
+                          className={classes.editButton}
                         >
                           עדכן
                         </button>
                         <button
                           onClick={() => handleDelete(membership.membership_id)}
-                          className={classes.actionButton}
+                          className={classes.deleteButton}
                         >
                           מחק
                         </button>
@@ -290,7 +275,6 @@ export default function Membership({ onLogout }) {
                 </tr>
               ))}
 
-              {/* NEW: Row for adding a new membership */}
               {showAddForm && (
                 <tr>
                   <td>
@@ -346,10 +330,6 @@ export default function Membership({ onLogout }) {
           </table>
         </div>
 
-        {/* The Add New Membership Form section is now removed as it's replaced by the inline form */}
-        {/* The Update Membership Form section was already commented out and can be removed */}
-
-        {/* Error Modal */}
         {showError && (
           <div className={classes.errorModal}>
             <div className={classes.errorContent}>

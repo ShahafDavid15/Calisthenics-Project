@@ -56,15 +56,15 @@
 .table th:last-child {
   border-top-left-radius: 8px;
   text-align: center;
-  display: flex; 
-  align-items: center; 
-  justify-content: space-between; 
-  padding-left: 0.8rem; 
-  padding-right: 0.8rem; 
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-left: 0.8rem;
+  padding-right: 0.8rem;
 }
 
 .table th span {
-  display: inline-block; 
+  display: inline-block;
 }
 
 .inlineInput {
@@ -96,6 +96,7 @@
   background-color: #096b68;
 }
 
+/* כפתור שמור */
 .saveButton {
   background-color: #129990;
 }
@@ -132,10 +133,9 @@
   height: 25px;
   font-size: 1.2rem;
   cursor: pointer;
- 
   vertical-align: middle;
   padding: 0;
-  display: inline-flex; 
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   transition: background-color 0.2s;
@@ -143,6 +143,44 @@
 
 .actionButtonAdd:hover {
   background-color: #096b68;
+}
+
+.editButton {
+  background-color: #129990;
+  color: white;
+  padding: 0.5rem 0.8rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+  display: block;
+  width: 100%;
+  text-align: center;
+  transition: background-color 0.3s ease;
+}
+
+.editButton:hover {
+  background-color: #096b68;
+}
+
+.deleteButton {
+  background-color: #dc3545;
+  color: white;
+  padding: 0.5rem 0.8rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+  display: block;
+  width: 100%;
+  text-align: center;
+  transition: background-color 0.3s ease;
+}
+
+.deleteButton:hover {
+  background-color: #c82333;
 }
 
 .table td:last-child {
@@ -176,7 +214,7 @@
 .errorContent button {
   margin-top: 1rem;
   padding: 0.5rem 1rem;
-  background-color: #dc3545;
+  background-color: #c82333;
   color: white;
   border: none;
   border-radius: 4px;
