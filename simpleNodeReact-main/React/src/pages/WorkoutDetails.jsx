@@ -6,13 +6,16 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import React from "react";
-
+import MessageModal from "../components/messagemodal/MessageModal";
 
 export default function WorkoutEntry({ onLogout }) {
   const [selectedExercise, setSelectedExercise] = useState("");
   const [repetitions, setRepetitions] = useState("");
   const [duration, setDuration] = useState("");
-  const [workoutList, setWorkoutList] = useState([]);
+
+  const [modalMessage, setModalMessage] = useState("");
+  const [modalType, setModalType] = useState("error"); 
+  const [showModal, setShowModal] = useState(false);
 
   const predefinedExercises = [
     "עליות כוח",
@@ -22,33 +25,39 @@ export default function WorkoutEntry({ onLogout }) {
     "בטן",
   ];
 
-  const handleAddExercise = () => {
+  const showError = (msg) => {
+    setModalType("error");
+    setModalMessage(msg);
+    setShowModal(true);
+  };
+
+  const showSuccess = (msg) => {
+    setModalType("success");
+    setModalMessage(msg);
+    setShowModal(true);
+  };
+
+  const handleSubmitExercise = async () => {
     if (!selectedExercise || !repetitions || !duration) {
-      alert("יש למלא את כל השדות");
+      showError("יש למלא את כל השדות");
       return;
     }
 
-    const newExercise = {
+    const exerciseData = {
       exercise: selectedExercise,
       repetitions: Number(repetitions),
       duration: Number(duration),
     };
 
-    setWorkoutList([...workoutList, newExercise]);
-    setRepetitions("");
-    setDuration("");
-  };
-
-  const handleSubmitAll = async () => {
     try {
-      const response = await axios.post("http://localhost:3001/api/workouts", {
-        workouts: workoutList,
-      });
-      alert("האימון נשמר בהצלחה!");
-      setWorkoutList([]);
+      await axios.post("http://localhost:3001/api/workouts", exerciseData);
+      showSuccess("התרגיל נשלח ונשמר בהצלחה!");
+      setSelectedExercise("");
+      setRepetitions("");
+      setDuration("");
     } catch (error) {
       console.error(error);
-      alert("שגיאה בשליחה לשרת");
+      showError("שגיאה בשליחה לשרת");
     }
   };
 
@@ -102,37 +111,19 @@ export default function WorkoutEntry({ onLogout }) {
           />
         </div>
 
-        <button onClick={handleAddExercise} className={classes.button}>
-          הוסף לטבלה
+        <button onClick={handleSubmitExercise} className={classes.button}>
+          שלח
         </button>
-
-        {workoutList.length > 0 && (
-          <>
-            <table className={classes.table}>
-              <thead>
-                <tr>
-                  <th>שם תרגיל</th>
-                  <th>חזרות</th>
-                  <th>משך (שניות)</th>
-                </tr>
-              </thead>
-              <tbody>
-                {workoutList.map((ex, idx) => (
-                  <tr key={idx}>
-                    <td>{ex.exercise}</td>
-                    <td>{ex.repetitions}</td>
-                    <td>{ex.duration}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            <button onClick={handleSubmitAll} className={classes.button}>
-              שלח את כל האימון
-            </button>
-          </>
-        )}
       </main>
       <Footer />
+
+      {showModal && (
+        <MessageModal
+          type={modalType}
+          message={modalMessage}
+          onClose={() => setShowModal(false)}
+        />
+      )}
     </div>
   );
 }

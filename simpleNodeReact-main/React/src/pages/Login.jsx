@@ -76,8 +76,10 @@ export default function Login({ setUser }) {
         return;
       }
 
+      // Login successful: Set user, cookies, and redirect to home
       setUser({ name: data.username, id: data.user_id });
       Cookies.set("username", data.username);
+      Cookies.set("user_id", data.user_id); // Save user_id to cookies
       history.push("/home");
     } catch (err) {
       setError("Connection error. Please check the connection to the server.");
@@ -112,7 +114,10 @@ export default function Login({ setUser }) {
         return;
       }
 
-      history.push("/");
+      // Registration successful:
+      // Removed setUser and Cookies.set here.
+      // Redirect to the login page
+      history.push("/"); // *** THIS IS THE CHANGE ***
     } catch (err) {
       setError("Connection error. Please check the connection to the server.");
       setShowError(true);

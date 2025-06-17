@@ -70,11 +70,11 @@
 }
 
 .errorContent button:hover {
-  background-color: #2980b9;
+  background-color: #096b68;
 }
 
 .errorContent button {
-  background-color: #3498db;
+  background-color: #129990;
   color: white;
   border: none;
   padding: 8px 16px;
@@ -88,7 +88,7 @@
   width: 100%;
   max-width: 250px;
   padding: 0.5rem 1rem;
-  background-color: #90d1ca;
+  background-color: #129990;
   color: white;
   font-size: 1rem;
   border: none;
@@ -98,7 +98,7 @@
 }
 
 .button:hover {
-  background-color: #129990;
+  background-color: #096b68;
 }
 
 .link {

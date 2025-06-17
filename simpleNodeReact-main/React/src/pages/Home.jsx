@@ -25,7 +25,7 @@ export default function Home({ onLogout }) {
           </li>
           <li className={classes.linkItem}>
             <Link to="/membership" className={classes.link}>
-              רכישת מנוי
+              ניהול מנויים
             </Link>
           </li>
           <li className={classes.linkItem}>

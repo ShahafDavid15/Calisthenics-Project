@@ -1,3 +1,5 @@
+/* profile.module.css */
+
 .container {
   display: flex;
   flex-direction: column;
@@ -48,6 +50,15 @@ select.input {
   font-size: 16px;
 }
 
+/* --- Specific styling for LTR inputs (Email and Phone) --- */
+input[type="email"],
+input[type="tel"] { /* Added input[type="tel"] here */
+  text-align: left;
+  direction: ltr;
+}
+/* --- END Specific styling --- */
+
+
 .button {
   background-color: #129990;
   color: white;
@@ -74,7 +85,6 @@ select.input {
 
 .link:hover {
   text-decoration: underline;
-  background-color: #096b68;
 }
 
 .topLink {
@@ -117,5 +127,56 @@ h1 {
 }
 
 .logoutButton:hover {
+  background-color: #096b68;
+}
+
+.errorModal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.errorContent {
+  background-color: white;
+  padding: 20px;
+  border-radius: 5px;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  direction: rtl;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.errorContent h3 {
+  color: #e74c3c;
+  margin-top: 0;
+  margin-bottom: 15px;
+}
+
+.errorContent p {
+  color: #333;
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+.errorContent button {
+  background-color: #129990;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+.errorContent button:hover {
   background-color: #096b68;
 }
