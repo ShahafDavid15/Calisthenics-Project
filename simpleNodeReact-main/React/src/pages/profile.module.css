@@ -1,21 +1,20 @@
-/* profile.module.css */
-
 .container {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  position: relative;
 }
 
 .main {
-  flex: 1;
-  padding: 5px 20px 20px 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  width: 100%;
 }
 
 .title {
-  color: #129990;
+  color: #096b68;
   font-size: 24px;
   margin-bottom: 20px;
 }
@@ -31,7 +30,7 @@
 .inputContainer {
   margin-bottom: 15px;
   width: 100%;
-  max-width: 400px;
+  max-width: 350px;
   display: flex;
   justify-content: center;
 }
@@ -50,14 +49,11 @@ select.input {
   font-size: 16px;
 }
 
-/* --- Specific styling for LTR inputs (Email and Phone) --- */
 input[type="email"],
 input[type="tel"] {
-  /* Added input[type="tel"] here */
   text-align: left;
   direction: ltr;
 }
-/* --- END Specific styling --- */
 
 .button {
   background-color: #129990;
@@ -68,7 +64,7 @@ input[type="tel"] {
   border-radius: 4px;
   cursor: pointer;
   width: 100%;
-  max-width: 400px;
+  max-width: 350px;
   margin-top: 10px;
 }
 

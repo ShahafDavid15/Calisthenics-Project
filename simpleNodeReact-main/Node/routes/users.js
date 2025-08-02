@@ -1,25 +1,30 @@
 const express = require("express");
 const router = express.Router();
-const db = require("../db"); // ודא שהקובץ db.js מייצא את החיבור למסד הנתונים
+const db = require("../db");
 
-// ✅ POST - Register new user
+// POST - Register new user
+// Registers a new user with username and password after checking if username exists
 router.post("/", (req, res) => {
   const { username, password } = req.body;
 
+  // Validate required fields
   if (!username || !password) {
     return res
       .status(400)
       .json({ error: "Username and password are required" });
   }
 
+  // Check if username already exists in database
   const checkQuery = `SELECT * FROM users WHERE username = ?`;
   db.query(checkQuery, [username], (checkErr, checkResults) => {
     if (checkErr) return res.status(500).json({ error: "DB error" });
 
     if (checkResults.length > 0) {
+      // Username already taken
       return res.status(409).json({ error: "Username already exists" });
     }
 
+    // Insert new user into database
     const insertQuery = `
       INSERT INTO users (username, password)
       VALUES (?, ?)
@@ -27,6 +32,7 @@ router.post("/", (req, res) => {
     db.query(insertQuery, [username, password], (err, result) => {
       if (err) return res.status(500).json({ error: "Insert error" });
 
+      // Respond with success and user info
       res.status(201).json({
         message: "User registered",
         user_id: result.insertId,
@@ -36,16 +42,19 @@ router.post("/", (req, res) => {
   });
 });
 
-// ✅ POST - Login user
+// POST - Login user
+// Authenticates user by checking username and password match
 router.post("/login", (req, res) => {
   const { username, password } = req.body;
 
+  // Validate required fields
   if (!username || !password) {
     return res
       .status(400)
       .json({ error: "Username and password are required" });
   }
 
+  // Query for user matching username and password
   const query = `SELECT * FROM users WHERE username = ? AND password = ?`;
   db.query(query, [username, password], (err, results) => {
     if (err) {
@@ -54,11 +63,13 @@ router.post("/login", (req, res) => {
     }
 
     if (results.length === 0) {
+      // No matching user found
       return res.status(401).json({ error: "Invalid username or password" });
     }
 
     const user = results[0];
 
+    // Successful login, return user info
     res.status(200).json({
       message: "Login successful",
       user_id: user.user_id,
@@ -67,7 +78,8 @@ router.post("/login", (req, res) => {
   });
 });
 
-// ✅ GET - Get user profile by user_id
+// GET - Get user profile by user_id
+// Retrieves detailed user profile information by user ID
 router.get("/:user_id", (req, res) => {
   const { user_id } = req.params;
   const query = `
@@ -82,12 +94,14 @@ router.get("/:user_id", (req, res) => {
     }
 
     if (results.length === 0) {
+      // User not found
       return res.status(404).json({ error: "User not found" });
     }
 
     const user = results[0];
     let formattedBirthDate = "";
 
+    // Format birth_date to YYYY-MM-DD string if exists
     if (user.birth_date) {
       const dbDate = new Date(user.birth_date);
       const year = dbDate.getFullYear();
@@ -96,6 +110,7 @@ router.get("/:user_id", (req, res) => {
       formattedBirthDate = `${year}-${month}-${day}`;
     }
 
+    // Return user profile data with defaults for null values
     res.json({
       user_id: user.user_id,
       username: user.username,
@@ -109,11 +124,13 @@ router.get("/:user_id", (req, res) => {
   });
 });
 
-// ✅ POST - Update user profile
+// POST - Update user profile
+// Updates user's profile details by username
 router.post("/profile", (req, res) => {
   const { username, firstName, lastName, phone, email, birthDate, gender } =
     req.body;
 
+  // Validate all profile fields are present and not undefined
   if (
     !username ||
     firstName === undefined ||
@@ -128,6 +145,7 @@ router.post("/profile", (req, res) => {
     });
   }
 
+  // Update the user's profile in the database
   const query = `
     UPDATE users
     SET first_name = ?, last_name = ?, phone = ?, email = ?, birth_date = ?, gender = ?
@@ -144,9 +162,11 @@ router.post("/profile", (req, res) => {
       }
 
       if (result.affectedRows === 0) {
+        // No user found with given username
         return res.status(404).json({ error: "User not found" });
       }
 
+      // Successful profile update
       res.status(200).json({ message: "Profile updated successfully" });
     }
   );

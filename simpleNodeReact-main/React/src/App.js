@@ -11,8 +11,8 @@ import Profile from "./pages/Profile";
 import Membership from "./pages/Membership";
 import Workout from "./pages/Workout";
 import WorkoutDetails from "./pages/WorkoutDetails";
+import PurchaseMembership from "./pages/PurchaseMembership"; // ✅ חדש
 import React from "react";
-
 
 function App() {
   const [user, setUser] = useState(() => {
@@ -38,24 +38,43 @@ function App() {
         <Route exact path="/">
           {user ? <Redirect to="/home" /> : <Login setUser={setUser} />}
         </Route>
+
         <Route path="/signup">
           <Login setUser={setUser} />
         </Route>
+
         <Route path="/home">
           {user ? <Home onLogout={handleLogout} /> : <Redirect to="/" />}
         </Route>
+
         <Route path="/profile">
           {user ? <Profile onLogout={handleLogout} /> : <Redirect to="/" />}
         </Route>
+
         <Route path="/membership">
           {user ? <Membership onLogout={handleLogout} /> : <Redirect to="/" />}
         </Route>
+
         <Route path="/workout">
-          {user ? <Workout onLogout={handleLogout} /> : <Redirect to="/" />}
+          {user ? (
+            <Workout onLogout={handleLogout} currentUser={user} />
+          ) : (
+            <Redirect to="/" />
+          )}
         </Route>
+
         <Route path="/workoutdetails">
           {user ? (
             <WorkoutDetails onLogout={handleLogout} />
+          ) : (
+            <Redirect to="/" />
+          )}
+        </Route>
+
+        <Route path="/purchase-membership">
+          {" "}
+          {user ? (
+            <PurchaseMembership onLogout={handleLogout} currentUser={user} />
           ) : (
             <Redirect to="/" />
           )}

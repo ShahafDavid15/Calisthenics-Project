@@ -9,10 +9,15 @@ body {
   bottom: 0;
   width: 100%;
   padding: 20px;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .myP {
   color: #096b68;
+  margin: 0;
+  text-align: center;
+  direction: ltr;
 }
 
 .footer p {
@@ -24,3 +29,5 @@ body {
   color: #096b68;
   font-size: 2rem;
 }
+
+

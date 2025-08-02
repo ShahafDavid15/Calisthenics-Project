@@ -1,3 +1,4 @@
+// Import necessary components, styles, hooks, and libraries
 import Header from "../components/header/Header";
 import Footer from "../components/footer/Footer";
 import NavBar from "../components/navbar/NavBar";
@@ -13,15 +14,15 @@ export default function WorkoutEntry({ onLogout }) {
   const [repetitions, setRepetitions] = useState("");
   const [duration, setDuration] = useState("");
   const [workouts, setWorkouts] = useState([]);
-
   const [editWorkoutId, setEditWorkoutId] = useState(null);
   const [editedExercise, setEditedExercise] = useState("");
   const [editedReps, setEditedReps] = useState("");
   const [editedDuration, setEditedDuration] = useState("");
-
   const [modalMessage, setModalMessage] = useState("");
   const [modalType, setModalType] = useState("error");
   const [showModal, setShowModal] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredWorkouts, setFilteredWorkouts] = useState([]);
 
   const API_BASE = "http://localhost:3002/api/workout_exercises";
 
@@ -34,18 +35,17 @@ export default function WorkoutEntry({ onLogout }) {
   ];
 
   useEffect(() => {
-    fetchWorkouts();
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(API_BASE);
+        setWorkouts(response.data);
+      } catch (error) {
+        console.error(error);
+        showError("שגיאה בטעינת נתוני האימונים");
+      }
+    };
+    fetchData();
   }, []);
-
-  const fetchWorkouts = async () => {
-    try {
-      const response = await axios.get(API_BASE);
-      setWorkouts(response.data);
-    } catch (error) {
-      console.error(error);
-      showError("שגיאה בטעינת נתוני האימונים");
-    }
-  };
 
   const showError = (msg) => {
     setModalType("error");
@@ -65,19 +65,28 @@ export default function WorkoutEntry({ onLogout }) {
       return;
     }
 
-    const exerciseData = {
-      exercise: selectedExercise,
-      repetitions: Number(repetitions),
-      duration: Number(duration),
-    };
+    const repsValue = Number(repetitions);
+    const durationValue = Number(duration);
+
+    if (repsValue < 0 || durationValue < 0) {
+      showError("מספר חזרות וזמן חייבים להיות חיוביים");
+      return;
+    }
 
     try {
-      await axios.post(API_BASE, exerciseData);
-      await fetchWorkouts();
+      await axios.post(API_BASE, {
+        exercise: selectedExercise,
+        repetitions: repsValue,
+        duration: durationValue,
+      });
+      const response = await axios.get(API_BASE);
+      setWorkouts(response.data);
       showSuccess("התרגיל נשלח ונשמר בהצלחה!");
       setSelectedExercise("");
       setRepetitions("");
       setDuration("");
+      setSearchTerm("");
+      setFilteredWorkouts([]);
     } catch (error) {
       console.error(error);
       showError("שגיאה בשליחה לשרת");
@@ -87,8 +96,10 @@ export default function WorkoutEntry({ onLogout }) {
   const handleDelete = async (workoutId) => {
     try {
       await axios.delete(`${API_BASE}/${workoutId}`);
-      await fetchWorkouts();
+      const response = await axios.get(API_BASE);
+      setWorkouts(response.data);
       showSuccess("האימון נמחק בהצלחה!");
+      setFilteredWorkouts((prev) => prev.filter((w) => w.id !== workoutId));
     } catch (error) {
       console.error(error);
       showError("שגיאה במחיקת האימון");
@@ -110,20 +121,59 @@ export default function WorkoutEntry({ onLogout }) {
   };
 
   const handleSave = async (id) => {
+    const repsValue = Number(editedReps);
+    const durationValue = Number(editedDuration);
+
+    if (repsValue < 0 || durationValue < 0) {
+      showError("מספר חזרות וזמן חייבים להיות חיוביים");
+      return;
+    }
+
     try {
       await axios.put(`${API_BASE}/${id}`, {
         exercise: editedExercise,
-        repetitions: Number(editedReps),
-        duration: Number(editedDuration),
+        repetitions: repsValue,
+        duration: durationValue,
       });
-      await fetchWorkouts();
+      const response = await axios.get(API_BASE);
+      setWorkouts(response.data);
       setEditWorkoutId(null);
       showSuccess("העדכון נשמר בהצלחה!");
+      setFilteredWorkouts((prev) =>
+        prev.map((w) =>
+          w.id === id
+            ? {
+                ...w,
+                exercise: editedExercise,
+                repetitions: repsValue,
+                duration: durationValue,
+              }
+            : w
+        )
+      );
     } catch (error) {
-      console.error("Error response:", error.response);
+      console.error(error);
       showError("שגיאה בעדכון הנתונים");
     }
   };
+
+  const handleSearch = () => {
+    const trimmed = searchTerm.trim();
+    if (!trimmed) {
+      setFilteredWorkouts([]);
+      return;
+    }
+    const results = workouts.filter((w) => w.exercise === trimmed);
+    setFilteredWorkouts(results);
+  };
+
+  const handleClear = () => {
+    setSearchTerm("");
+    setFilteredWorkouts([]);
+  };
+
+  const displayedWorkouts =
+    filteredWorkouts.length > 0 ? filteredWorkouts : workouts;
 
   return (
     <div className={classes.container} dir="rtl">
@@ -158,6 +208,7 @@ export default function WorkoutEntry({ onLogout }) {
         <div className={classes.inputContainer}>
           <input
             type="number"
+            min="0"
             placeholder="מספר חזרות"
             className={classes.input}
             value={repetitions}
@@ -168,6 +219,7 @@ export default function WorkoutEntry({ onLogout }) {
         <div className={classes.inputContainer}>
           <input
             type="number"
+            min="0"
             placeholder="זמן (בשניות)"
             className={classes.input}
             value={duration}
@@ -181,21 +233,44 @@ export default function WorkoutEntry({ onLogout }) {
 
         <div className={classes.tableContainer}>
           <h3>היסטוריית אימונים</h3>
+
+          <div className={classes.searchBarRow}>
+            <input
+              type="text"
+              className={classes.searchInput}
+              placeholder="חפש תרגיל"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            <button
+              className={`${classes.actionButton} ${classes.updateButton}`}
+              onClick={handleSearch}
+            >
+              חפש
+            </button>
+            <button
+              className={`${classes.actionButton} ${classes.deleteButton}`}
+              onClick={handleClear}
+            >
+              נקה
+            </button>
+          </div>
+
           <table className={classes.table}>
             <thead>
               <tr>
-                <th className={classes.columnHeaderExercise}>תרגיל</th>
-                <th className={classes.columnHeaderRepetitions}>מספר חזרות</th>
-                <th className={classes.columnHeaderDuration}>זמן (שניות)</th>
-                <th className={classes.columnHeaderDate}>תאריך</th>
-                <th className={classes.columnHeaderActions}>פעולות</th>
+                <th>תרגיל</th>
+                <th>מספר חזרות</th>
+                <th>זמן (שניות)</th>
+                <th>תאריך</th>
+                <th>פעולות</th>
               </tr>
             </thead>
             <tbody>
-              {workouts.map((workout) => (
-                <tr key={workout.id}>
+              {displayedWorkouts.map((w) => (
+                <tr key={w.id}>
                   <td>
-                    {editWorkoutId === workout.id ? (
+                    {editWorkoutId === w.id ? (
                       <select
                         value={editedExercise}
                         onChange={(e) => setEditedExercise(e.target.value)}
@@ -208,42 +283,42 @@ export default function WorkoutEntry({ onLogout }) {
                         ))}
                       </select>
                     ) : (
-                      workout.exercise
+                      w.exercise
                     )}
                   </td>
                   <td>
-                    {editWorkoutId === workout.id ? (
+                    {editWorkoutId === w.id ? (
                       <input
                         type="number"
+                        min="0"
                         value={editedReps}
                         onChange={(e) => setEditedReps(e.target.value)}
                         className={classes.inlineInput}
                       />
                     ) : (
-                      workout.repetitions
+                      w.repetitions
                     )}
                   </td>
                   <td>
-                    {editWorkoutId === workout.id ? (
+                    {editWorkoutId === w.id ? (
                       <input
                         type="number"
+                        min="0"
                         value={editedDuration}
                         onChange={(e) => setEditedDuration(e.target.value)}
                         className={classes.inlineInput}
                       />
                     ) : (
-                      workout.duration
+                      w.duration
                     )}
                   </td>
+                  <td>{new Date(w.created_at).toLocaleDateString("he-IL")}</td>
                   <td>
-                    {new Date(workout.created_at).toLocaleDateString("he-IL")}
-                  </td>
-                  <td>
-                    {editWorkoutId === workout.id ? (
+                    {editWorkoutId === w.id ? (
                       <>
                         <button
                           className={`${classes.actionButton} ${classes.saveButton}`}
-                          onClick={() => handleSave(workout.id)}
+                          onClick={() => handleSave(w.id)}
                         >
                           שמור
                         </button>
@@ -257,13 +332,13 @@ export default function WorkoutEntry({ onLogout }) {
                     ) : (
                       <>
                         <button
-                          onClick={() => handleEdit(workout)}
+                          onClick={() => handleEdit(w)}
                           className={`${classes.actionButton} ${classes.updateButton}`}
                         >
                           עדכן
                         </button>
                         <button
-                          onClick={() => handleDelete(workout.id)}
+                          onClick={() => handleDelete(w.id)}
                           className={`${classes.actionButton} ${classes.deleteButton}`}
                         >
                           מחק
@@ -273,6 +348,13 @@ export default function WorkoutEntry({ onLogout }) {
                   </td>
                 </tr>
               ))}
+              {displayedWorkouts.length === 0 && (
+                <tr>
+                  <td colSpan="5" className={classes.noResultsCell}>
+                    לא נמצאו תוצאות לתרגיל "{searchTerm}"
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>

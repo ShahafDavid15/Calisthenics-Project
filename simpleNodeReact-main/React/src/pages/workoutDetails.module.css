@@ -1,10 +1,12 @@
 .container {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
   min-height: 100vh;
+  padding: 4rem;
   background-color: #fffbde;
   direction: rtl;
-  padding: 2rem;
 }
 
 .tableContainer h3 {
@@ -13,18 +15,15 @@
 }
 
 .main {
-  flex: 1;
-  padding: 5px 20px 20px 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  max-width: 1200px;
-  margin: 0 auto;
+  justify-content: center;
   width: 100%;
 }
 
 .title {
-  color: #129990;
+  color: #096b68;
   font-size: 24px;
   margin-bottom: 20px;
   text-align: center;
@@ -108,6 +107,7 @@
   margin-top: 30px;
   overflow-x: auto;
   width: 100%;
+  max-width: 900px;
 }
 
 .table {
@@ -190,6 +190,58 @@
   background-color: #da190b;
 }
 
+.searchBarContainer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  width: 100%;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.searchInput {
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  width: 200px;
+  font-size: 1rem;
+  text-align: right;
+  box-sizing: border-box;
+}
+
+.searchButton {
+  background-color: #129990;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s ease;
+}
+
+.searchButton:hover {
+  background-color: #096b68;
+}
+
+.clearSearchButton {
+  background-color: #f44336;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s ease;
+}
+
+.clearSearchButton:hover {
+  background-color: #da190b;
+}
+
 .inlineInput {
   width: 100%;
   padding: 6px;
@@ -197,6 +249,13 @@
   border-radius: 4px;
   font-size: 0.9rem;
   box-sizing: border-box;
+}
+
+.searchBarRow {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  align-items: center;
 }
 
 .table th.columnHeaderExercise {

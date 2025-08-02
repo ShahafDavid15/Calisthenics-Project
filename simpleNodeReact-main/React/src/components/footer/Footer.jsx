@@ -3,9 +3,11 @@ import React from "react";
 
 /**
  * Footer component
- * @returns JSX of component
+ * Displays a footer with the current year and author name
+ * @returns JSX element representing the footer
  */
 export default function Footer() {
+  // Get the current year dynamically
   const date = new Date().getFullYear();
 
   return (

@@ -78,10 +78,20 @@ INSERT INTO `users` (`user_id`, `username`, `password`, `first_name`, `last_name
 -- Table structure for table `user_workout`
 --
 
-CREATE TABLE `user_workout` (
-  `user_id` int(11) NOT NULL,
-  `workout_id` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+CREATE TABLE user_workouts (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  workout_date DATE NOT NULL,
+  workout_time TIME NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+  CONSTRAINT fk_user
+    FOREIGN KEY (user_id) REFERENCES users(id)
+    ON DELETE CASCADE,
+
+  UNIQUE KEY unique_booking (user_id, workout_date, workout_time)
+);
+
 
 --
 -- Dumping data for table `user_workout`

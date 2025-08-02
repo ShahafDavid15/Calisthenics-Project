@@ -10,14 +10,12 @@ export default function Membership({ onLogout }) {
   const [memberships, setMemberships] = useState([]);
   const [showError, setShowError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-
   const [editingMembershipId, setEditingMembershipId] = useState(null);
   const [currentEditData, setCurrentEditData] = useState({
     name: "",
     price: "",
     duration_days: "",
   });
-
   const [showAddForm, setShowAddForm] = useState(false);
   const [newMembershipData, setNewMembershipData] = useState({
     name: "",
@@ -26,21 +24,24 @@ export default function Membership({ onLogout }) {
   });
 
   useEffect(() => {
+    const fetchMemberships = async () => {
+      try {
+        const response = await fetch("/api/memberships");
+        if (!response.ok) throw new Error("Failed to fetch memberships");
+        const data = await response.json();
+        const sorted = data.sort((a, b) => a.price - b.price);
+        setMemberships(sorted);
+      } catch (error) {
+        showErrorMessage("Failed to load memberships");
+      }
+    };
+
     fetchMemberships();
   }, []);
 
-  const fetchMemberships = async () => {
-    try {
-      const response = await fetch("/api/memberships");
-      if (!response.ok) {
-        throw new Error("Failed to fetch memberships");
-      }
-      const data = await response.json();
-      const sortedMemberships = data.sort((a, b) => a.price - b.price);
-      setMemberships(sortedMemberships);
-    } catch (error) {
-      showErrorMessage("Failed to load memberships");
-    }
+  const showErrorMessage = (message) => {
+    setErrorMessage(message);
+    setShowError(true);
   };
 
   const handleAddSubmit = async () => {
@@ -52,25 +53,38 @@ export default function Membership({ onLogout }) {
       showErrorMessage("אנא מלא את כל השדות עבור המנוי החדש.");
       return;
     }
+
+    const priceValue = parseFloat(newMembershipData.price);
+    const durationValue = parseInt(newMembershipData.duration_days);
+
+    if (priceValue <= 0) {
+      showErrorMessage("מחיר מנוי חייב להיות חיובי.");
+      return;
+    }
+    if (durationValue <= 0) {
+      showErrorMessage("מספר ימים חייב להיות חיובי.");
+      return;
+    }
+
     try {
       const response = await fetch("/api/memberships", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: newMembershipData.name,
-          price: parseFloat(newMembershipData.price),
-          duration_days: parseInt(newMembershipData.duration_days),
+          price: priceValue,
+          duration_days: durationValue,
         }),
       });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Failed to add membership: ${errorText}`);
-      }
+      if (!response.ok) throw new Error("Failed to add membership");
 
-      fetchMemberships();
+      // Fetch again after adding
+      const res = await fetch("/api/memberships");
+      const data = await res.json();
+      const sorted = data.sort((a, b) => a.price - b.price);
+      setMemberships(sorted);
+
       setNewMembershipData({ name: "", price: "", duration_days: "" });
       setShowAddForm(false);
     } catch (error) {
@@ -98,40 +112,54 @@ export default function Membership({ onLogout }) {
 
   const handleEditChange = (e) => {
     const { name, value } = e.target;
-    setCurrentEditData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setCurrentEditData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleNewMembershipChange = (e) => {
     const { name, value } = e.target;
-    setNewMembershipData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setNewMembershipData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleUpdate = async (id) => {
+    if (
+      !currentEditData.name ||
+      currentEditData.price === "" ||
+      currentEditData.duration_days === ""
+    ) {
+      showErrorMessage("אנא מלא את כל השדות לעדכון המנוי.");
+      return;
+    }
+
+    const priceValue = parseFloat(currentEditData.price);
+    const durationValue = parseInt(currentEditData.duration_days);
+
+    if (priceValue <= 0) {
+      showErrorMessage("מחיר מנוי חייב להיות חיובי.");
+      return;
+    }
+    if (durationValue <= 0) {
+      showErrorMessage("מספר ימים חייב להיות חיובי.");
+      return;
+    }
+
     try {
       const response = await fetch(`/api/memberships/${id}`, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: currentEditData.name,
-          price: parseFloat(currentEditData.price),
-          duration_days: parseInt(currentEditData.duration_days),
+          price: priceValue,
+          duration_days: durationValue,
         }),
       });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Failed to update membership: ${errorText}`);
-      }
+      if (!response.ok) throw new Error("Failed to update membership");
 
-      fetchMemberships();
+      const res = await fetch("/api/memberships");
+      const data = await res.json();
+      const sorted = data.sort((a, b) => a.price - b.price);
+      setMemberships(sorted);
+
       cancelEditing();
     } catch (error) {
       showErrorMessage(error.message);
@@ -143,27 +171,19 @@ export default function Membership({ onLogout }) {
       const response = await fetch(`/api/memberships/${id}`, {
         method: "DELETE",
       });
+      if (!response.ok) throw new Error("Failed to delete membership");
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Failed to delete membership: ${errorText}`);
-      }
-
-      fetchMemberships();
+      const res = await fetch("/api/memberships");
+      const data = await res.json();
+      const sorted = data.sort((a, b) => a.price - b.price);
+      setMemberships(sorted);
     } catch (error) {
       showErrorMessage(error.message);
     }
   };
 
-  const showErrorMessage = (message) => {
-    setErrorMessage(message);
-    setShowError(true);
-  };
-
   const toggleAddForm = () => {
-    if (editingMembershipId) {
-      cancelEditing();
-    }
+    if (editingMembershipId) cancelEditing();
     setShowAddForm((prev) => !prev);
     if (!showAddForm) {
       setNewMembershipData({ name: "", price: "", duration_days: "" });
@@ -174,18 +194,14 @@ export default function Membership({ onLogout }) {
     <div className={classes.container}>
       <Header />
       <NavBar />
-
       <button onClick={onLogout} className={classes.logoutButton}>
         התנתקות
       </button>
-
       <Link to="/home" className={classes.topLink}>
         חזור לדף הבית
       </Link>
-
       <main className={classes.main}>
         <h2 className={classes.title}>ניהול מנויים</h2>
-
         <div className={classes.membershipsList}>
           <table className={classes.table}>
             <thead>
@@ -205,6 +221,58 @@ export default function Membership({ onLogout }) {
               </tr>
             </thead>
             <tbody>
+              {showAddForm && (
+                <tr>
+                  <td>
+                    <input
+                      type="text"
+                      name="name"
+                      placeholder="שם המנוי"
+                      value={newMembershipData.name}
+                      onChange={handleNewMembershipChange}
+                      className={classes.inlineInput}
+                      required
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="number"
+                      name="price"
+                      placeholder="מחיר"
+                      value={newMembershipData.price}
+                      onChange={handleNewMembershipChange}
+                      className={classes.inlineInput}
+                      required
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="number"
+                      name="duration_days"
+                      placeholder="מספר ימים"
+                      value={newMembershipData.duration_days}
+                      onChange={handleNewMembershipChange}
+                      className={classes.inlineInput}
+                      required
+                    />
+                  </td>
+                  <td>
+                    <button
+                      onClick={handleAddSubmit}
+                      className={`${classes.actionButton} ${classes.saveButton}`}
+                    >
+                      הוסף
+                    </button>
+                    <button
+                      onClick={() => setShowAddForm(false)}
+                      className={`${classes.actionButton} ${classes.cancelActionButton}`}
+                    >
+                      ביטול
+                    </button>
+                  </td>
+                </tr>
+              )}
+
               {memberships.map((membership) => (
                 <tr key={membership.membership_id}>
                   {editingMembershipId === membership.membership_id ? (
@@ -274,58 +342,6 @@ export default function Membership({ onLogout }) {
                   )}
                 </tr>
               ))}
-
-              {showAddForm && (
-                <tr>
-                  <td>
-                    <input
-                      type="text"
-                      name="name"
-                      placeholder="שם המנוי"
-                      value={newMembershipData.name}
-                      onChange={handleNewMembershipChange}
-                      className={classes.inlineInput}
-                      required
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="number"
-                      name="price"
-                      placeholder="מחיר"
-                      value={newMembershipData.price}
-                      onChange={handleNewMembershipChange}
-                      className={classes.inlineInput}
-                      required
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="number"
-                      name="duration_days"
-                      placeholder="מספר ימים"
-                      value={newMembershipData.duration_days}
-                      onChange={handleNewMembershipChange}
-                      className={classes.inlineInput}
-                      required
-                    />
-                  </td>
-                  <td>
-                    <button
-                      onClick={handleAddSubmit}
-                      className={`${classes.actionButton} ${classes.saveButton}`}
-                    >
-                      הוסף
-                    </button>
-                    <button
-                      onClick={() => setShowAddForm(false)}
-                      className={`${classes.actionButton} ${classes.cancelActionButton}`}
-                    >
-                      ביטול
-                    </button>
-                  </td>
-                </tr>
-              )}
             </tbody>
           </table>
         </div>

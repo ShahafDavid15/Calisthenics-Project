@@ -7,18 +7,25 @@ import classes from "./login.module.css";
 import Cookies from "js-cookie";
 import React from "react";
 
-
+/**
+ * Login component
+ * Handles both login and registration logic, based on current route (/ or /signup)
+ * @param {function} setUser - Sets the logged-in user in parent component
+ */
 export default function Login({ setUser }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState(""); // Only used during registration
   const [error, setError] = useState("");
   const [showError, setShowError] = useState(false);
+
   const history = useHistory();
   const location = useLocation();
 
+  // Determine if user is on the registration page
   const isRegistration = location.pathname === "/signup";
 
+  // Reset form state when switching between login and signup
   useEffect(() => {
     setUsername("");
     setPassword("");
@@ -27,14 +34,17 @@ export default function Login({ setUser }) {
     setShowError(false);
   }, [isRegistration]);
 
+  // Validate the form input
   const validateForm = () => {
     setError("");
 
+    // Check username validity (only letters, min 2 chars)
     if (!username || !/^[A-Za-z]{2,}$/.test(username)) {
       setError("Username must contain at least 2 letters");
       return false;
     }
 
+    // Check password validity (3-8 chars, at least 1 letter and 1 number)
     if (
       !password ||
       !/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{3,8}$/.test(password)
@@ -45,6 +55,7 @@ export default function Login({ setUser }) {
       return false;
     }
 
+    // In registration: check if passwords match
     if (isRegistration && password !== confirmPassword) {
       setError("Passwords do not match");
       return false;
@@ -53,6 +64,7 @@ export default function Login({ setUser }) {
     return true;
   };
 
+  // Handle login logic
   const handleLogin = async () => {
     if (!validateForm()) {
       setShowError(true);
@@ -76,10 +88,10 @@ export default function Login({ setUser }) {
         return;
       }
 
-      // Login successful: Set user, cookies, and redirect to home
+      // On success: set user state and cookies, navigate to home
       setUser({ name: data.username, id: data.user_id });
       Cookies.set("username", data.username);
-      Cookies.set("user_id", data.user_id); // Save user_id to cookies
+      Cookies.set("user_id", data.user_id);
       history.push("/home");
     } catch (err) {
       setError("Connection error. Please check the connection to the server.");
@@ -87,6 +99,7 @@ export default function Login({ setUser }) {
     }
   };
 
+  // Handle registration logic
   const handleRegistration = async () => {
     if (!validateForm()) {
       setShowError(true);
@@ -114,20 +127,20 @@ export default function Login({ setUser }) {
         return;
       }
 
-      // Registration successful:
-      // Removed setUser and Cookies.set here.
-      // Redirect to the login page
-      history.push("/"); // *** THIS IS THE CHANGE ***
+      // On success: redirect to login page
+      history.push("/");
     } catch (err) {
       setError("Connection error. Please check the connection to the server.");
       setShowError(true);
     }
   };
 
+  // Close the error modal
   const closeErrorModel = () => {
     setShowError(false);
   };
 
+  // Choose handler based on current mode
   const handleSubmit = isRegistration ? handleRegistration : handleLogin;
 
   return (
@@ -135,10 +148,12 @@ export default function Login({ setUser }) {
       <Header />
       <NavBar />
       <main className={classes.main}>
+        {/* Title changes depending on login or registration */}
         <h2 className={classes.title}>
           {isRegistration ? "Register" : "Login"}
         </h2>
 
+        {/* Username input */}
         <div className={classes.inputContainer}>
           <input
             id="username"
@@ -150,6 +165,7 @@ export default function Login({ setUser }) {
           />
         </div>
 
+        {/* Password input */}
         <div className={classes.inputContainer}>
           <input
             id="password"
@@ -161,6 +177,7 @@ export default function Login({ setUser }) {
           />
         </div>
 
+        {/* Confirm password input (only for registration) */}
         {isRegistration && (
           <div className={classes.inputContainer}>
             <input
@@ -174,10 +191,12 @@ export default function Login({ setUser }) {
           </div>
         )}
 
+        {/* Submit button */}
         <button className={classes.button} onClick={handleSubmit}>
           {isRegistration ? "Register" : "Login"}
         </button>
 
+        {/* Link to switch between login and register */}
         <p>
           <Link to={isRegistration ? "/" : "/signup"} className={classes.link}>
             {isRegistration
@@ -186,6 +205,7 @@ export default function Login({ setUser }) {
           </Link>
         </p>
 
+        {/* Error modal */}
         {showError && (
           <div className={classes.errorModel}>
             <div className={classes.errorContent}>
