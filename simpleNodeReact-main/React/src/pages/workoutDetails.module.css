@@ -1,3 +1,4 @@
+/* Container for the entire page layout with RTL direction */
 .container {
   display: flex;
   flex-direction: column;
@@ -9,11 +10,13 @@
   direction: rtl;
 }
 
+/* Heading style inside the table container */
 .tableContainer h3 {
   text-align: center;
   color: #096b68;
 }
 
+/* Main content area styling */
 .main {
   display: flex;
   flex-direction: column;
@@ -22,6 +25,7 @@
   width: 100%;
 }
 
+/* Title style */
 .title {
   color: #096b68;
   font-size: 24px;
@@ -29,6 +33,7 @@
   text-align: center;
 }
 
+/* Container for input elements */
 .inputContainer {
   margin-bottom: 15px;
   width: 100%;
@@ -37,6 +42,7 @@
   justify-content: center;
 }
 
+/* Common input field style */
 .input {
   width: 100%;
   padding: 10px;
@@ -46,6 +52,7 @@
   text-align: right;
 }
 
+/* General button style */
 .button {
   background-color: #129990;
   color: white;
@@ -59,10 +66,12 @@
   margin-top: 10px;
 }
 
+/* Button hover effect */
 .button:hover {
   background-color: #096b68;
 }
 
+/* Logout button style and position */
 .logoutButton {
   position: absolute;
   top: 20px;
@@ -79,10 +88,12 @@
   transition: background-color 0.3s ease;
 }
 
+/* Logout button hover effect */
 .logoutButton:hover {
   background-color: #096b68;
 }
 
+/* Top navigation link style */
 .topLink {
   display: block;
   width: 100%;
@@ -97,12 +108,14 @@
   margin-top: 15px;
 }
 
+/* Top link hover effect */
 .topLink:hover {
   color: #096b68;
   text-decoration: underline;
   transform: translateY(-3px);
 }
 
+/* Container for the workout history table with horizontal scrolling */
 .tableContainer {
   margin-top: 30px;
   overflow-x: auto;
@@ -110,6 +123,7 @@
   max-width: 900px;
 }
 
+/* Styling for the workout history table */
 .table {
   width: 100%;
   max-width: 900px;
@@ -121,6 +135,7 @@
   overflow: hidden;
 }
 
+/* Common styles for table header cells and data cells */
 .table th,
 .table td {
   padding: 12px;
@@ -129,22 +144,26 @@
   vertical-align: middle;
 }
 
+/* Table header row style */
 .table th {
   background-color: #f5f5f5;
   font-weight: bold;
   color: #333;
 }
 
+/* Table row hover effect */
 .table tr:hover {
   background-color: #f9f9f9;
 }
 
+/* Last table cell style to align action buttons */
 .table td:last-child {
   display: flex;
   gap: 5px;
   justify-content: center;
 }
 
+/* Base style for action buttons */
 .actionButton {
   padding: 6px 12px;
   border: none;
@@ -154,42 +173,51 @@
   transition: background-color 0.2s;
 }
 
+/* Update button style */
 .updateButton {
   background-color: #129990;
   color: white;
 }
 
+/* Update button hover effect */
 .updateButton:hover {
   background-color: #096b68;
 }
 
+/* Delete button style */
 .deleteButton {
   background-color: #f44336;
   color: white;
 }
 
+/* Delete button hover effect */
 .deleteButton:hover {
   background-color: #da190b;
 }
 
+/* Save button style */
 .saveButton {
   background-color: #129990;
   color: white;
 }
 
+/* Save button hover effect */
 .saveButton:hover {
   background-color: #096b68;
 }
 
+/* Cancel action button style */
 .cancelActionButton {
   background-color: #f44336;
   color: white;
 }
 
+/* Cancel action button hover effect */
 .cancelActionButton:hover {
   background-color: #da190b;
 }
 
+/* Container for search bar section */
 .searchBarContainer {
   display: flex;
   justify-content: flex-end;
@@ -202,6 +230,7 @@
   margin-right: auto;
 }
 
+/* Search input field style */
 .searchInput {
   padding: 0.5rem;
   border: 1px solid #ccc;
@@ -212,6 +241,7 @@
   box-sizing: border-box;
 }
 
+/* Search button style */
 .searchButton {
   background-color: #129990;
   color: white;
@@ -223,10 +253,12 @@
   transition: background-color 0.2s ease;
 }
 
+/* Search button hover effect */
 .searchButton:hover {
   background-color: #096b68;
 }
 
+/* Clear search button style */
 .clearSearchButton {
   background-color: #f44336;
   color: white;
@@ -238,10 +270,12 @@
   transition: background-color 0.2s ease;
 }
 
+/* Clear search button hover effect */
 .clearSearchButton:hover {
   background-color: #da190b;
 }
 
+/* Inline input fields inside table cells */
 .inlineInput {
   width: 100%;
   padding: 6px;
@@ -251,6 +285,7 @@
   box-sizing: border-box;
 }
 
+/* Search bar row layout */
 .searchBarRow {
   display: flex;
   gap: 8px;
@@ -258,18 +293,22 @@
   align-items: center;
 }
 
+/* Padding adjustment for Exercise column header */
 .table th.columnHeaderExercise {
   padding-right: 35px;
 }
 
+/* Padding adjustment for Repetitions column header */
 .table th.columnHeaderRepetitions {
   padding-left: 30px;
 }
 
+/* Padding adjustment for Actions column header */
 .table th.columnHeaderActions {
   padding-right: 100px;
 }
 
+/* Padding adjustment for Date column header */
 .table th.columnHeaderDate {
   padding-right: 25px;
 }

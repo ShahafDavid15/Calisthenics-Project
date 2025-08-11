@@ -1,26 +1,30 @@
-// Import necessary components, styles, hooks, and libraries
+import React, { useState, useEffect } from "react";
 import Header from "../components/header/Header";
 import Footer from "../components/footer/Footer";
 import NavBar from "../components/navbar/NavBar";
-import classes from "./workoutDetails.module.css";
-import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import axios from "axios";
-import React from "react";
 import MessageModal from "../components/messagemodal/MessageModal";
+import classes from "./workoutDetails.module.css";
+import axios from "axios";
+import { Link } from "react-router-dom";
 
-export default function WorkoutEntry({ onLogout }) {
+export default function WorkoutEntry({ onLogout, currentUser }) {
+  const userId = currentUser?.id;
+
   const [selectedExercise, setSelectedExercise] = useState("");
   const [repetitions, setRepetitions] = useState("");
   const [duration, setDuration] = useState("");
+
   const [workouts, setWorkouts] = useState([]);
+
   const [editWorkoutId, setEditWorkoutId] = useState(null);
   const [editedExercise, setEditedExercise] = useState("");
   const [editedReps, setEditedReps] = useState("");
   const [editedDuration, setEditedDuration] = useState("");
+
   const [modalMessage, setModalMessage] = useState("");
-  const [modalType, setModalType] = useState("error");
+  const [modalType, setModalType] = useState("error"); // "error" או "success"
   const [showModal, setShowModal] = useState(false);
+
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredWorkouts, setFilteredWorkouts] = useState([]);
 
@@ -34,18 +38,22 @@ export default function WorkoutEntry({ onLogout }) {
     "בטן",
   ];
 
+  // טעינת אימונים של המשתמש
   useEffect(() => {
+    if (!userId) return;
+
     const fetchData = async () => {
       try {
-        const response = await axios.get(API_BASE);
+        const response = await axios.get(`${API_BASE}?user_id=${userId}`);
         setWorkouts(response.data);
       } catch (error) {
         console.error(error);
         showError("שגיאה בטעינת נתוני האימונים");
       }
     };
+
     fetchData();
-  }, []);
+  }, [userId]);
 
   const showError = (msg) => {
     setModalType("error");
@@ -59,6 +67,7 @@ export default function WorkoutEntry({ onLogout }) {
     setShowModal(true);
   };
 
+  // הוספת אימון חדש - POST
   const handleSubmitExercise = async () => {
     if (!selectedExercise || !repetitions || !duration) {
       showError("יש למלא את כל השדות");
@@ -73,14 +82,23 @@ export default function WorkoutEntry({ onLogout }) {
       return;
     }
 
+    if (!userId) {
+      showError("משתמש לא מזוהה");
+      return;
+    }
+
     try {
       await axios.post(API_BASE, {
+        user_id: userId,
         exercise: selectedExercise,
         repetitions: repsValue,
         duration: durationValue,
       });
-      const response = await axios.get(API_BASE);
+
+      // רענון הרשימה לאחר הוספה
+      const response = await axios.get(`${API_BASE}?user_id=${userId}`);
       setWorkouts(response.data);
+
       showSuccess("התרגיל נשלח ונשמר בהצלחה!");
       setSelectedExercise("");
       setRepetitions("");
@@ -93,11 +111,15 @@ export default function WorkoutEntry({ onLogout }) {
     }
   };
 
+  // מחיקת אימון לפי id
   const handleDelete = async (workoutId) => {
     try {
       await axios.delete(`${API_BASE}/${workoutId}`);
-      const response = await axios.get(API_BASE);
+
+      // רענון הרשימה לאחר מחיקה
+      const response = await axios.get(`${API_BASE}?user_id=${userId}`);
       setWorkouts(response.data);
+
       showSuccess("האימון נמחק בהצלחה!");
       setFilteredWorkouts((prev) => prev.filter((w) => w.id !== workoutId));
     } catch (error) {
@@ -106,6 +128,7 @@ export default function WorkoutEntry({ onLogout }) {
     }
   };
 
+  // התחלת עריכה של אימון קיים
   const handleEdit = (workout) => {
     setEditWorkoutId(workout.id);
     setEditedExercise(workout.exercise);
@@ -120,6 +143,7 @@ export default function WorkoutEntry({ onLogout }) {
     setEditedDuration("");
   };
 
+  // שמירת עריכות
   const handleSave = async (id) => {
     const repsValue = Number(editedReps);
     const durationValue = Number(editedDuration);
@@ -135,28 +159,20 @@ export default function WorkoutEntry({ onLogout }) {
         repetitions: repsValue,
         duration: durationValue,
       });
-      const response = await axios.get(API_BASE);
+
+      // רענון הרשימה אחרי שמירה
+      const response = await axios.get(`${API_BASE}?user_id=${userId}`);
       setWorkouts(response.data);
       setEditWorkoutId(null);
+
       showSuccess("העדכון נשמר בהצלחה!");
-      setFilteredWorkouts((prev) =>
-        prev.map((w) =>
-          w.id === id
-            ? {
-                ...w,
-                exercise: editedExercise,
-                repetitions: repsValue,
-                duration: durationValue,
-              }
-            : w
-        )
-      );
     } catch (error) {
       console.error(error);
       showError("שגיאה בעדכון הנתונים");
     }
   };
 
+  // חיפוש לפי שם אימון מדויק
   const handleSearch = () => {
     const trimmed = searchTerm.trim();
     if (!trimmed) {
@@ -179,14 +195,11 @@ export default function WorkoutEntry({ onLogout }) {
     <div className={classes.container} dir="rtl">
       <Header />
       <NavBar />
+
       <main className={classes.main}>
         <button onClick={onLogout} className={classes.logoutButton}>
           התנתקות
         </button>
-
-        <Link to="/home" className={classes.topLink}>
-          חזור לדף הבית
-        </Link>
 
         <h2 className={classes.title}>הזנת נתוני אימון</h2>
 
@@ -196,7 +209,7 @@ export default function WorkoutEntry({ onLogout }) {
             value={selectedExercise}
             onChange={(e) => setSelectedExercise(e.target.value)}
           >
-            <option value=""> בחר תרגיל </option>
+            <option value="">בחר תרגיל</option>
             {predefinedExercises.map((ex, i) => (
               <option key={i} value={ex}>
                 {ex}
@@ -267,6 +280,13 @@ export default function WorkoutEntry({ onLogout }) {
               </tr>
             </thead>
             <tbody>
+              {displayedWorkouts.length === 0 && (
+                <tr>
+                  <td colSpan="5" className={classes.noResultsCell}>
+                    לא נמצאו תוצאות לתרגיל "{searchTerm}"
+                  </td>
+                </tr>
+              )}
               {displayedWorkouts.map((w) => (
                 <tr key={w.id}>
                   <td>
@@ -348,17 +368,11 @@ export default function WorkoutEntry({ onLogout }) {
                   </td>
                 </tr>
               ))}
-              {displayedWorkouts.length === 0 && (
-                <tr>
-                  <td colSpan="5" className={classes.noResultsCell}>
-                    לא נמצאו תוצאות לתרגיל "{searchTerm}"
-                  </td>
-                </tr>
-              )}
             </tbody>
           </table>
         </div>
       </main>
+
       <Footer />
 
       {showModal && (

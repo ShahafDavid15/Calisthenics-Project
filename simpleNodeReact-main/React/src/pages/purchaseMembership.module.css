@@ -1,17 +1,19 @@
+/* Container for the entire page, using flex column layout centered horizontally */
+/* Sets min height to full viewport and applies RTL text direction */
 .container {
-  position: relative;
   display: flex;
   flex-direction: column;
-  align-items: center; /* ממרכז כל התוכן לרוחב */
+  align-items: center;
   justify-content: flex-start;
   min-height: 100vh;
-  padding: 2rem;
   background-color: #fffbde;
   direction: rtl;
-  font-family: Arial, sans-serif;
-  box-sizing: border-box;
 }
 
+/* Logout button fixed at top-left corner */
+/* Styled with background color, padding, small font size, rounded corners */
+/* Uses z-index to stay on top */
+/* Smooth background-color transition on hover */
 .logoutButton {
   position: absolute;
   top: 20px;
@@ -28,59 +30,73 @@
   transition: background-color 0.2s;
 }
 
+/* Darker background color on hover for logout button */
 .logoutButton:hover {
   background-color: #096b68;
 }
 
+/* Top navigation link, styled as block with max width */
+/* Light background, centered text, smooth color and position transition */
+/* Margin bottom separates it from content below */
 .topLink {
   display: block;
-  max-width: 400px; /* רוחב אחיד */
   width: 100%;
-  padding: 0.8rem;
-  font-size: 1.1rem;
+  max-width: 400px;
+  padding: 1rem;
+  font-size: 1.2rem;
   color: #129990;
   background-color: #fffbde;
   text-align: center;
   transition: all 0.3s ease;
   text-decoration: none;
-  user-select: none;
-  margin: 0 auto 1.5rem auto; /* מרכז והפרדה מתחת */
+  margin-bottom: 15px;
 }
 
+/* Hover effects for topLink: color change, slight upward move, underline */
 .topLink:hover {
   color: #096b68;
   transform: translateY(-3px);
   text-decoration: underline;
 }
 
+/* Main content area styles */
+/* Flex grow to fill vertical space, column direction, center alignment */
+/* Padding inside container, and RTL direction for text */
 .main {
   flex: 1;
-  padding: 1.5rem;
-  max-width: 400px; /* רוחב מוגבל למרכז */
-  margin: 0 auto;
-  width: 100%;
+  padding: 5px 20px 20px 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  direction: rtl;
 }
 
+/* Title styling: color, font size, margin below */
 .title {
-  text-align: center;
-  margin-bottom: 1.5rem;
   color: #096b68;
+  font-size: 24px;
+  margin-bottom: 20px;
 }
 
+/* Container for memberships list with bottom margin and full width */
 .membershipsList {
   margin-bottom: 2rem;
   width: 100%;
 }
 
+/* Reset list styling for membership cards */
 .membershipCards {
   list-style: none;
   padding: 0;
   margin: 0;
 }
 
+/* Individual membership card styles */
+/* White background, padding, margin spacing, rounded corners */
+/* Slight box shadow for subtle depth */
+/* Flex layout to align content horizontally with gap */
+/* Cursor pointer and smooth background transition on hover/focus */
+/* Remove default outline but use background change for focus accessibility */
 .membershipItem {
   background-color: white;
   padding: 1rem 1.5rem;
@@ -96,16 +112,21 @@
   outline: none;
 }
 
+/* Change background color on hover or keyboard focus for better UI feedback */
 .membershipItem:hover,
 .membershipItem:focus {
   background-color: #e6f3f2;
 }
 
+/* Increase size of radio input and cursor pointer */
 .membershipItem input[type="radio"] {
   transform: scale(1.3);
   cursor: pointer;
 }
 
+/* Membership info section laid out as a grid */
+/* Three columns: name, price, duration */
+/* Align text right-to-left and set color and font size */
 .membershipInfo {
   display: grid;
   grid-template-columns: 1fr 80px 80px;
@@ -116,6 +137,8 @@
   gap: 1rem;
 }
 
+/* Price container uses inline-flex for horizontal layout */
+/* Small gap between currency and amount */
 .membershipPrice {
   display: inline-flex;
   flex-direction: row;
@@ -124,14 +147,18 @@
   justify-content: flex-start;
 }
 
+/* Currency symbol order forced first */
 .currency {
   order: 0;
 }
 
+/* Price number order forced second */
 .membershipPrice > span:last-child {
   order: 1;
 }
 
+/* Duration container similar inline-flex layout with gap */
+/* Styled with matching color and font size */
 .membershipDuration {
   display: inline-flex;
   flex-direction: row;
@@ -142,18 +169,26 @@
   justify-content: flex-start;
 }
 
+/* Duration text order first */
 .durationText {
   order: 0;
 }
 
+/* Number order second */
 .membershipDuration > span:last-child {
   order: 1;
 }
 
+/* Additional left padding for basic membership info */
 .basicItem .membershipInfo {
   padding-left: 30px;
 }
 
+/* Purchase button styles */
+/* Green background, white text, rounded corners */
+/* Padding and font size for easy clicking */
+/* Limited max width for desktop, full width on smaller screens */
+/* Smooth color transition on hover */
 .purchaseButton {
   background-color: #129990;
   color: white;
@@ -169,30 +204,40 @@
   transition: background-color 0.2s ease;
 }
 
+/* Darker green background on hover, but only if button is not disabled */
 .purchaseButton:hover:not(:disabled) {
   background-color: #096b68;
 }
 
+/* Disabled state styles: lighter color and no pointer cursor */
 .purchaseButton:disabled {
   background-color: #7fb8b6;
   cursor: not-allowed;
 }
 
+/* Responsive styles for tablets and smaller devices */
 @media (max-width: 768px) {
+  /* Reduce main padding and allow wider width */
   .main {
     padding: 1rem;
     max-width: 95%;
   }
+
+  /* Smaller logout button font size and padding for narrow screens */
   .logoutButton {
     font-size: 10px;
     padding: 5px 10px;
     min-width: 70px;
   }
+
+  /* Smaller font and padding for top link, full width */
   .topLink {
     font-size: 1rem;
     padding: 0.8rem;
     max-width: 100%;
   }
+
+  /* Make purchase button full width on smaller screens */
   .purchaseButton {
     max-width: 100%;
   }

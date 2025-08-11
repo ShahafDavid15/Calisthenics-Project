@@ -1,3 +1,4 @@
+/* Overlay that covers the entire screen with a semi-transparent black background */
 .modalOverlay {
   position: fixed;
   top: 0;
@@ -11,6 +12,7 @@
   z-index: 1000;
 }
 
+/* Modal container with white background, padding, rounded corners, and centered text */
 .modalContent {
   background-color: white;
   padding: 2rem;
@@ -20,13 +22,15 @@
   width: 90%;
 }
 
+/* Container for buttons with horizontal layout and spacing between them */
 .buttonGroup {
   display: flex;
   justify-content: center;
-  gap: 8px; /* מרווח בין הכפתורים */
+  gap: 8px; /* space between buttons */
   margin-top: 20px;
 }
 
+/* Confirm button styling: teal background, white text, padding, rounded corners */
 .confirmBtn {
   background-color: #129990;
   color: white;
@@ -37,10 +41,12 @@
   transition: background-color 0.2s ease;
 }
 
+/* Confirm button hover effect: darker teal */
 .confirmBtn:hover {
   background-color: #096b68;
 }
 
+/* Cancel button styling: red background, white text, padding, rounded corners */
 .cancelBtn {
   background-color: #dc3545;
   color: white;
@@ -51,6 +57,7 @@
   transition: background-color 0.2s ease;
 }
 
+/* Cancel button hover effect: darker red */
 .cancelBtn:hover {
   background-color: #c82333;
 }

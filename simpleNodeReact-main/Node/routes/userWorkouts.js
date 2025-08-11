@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const db = require("../db");
 
-// GET אימונים של משתמש לפי user_id
+// GET user workouts by user_id
 router.get("/", (req, res) => {
   const userId = req.query.user_id;
   if (!userId) {
@@ -11,6 +11,7 @@ router.get("/", (req, res) => {
 
   const query = `
     SELECT 
+      id, 
       DATE_FORMAT(workout_date, '%Y-%m-%d') AS workout_date,
       TIME_FORMAT(workout_time, '%H:%i') AS workout_time
     FROM user_workouts
@@ -27,7 +28,7 @@ router.get("/", (req, res) => {
   });
 });
 
-// POST - הרשמה לאימון חדש עם בדיקה למניעת יותר מאימון אחד ביום
+// POST - Register a new workout booking
 router.post("/", (req, res) => {
   const { user_id, workout_date, workout_time } = req.body;
   if (!user_id || !workout_date || !workout_time) {
@@ -36,7 +37,7 @@ router.post("/", (req, res) => {
       .json({ error: "Missing user_id, workout_date or workout_time" });
   }
 
-  // בדיקה האם כבר קיים אימון באותו יום למשתמש
+  // Check if user already booked a workout on the same date
   const checkQuery = `
     SELECT COUNT(*) AS count FROM user_workouts
     WHERE user_id = ? AND workout_date = ?
@@ -54,7 +55,7 @@ router.post("/", (req, res) => {
         .json({ error: "User already booked a workout this day" });
     }
 
-    // אם אין אימון באותו יום, מבצעים הוספה
+    // Insert new booking
     const insertQuery = `
       INSERT INTO user_workouts (user_id, workout_date, workout_time)
       VALUES (?, ?, ?)
@@ -82,22 +83,15 @@ router.post("/", (req, res) => {
   });
 });
 
-// DELETE - ביטול הרשמה לאימון
-router.delete("/", (req, res) => {
-  const { user_id, workout_date, workout_time } = req.body;
-
-  if (!user_id || !workout_date || !workout_time) {
-    return res
-      .status(400)
-      .json({ error: "Missing user_id, workout_date or workout_time" });
+// DELETE - Cancel a workout booking by id (from URL param)
+router.delete("/:id", (req, res) => {
+  const id = req.params.id;
+  if (!id) {
+    return res.status(400).json({ error: "Missing id" });
   }
 
-  const query = `
-    DELETE FROM user_workouts
-    WHERE user_id = ? AND workout_date = ? AND workout_time = ?
-  `;
-
-  db.query(query, [user_id, workout_date, workout_time], (err, result) => {
+  const query = `DELETE FROM user_workouts WHERE id = ?`;
+  db.query(query, [id], (err, result) => {
     if (err) {
       console.error("Delete error:", err);
       return res.status(500).json({ error: "Delete error" });
@@ -113,30 +107,29 @@ router.delete("/", (req, res) => {
   });
 });
 
-// GET - ספירת משתתפים בכל אימון
+// GET all participants counts grouped by workout_date and workout_time
 router.get("/all-participants", (req, res) => {
   const query = `
     SELECT 
-      DATE_FORMAT(workout_date, '%Y-%m-%d') AS workout_date,
+      workout_date, 
       TIME_FORMAT(workout_time, '%H:%i') AS workout_time,
-      COUNT(*) AS count
+      COUNT(*) AS participant_count
     FROM user_workouts
     GROUP BY workout_date, workout_time
   `;
 
   db.query(query, (err, results) => {
     if (err) {
-      console.error("All participants query error:", err);
+      console.error("Error fetching participants counts:", err);
       return res.status(500).json({ error: "DB error" });
     }
 
-    const formatted = {};
-    results.forEach(({ workout_date, workout_time, count }) => {
-      const key = `${workout_date.trim()}|${workout_time.trim()}`;
-      formatted[key] = count;
+    const counts = {};
+    results.forEach(({ workout_date, workout_time, participant_count }) => {
+      counts[`${workout_date}|${workout_time}`] = participant_count;
     });
 
-    res.json(formatted);
+    res.json(counts);
   });
 });
 

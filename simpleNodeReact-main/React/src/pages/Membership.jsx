@@ -3,10 +3,9 @@ import Footer from "../components/footer/Footer";
 import NavBar from "../components/navbar/NavBar";
 import classes from "./membership.module.css";
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
 import React from "react";
 
-export default function Membership({ onLogout }) {
+export default function Membership({ onLogout, currentUser }) {
   const [memberships, setMemberships] = useState([]);
   const [showError, setShowError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -79,7 +78,6 @@ export default function Membership({ onLogout }) {
 
       if (!response.ok) throw new Error("Failed to add membership");
 
-      // Fetch again after adding
       const res = await fetch("/api/memberships");
       const data = await res.json();
       const sorted = data.sort((a, b) => a.price - b.price);
@@ -184,7 +182,9 @@ export default function Membership({ onLogout }) {
 
   const toggleAddForm = () => {
     if (editingMembershipId) cancelEditing();
+
     setShowAddForm((prev) => !prev);
+
     if (!showAddForm) {
       setNewMembershipData({ name: "", price: "", duration_days: "" });
     }
@@ -193,15 +193,14 @@ export default function Membership({ onLogout }) {
   return (
     <div className={classes.container}>
       <Header />
-      <NavBar />
+      <NavBar currentUser={currentUser} />
       <button onClick={onLogout} className={classes.logoutButton}>
         התנתקות
       </button>
-      <Link to="/home" className={classes.topLink}>
-        חזור לדף הבית
-      </Link>
+
       <main className={classes.main}>
         <h2 className={classes.title}>ניהול מנויים</h2>
+
         <div className={classes.membershipsList}>
           <table className={classes.table}>
             <thead>

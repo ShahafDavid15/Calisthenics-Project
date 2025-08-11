@@ -1,3 +1,4 @@
+/* Main container of the page layout */
 .container {
   display: flex;
   flex-direction: column;
@@ -5,14 +6,17 @@
   position: relative;
 }
 
+/* Main content area */
 .main {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   width: 100%;
+  padding-bottom: 50px;
 }
 
+/* Welcome text block */
 .text {
   font-size: 1.5rem;
   color: #333;
@@ -22,38 +26,7 @@
   max-width: 600px;
 }
 
-.linkList {
-  list-style-type: none;
-  padding: 0;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  gap: 1.2rem;
-}
-
-.linkItem {
-  width: 100%;
-  max-width: 300px;
-}
-
-.link {
-  display: block;
-  width: 100%;
-  padding: 1rem;
-  font-size: 1.2rem;
-  color: #129990;
-  background-color: #fffbde;
-  text-align: center;
-  transition: all 0.3s ease;
-  text-decoration: none;
-}
-
-.link:hover {
-  color: #096b68;
-  transform: translateY(-3px);
-  text-decoration: underline;
-}
-
+/* Image styling (calisthenics) */
 .pic {
   margin-left: 2rem;
   margin-bottom: 3rem;
@@ -62,13 +35,7 @@
   border-radius: 10px;
 }
 
-.container {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
-
+/* Logout button (positioned at the top-left) */
 .logoutButton {
   position: absolute;
   top: 20px;
@@ -84,10 +51,12 @@
   z-index: 1000;
 }
 
+/* Hover effect for logout button */
 .logoutButton:hover {
   background-color: #096b68;
 }
 
+/* Container for displaying user's booked workouts */
 .userWorkouts {
   margin-top: 2rem;
   background-color: #f9f9f9;
@@ -99,17 +68,20 @@
   text-align: right;
 }
 
+/* Header inside the workout section */
 .userWorkouts h3 {
   color: #129990;
   margin-bottom: 1rem;
 }
 
+/* List of workouts */
 .workoutList {
   list-style-type: none;
   padding: 0;
   margin: 0;
 }
 
+/* Each workout item */
 .workoutList li {
   background-color: #fff;
   border: 1px solid #ddd;
@@ -119,9 +91,10 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  direction: rtl;
+  direction: rtl; /* Right-to-left for Hebrew text */
 }
 
+/* Button to cancel a workout */
 .cancelButton {
   background-color: #d32f2f;
   color: white;
@@ -132,13 +105,35 @@
   font-size: 14px;
 }
 
+/* Hover effect for cancel button */
 .cancelButton:hover {
   background-color: #b71c1c;
 }
 
+/* Success or error message styling */
 .message {
   margin-top: 1rem;
   color: green;
   font-weight: bold;
   text-align: center;
+}
+
+.pastWorkout {
+  color: gray;
+  opacity: 0.6;
+  pointer-events: none; /* מונע לחיצה על הלינקים או הכפתורים */
+}
+
+.cancelButton {
+  margin-left: 10px;
+  background-color: #e74c3c;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 5px 10px;
+  border-radius: 4px;
+}
+
+.cancelButton:hover {
+  background-color: #c0392b;
 }

@@ -3,17 +3,23 @@ const router = express.Router();
 const { client } = require("../utils/paypalClient");
 const checkoutNodeJssdk = require("@paypal/checkout-server-sdk");
 
-// יצירת הזמנה
+// -------------------------------------
+// POST /create-order
+// Create a new PayPal order with the specified amount
+// Validates the amount is present and a positive number
+// -------------------------------------
 router.post("/create-order", async (req, res) => {
   const { amount } = req.body;
 
-  console.log("בקשת יצירת הזמנה התקבלה:", req.body);
+  console.log("Received create order request:", req.body);
 
-  if (!amount || isNaN(amount)) {
-    console.warn("סכום לא תקין או חסר");
-    return res.status(400).json({ error: "סכום לא תקין או חסר" });
+  // Validate amount exists and is a positive number
+  if (!amount || isNaN(amount) || parseFloat(amount) <= 0) {
+    console.warn("Invalid or missing amount");
+    return res.status(400).json({ error: "Invalid or missing amount" });
   }
 
+  // Build PayPal order creation request
   const request = new checkoutNodeJssdk.orders.OrdersCreateRequest();
   request.prefer("return=representation");
   request.requestBody({
@@ -29,36 +35,58 @@ router.post("/create-order", async (req, res) => {
   });
 
   try {
+    // Execute the order creation request with PayPal
     const order = await client().execute(request);
-    console.log("הזמנה נוצרה:", order.result.id);
+
+    if (!order || !order.result || !order.result.id) {
+      throw new Error("Invalid order response from PayPal");
+    }
+
+    console.log("Order created with ID:", order.result.id);
+
+    // Return the PayPal order ID to the client
     res.json({ orderID: order.result.id });
   } catch (err) {
-    console.error("שגיאה ביצירת הזמנה:", err.message);
-    res.status(500).json({ error: "יצירת ההזמנה נכשלה" });
+    console.error("Error creating order:", err);
+    res
+      .status(500)
+      .json({ error: "Order creation failed", details: err.message });
   }
 });
 
-// אישור תשלום
+// -------------------------------------
+// POST /capture-order
+// Capture payment for an existing PayPal order by orderID
+// Validates orderID presence and type
+// -------------------------------------
 router.post("/capture-order", async (req, res) => {
   const { orderID } = req.body;
 
-  console.log("בקשת אישור תשלום:", req.body);
+  console.log("Received capture order request:", req.body);
 
+  // Validate orderID exists and is a string
   if (!orderID || typeof orderID !== "string") {
-    console.warn("מזהה הזמנה חסר או לא תקין");
-    return res.status(400).json({ error: "מזהה הזמנה חסר או לא תקין" });
+    console.warn("Missing or invalid orderID");
+    return res.status(400).json({ error: "Missing or invalid orderID" });
   }
 
+  // Build PayPal capture request for the specified orderID
   const request = new checkoutNodeJssdk.orders.OrdersCaptureRequest(orderID);
   request.requestBody({});
 
   try {
+    // Execute the capture request with PayPal
     const capture = await client().execute(request);
-    console.log("תשלום אושר:", capture.result.id);
+
+    console.log("Payment captured with ID:", capture.result.id);
+
+    // Return full capture result to client
     res.json(capture.result);
   } catch (err) {
-    console.error("שגיאה באישור תשלום:", err.message);
-    res.status(500).json({ error: "אישור התשלום נכשל" });
+    console.error("Error capturing payment:", err);
+    res
+      .status(500)
+      .json({ error: "Payment capture failed", details: err.message });
   }
 });
 

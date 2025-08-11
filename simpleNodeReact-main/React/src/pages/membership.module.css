@@ -1,32 +1,37 @@
+/* Container for the entire page layout */
 .container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  min-height: 100vh;
+  min-height: 100vh; /* Full viewport height */
   padding: 2rem;
   background-color: #fffbde;
-  direction: rtl;
+  direction: rtl; /* Right-to-left text direction */
 }
 
+/* Main content area */
 .main {
-  flex: 1;
+  flex: 1; /* Take available vertical space */
   padding: 2rem;
   max-width: 1200px;
   margin: 0 auto;
   width: 100%;
 }
 
+/* Title styling */
 .title {
   text-align: center;
   margin-bottom: 2rem;
   color: #096b68;
 }
 
+/* Container for memberships list */
 .membershipsList {
   margin-bottom: 2rem;
 }
 
+/* Table styling */
 .table {
   width: 70%;
   margin: 1rem auto;
@@ -36,23 +41,27 @@
   border-radius: 8px;
 }
 
+/* Table headers and cells */
 .table th,
 .table td {
   padding: 0.8rem;
-  text-align: right;
+  text-align: right; /* Align text to the right for RTL */
   border-bottom: 1px solid #ddd;
   vertical-align: middle;
 }
 
+/* Table headers specific styles */
 .table th {
   background-color: #f5f5f5;
   font-weight: bold;
 }
 
+/* Rounded corners on top-right header cell */
 .table th:first-child {
   border-top-right-radius: 8px;
 }
 
+/* Rounded corners on top-left header cell and flex layout for header actions */
 .table th:last-child {
   border-top-left-radius: 8px;
   text-align: center;
@@ -63,10 +72,12 @@
   padding-right: 0.8rem;
 }
 
+/* Inline block span inside table headers */
 .table th span {
   display: inline-block;
 }
 
+/* Inline inputs inside table cells for editing */
 .inlineInput {
   width: 90%;
   padding: 0.3rem;
@@ -77,6 +88,7 @@
   margin: 0.1rem 0;
 }
 
+/* Base styling for action buttons (save, cancel, edit, delete) */
 .actionButton {
   background-color: #129990;
   color: white;
@@ -92,10 +104,12 @@
   transition: background-color 0.2s;
 }
 
+/* Hover effect for action buttons */
 .actionButton:hover {
   background-color: #096b68;
 }
 
+/* Save button specific color */
 .saveButton {
   background-color: #129990;
 }
@@ -104,6 +118,7 @@
   background-color: #096b68;
 }
 
+/* Cancel button specific styles */
 .cancelActionButton {
   background-color: #dc3545;
   color: white;
@@ -123,6 +138,7 @@
   background-color: #c82333;
 }
 
+/* Add button with circular shape */
 .actionButtonAdd {
   background-color: #129990;
   color: white;
@@ -144,6 +160,7 @@
   background-color: #096b68;
 }
 
+/* Edit button styling */
 .editButton {
   background-color: #129990;
   color: white;
@@ -163,6 +180,7 @@
   background-color: #096b68;
 }
 
+/* Delete button styling */
 .deleteButton {
   background-color: #dc3545;
   color: white;
@@ -182,6 +200,7 @@
   background-color: #c82333;
 }
 
+/* Last table column cells use vertical flex layout for multiple buttons */
 .table td:last-child {
   display: flex;
   flex-direction: column;
@@ -190,19 +209,21 @@
   gap: 0.2rem;
 }
 
+/* Modal overlay background for errors */
 .errorModal {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black overlay */
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: 1000; /* On top of other content */
 }
 
+/* Modal content box */
 .errorContent {
   background-color: white;
   padding: 2rem;
@@ -210,6 +231,7 @@
   text-align: center;
 }
 
+/* Button inside error modal */
 .errorContent button {
   margin-top: 1rem;
   padding: 0.5rem 1rem;
@@ -220,6 +242,7 @@
   cursor: pointer;
 }
 
+/* Navigation buttons style (used for links or buttons in nav) */
 .navButton {
   background-color: #129990;
   color: white;
@@ -237,6 +260,7 @@
   text-decoration: none;
 }
 
+/* Logout button fixed at top-left */
 .logoutButton {
   position: absolute;
   top: 20px;
@@ -257,6 +281,7 @@
   background-color: #096b68;
 }
 
+/* Link at top of page to go back to home */
 .topLink {
   display: block;
   width: 100%;

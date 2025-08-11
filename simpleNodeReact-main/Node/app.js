@@ -1,38 +1,48 @@
-// Developer: Shahaf David
-
 const express = require("express");
 const cors = require("cors");
+const cron = require("node-cron");
+const insertWorkouts = require("./utils/seedWorkouts");
+
 const app = express();
 const PORT = 3002;
 
-// Enable CORS to allow requests from different origins
+// Enable CORS for all routes to allow cross-origin requests
 app.use(cors());
 
-// Middleware to parse incoming JSON requests
+// Middleware to parse incoming JSON request bodies
 app.use(express.json());
 
-// Mount the users routes at /api/users
+// Route for user-related API endpoints
 app.use("/api/users", require("./routes/users"));
 
-// Mount the workouts routes at /api/workouts
+// Route for workouts management
 app.use("/api/workouts", require("./routes/workout"));
 
-// Mount the memberships routes at /api/memberships
+// Route for managing memberships
 app.use("/api/memberships", require("./routes/membership"));
 
-// Mount the workout_exercises routes at /api/workout_exercises
+// Route for workout exercises CRUD
 app.use("/api/workout_exercises", require("./routes/workout_exercises"));
 
-// Mount the user workout routes
+// Route for user workout registrations
 app.use("/api/user-workouts", require("./routes/userWorkouts"));
 
-// Mount the purchasesMembership route
+// Route for membership purchases
 app.use("/api/purchases", require("./routes/purchasesMembership"));
 
-// Mount the PayPal routes at /api/paypal
+// Route for handling PayPal payments and orders
 app.use("/api/paypal", require("./routes/paypal"));
 
-// Start the server and listen on the specified port
+// Initial insertion of scheduled workouts into the database on server start
+insertWorkouts();
+
+// Schedule a daily job at 2:00 AM to insert workouts automatically
+cron.schedule("0 2 * * *", () => {
+  console.log("Running daily workout insertion...");
+  insertWorkouts();
+});
+
+// Start the Express server and listen on the defined port
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });

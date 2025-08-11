@@ -1,136 +1,154 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import Header from "../components/header/Header";
 import Footer from "../components/footer/Footer";
 import NavBar from "../components/navbar/NavBar";
+import MessageModal from "../components/messagemodal/MessageModal";
 import classes from "./home.module.css";
 import calisthenicsImg from "../images/Calisthenics.jpeg";
 
-/**
- * Home component
- * Displays the homepage with navigation links and a welcome message.
- * @param {function} onLogout - Function to handle user logout
- * @param {object} currentUser - The logged-in user object
- * @returns JSX for the Home screen
- */
 export default function Home({ onLogout, currentUser }) {
   const [userWorkouts, setUserWorkouts] = useState([]);
   const [message, setMessage] = useState("");
+  const [confirmCancel, setConfirmCancel] = useState(null);
 
   useEffect(() => {
     const fetchUserWorkouts = async () => {
+      if (!currentUser?.id) return;
       try {
         const res = await fetch(
-          `http://localhost:3002/api/user-workouts?user_id=${currentUser?.id}`
+          `http://localhost:3002/api/user-workouts?user_id=${currentUser.id}`
         );
+        if (!res.ok) throw new Error("Failed to fetch workouts");
         const data = await res.json();
         setUserWorkouts(data);
       } catch {
         setUserWorkouts([]);
       }
     };
-
-    if (currentUser?.id) {
-      fetchUserWorkouts();
-    }
+    fetchUserWorkouts();
   }, [currentUser]);
 
-  const handleCancel = async (workoutId) => {
-    if (!window.confirm("בטוח שברצונך לבטל את האימון?")) return;
+  const formatDate = (isoDate) => {
+    if (!isoDate) return "";
+    const [year, month, day] = isoDate.split("-");
+    return `${day}-${month}-${year}`;
+  };
+
+  const isPastWorkout = (workoutDate, workoutTime) => {
+    const now = new Date();
+    const workoutDateTime = new Date(`${workoutDate}T${workoutTime}:00`);
+    return workoutDateTime <= now;
+  };
+
+  const handleCancelClick = (id, workoutDate, workoutTime) => {
+    setConfirmCancel({ id, workoutDate, workoutTime });
+  };
+
+  const confirmCancelWorkout = async () => {
+    if (!confirmCancel) return;
+
+    const { id, workoutDate, workoutTime } = confirmCancel;
+    const now = new Date();
+    const workoutDateTime = new Date(`${workoutDate}T${workoutTime}:00`);
+
+    if (workoutDateTime <= now) {
+      setMessage("לא ניתן לבטל אימון שכבר עבר.");
+      setConfirmCancel(null);
+      return;
+    }
 
     try {
-      const res = await fetch(
-        `http://localhost:3002/api/user-workouts/${workoutId}`,
-        {
-          method: "DELETE",
-        }
-      );
-
+      const res = await fetch(`http://localhost:3002/api/user-workouts/${id}`, {
+        method: "DELETE",
+      });
       if (!res.ok) throw new Error("Delete failed");
-      setUserWorkouts((prev) => prev.filter((w) => w.id !== workoutId));
+
+      setUserWorkouts((prev) => prev.filter((w) => w.id !== id));
       setMessage("האימון בוטל בהצלחה.");
-      setTimeout(() => setMessage(""), 3000);
-    } catch (err) {
+    } catch {
       setMessage("שגיאה בביטול האימון.");
     }
+    setConfirmCancel(null);
   };
+
+  const registeredWorkoutsCount = userWorkouts.length;
+  const maxWorkouts = currentUser?.maxWorkouts ?? 3;
 
   return (
     <div className={classes.container}>
-      {/* Top header */}
       <Header />
+      <NavBar currentUser={currentUser} />
 
-      {/* Navigation bar */}
-      <NavBar />
-
-      {/* Logout button */}
       <button onClick={onLogout} className={classes.logoutButton}>
         התנתקות
       </button>
 
       <main className={classes.main}>
-        {/* Navigation links */}
-        <ul className={classes.linkList}>
-          <li className={classes.linkItem}>
-            <Link to="/profile" className={classes.link}>
-              פרטים אישיים
-            </Link>
-          </li>
-          <li className={classes.linkItem}>
-            <Link to="/membership" className={classes.link}>
-              ניהול מנויים
-            </Link>
-          </li>
-          <li className={classes.linkItem}>
-            <Link to="/purchase-membership" className={classes.link}>
-              רכישת מנוי
-            </Link>
-          </li>
-          <li className={classes.linkItem}>
-            <Link to="/workout" className={classes.link}>
-              הזמנת אימון
-            </Link>
-          </li>
-          <li className={classes.linkItem}>
-            <Link to="/workoutdetails" className={classes.link}>
-              נתוני אימון
-            </Link>
-          </li>
-        </ul>
-
-        {/* Welcome text */}
-        <div className={classes.text}>
-          !ברוכים הבאים לאתר אימוני הקליסטניקס
-          <br />
-          כאן תוכלו ללמוד איך לשלוט בגוף שלכם ברמה הגבוהה ביותר ולהגיע לתוצאות
-          שלא חלמתם עליהן
-          <br />
-          .תוכלו לבחור את המסלול המתאים עבורכם בקטגוריית רכישת מנוי
-        </div>
-
-        {/* User workouts list */}
         {userWorkouts.length > 0 && (
           <div className={classes.userWorkouts}>
-            <h3>האימונים שלך:</h3>
+            <h3>:האימונים שלך</h3>
+            <p>
+              {registeredWorkoutsCount} / {maxWorkouts} :אימונים שנרשמת אליהם
+            </p>
+
+            {registeredWorkoutsCount === maxWorkouts && (
+              <p>מומשו כל ההרשמות לשבוע</p>
+            )}
+
             <ul className={classes.workoutList}>
-              {userWorkouts.map((w) => (
-                <li key={w.id} className={classes.workoutItem}>
-                  אימון בתאריך {w.workout_date} בשעה {w.workout_time}
-                  <button
-                    onClick={() => handleCancel(w.id)}
-                    className={classes.cancelButton}
-                    type="button"
+              {userWorkouts.map((w) => {
+                const past = isPastWorkout(w.workout_date, w.workout_time);
+                return (
+                  <li
+                    key={w.id}
+                    className={classes.workoutItem}
+                    style={{ color: past ? "gray" : "black" }}
                   >
-                    ביטול
-                  </button>
-                </li>
-              ))}
+                    אימון בתאריך {formatDate(w.workout_date)} בשעה{" "}
+                    {w.workout_time}
+                    {!past && (
+                      <button
+                        onClick={() =>
+                          handleCancelClick(
+                            w.id,
+                            w.workout_date,
+                            w.workout_time
+                          )
+                        }
+                        className={classes.cancelButton}
+                        type="button"
+                      >
+                        ביטול
+                      </button>
+                    )}
+                  </li>
+                );
+              })}
             </ul>
-            {message && <p className={classes.message}>{message}</p>}
           </div>
         )}
 
-        {/* Calisthenics image */}
+        {confirmCancel && (
+          <MessageModal
+            message={`בטוח שברצונך לבטל את האימון בתאריך ${formatDate(
+              confirmCancel.workoutDate
+            )} בשעה ${confirmCancel.workoutTime}?`}
+            type="warning"
+            onClose={() => setConfirmCancel(null)}
+            onConfirm={confirmCancelWorkout}
+            confirmText="כן"
+            cancelText="ביטול"
+          />
+        )}
+
+        {message && (
+          <MessageModal
+            message={message}
+            type={message.includes("שגיאה") ? "error" : "info"}
+            onClose={() => setMessage("")}
+          />
+        )}
+
         <img
           src={calisthenicsImg}
           alt="Calisthenics_pic"
@@ -138,7 +156,6 @@ export default function Home({ onLogout, currentUser }) {
         />
       </main>
 
-      {/* Footer section */}
       <Footer />
     </div>
   );
