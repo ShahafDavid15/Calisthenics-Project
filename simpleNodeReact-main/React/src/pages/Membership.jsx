@@ -14,12 +14,14 @@ export default function Membership({ onLogout, currentUser }) {
     name: "",
     price: "",
     duration_days: "",
+    entry_count: 0,
   });
   const [showAddForm, setShowAddForm] = useState(false);
   const [newMembershipData, setNewMembershipData] = useState({
     name: "",
     price: "",
     duration_days: "",
+    entry_count: 0,
   });
 
   useEffect(() => {
@@ -34,7 +36,6 @@ export default function Membership({ onLogout, currentUser }) {
         showErrorMessage("Failed to load memberships");
       }
     };
-
     fetchMemberships();
   }, []);
 
@@ -73,6 +74,7 @@ export default function Membership({ onLogout, currentUser }) {
           name: newMembershipData.name,
           price: priceValue,
           duration_days: durationValue,
+          entry_count: newMembershipData.entry_count,
         }),
       });
 
@@ -83,7 +85,12 @@ export default function Membership({ onLogout, currentUser }) {
       const sorted = data.sort((a, b) => a.price - b.price);
       setMemberships(sorted);
 
-      setNewMembershipData({ name: "", price: "", duration_days: "" });
+      setNewMembershipData({
+        name: "",
+        price: "",
+        duration_days: "",
+        entry_count: 0,
+      });
       setShowAddForm(false);
     } catch (error) {
       showErrorMessage(error.message);
@@ -93,19 +100,30 @@ export default function Membership({ onLogout, currentUser }) {
   const startEditing = (membership) => {
     if (showAddForm) {
       setShowAddForm(false);
-      setNewMembershipData({ name: "", price: "", duration_days: "" });
+      setNewMembershipData({
+        name: "",
+        price: "",
+        duration_days: "",
+        entry_count: 0,
+      });
     }
     setEditingMembershipId(membership.membership_id);
     setCurrentEditData({
       name: membership.name,
       price: membership.price,
       duration_days: membership.duration_days,
+      entry_count: membership.entry_count,
     });
   };
 
   const cancelEditing = () => {
     setEditingMembershipId(null);
-    setCurrentEditData({ name: "", price: "", duration_days: "" });
+    setCurrentEditData({
+      name: "",
+      price: "",
+      duration_days: "",
+      entry_count: 0,
+    });
   };
 
   const handleEditChange = (e) => {
@@ -130,13 +148,10 @@ export default function Membership({ onLogout, currentUser }) {
 
     const priceValue = parseFloat(currentEditData.price);
     const durationValue = parseInt(currentEditData.duration_days);
+    const entryValue = parseInt(currentEditData.entry_count);
 
-    if (priceValue <= 0) {
-      showErrorMessage("מחיר מנוי חייב להיות חיובי.");
-      return;
-    }
-    if (durationValue <= 0) {
-      showErrorMessage("מספר ימים חייב להיות חיובי.");
+    if (priceValue <= 0 || durationValue <= 0 || entryValue < 0) {
+      showErrorMessage("הזן ערכים תקינים לכל השדות.");
       return;
     }
 
@@ -148,6 +163,7 @@ export default function Membership({ onLogout, currentUser }) {
           name: currentEditData.name,
           price: priceValue,
           duration_days: durationValue,
+          entry_count: entryValue,
         }),
       });
 
@@ -182,11 +198,14 @@ export default function Membership({ onLogout, currentUser }) {
 
   const toggleAddForm = () => {
     if (editingMembershipId) cancelEditing();
-
     setShowAddForm((prev) => !prev);
-
     if (!showAddForm) {
-      setNewMembershipData({ name: "", price: "", duration_days: "" });
+      setNewMembershipData({
+        name: "",
+        price: "",
+        duration_days: "",
+        entry_count: 0,
+      });
     }
   };
 
@@ -208,8 +227,8 @@ export default function Membership({ onLogout, currentUser }) {
                 <th>שם</th>
                 <th>מחיר</th>
                 <th>ימים</th>
+                <th>מס' כניסות בשבוע</th>
                 <th>
-                  פעולות{" "}
                   <button
                     onClick={toggleAddForm}
                     className={classes.actionButtonAdd}
@@ -253,6 +272,16 @@ export default function Membership({ onLogout, currentUser }) {
                       onChange={handleNewMembershipChange}
                       className={classes.inlineInput}
                       required
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="number"
+                      name="entry_count"
+                      placeholder="מס' כניסות"
+                      value={newMembershipData.entry_count}
+                      onChange={handleNewMembershipChange}
+                      className={classes.inlineInput}
                     />
                   </td>
                   <td>
@@ -304,6 +333,15 @@ export default function Membership({ onLogout, currentUser }) {
                         />
                       </td>
                       <td>
+                        <input
+                          type="number"
+                          name="entry_count"
+                          value={currentEditData.entry_count}
+                          onChange={handleEditChange}
+                          className={classes.inlineInput}
+                        />
+                      </td>
+                      <td>
                         <button
                           onClick={() => handleUpdate(membership.membership_id)}
                           className={`${classes.actionButton} ${classes.saveButton}`}
@@ -323,6 +361,7 @@ export default function Membership({ onLogout, currentUser }) {
                       <td>{membership.name}</td>
                       <td>{membership.price} ₪</td>
                       <td>{membership.duration_days} ימים</td>
+                      <td>{membership.entry_count}</td>
                       <td>
                         <button
                           onClick={() => startEditing(membership)}

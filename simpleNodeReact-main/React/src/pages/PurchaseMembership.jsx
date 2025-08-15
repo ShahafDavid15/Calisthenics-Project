@@ -3,7 +3,6 @@ import Header from "../components/header/Header";
 import Footer from "../components/footer/Footer";
 import NavBar from "../components/navbar/NavBar";
 import classes from "./purchaseMembership.module.css";
-import { Link } from "react-router-dom";
 
 export default function PurchaseMembership({ currentUser, onLogout }) {
   // State for list of memberships fetched from backend

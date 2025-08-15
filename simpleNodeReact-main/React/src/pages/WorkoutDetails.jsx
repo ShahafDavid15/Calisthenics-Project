@@ -5,7 +5,6 @@ import NavBar from "../components/navbar/NavBar";
 import MessageModal from "../components/messagemodal/MessageModal";
 import classes from "./workoutDetails.module.css";
 import axios from "axios";
-import { Link } from "react-router-dom";
 
 export default function WorkoutEntry({ onLogout, currentUser }) {
   const userId = currentUser?.id;
@@ -22,7 +21,7 @@ export default function WorkoutEntry({ onLogout, currentUser }) {
   const [editedDuration, setEditedDuration] = useState("");
 
   const [modalMessage, setModalMessage] = useState("");
-  const [modalType, setModalType] = useState("error"); // "error" או "success"
+  const [modalType, setModalType] = useState("error");
   const [showModal, setShowModal] = useState(false);
 
   const [searchTerm, setSearchTerm] = useState("");

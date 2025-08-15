@@ -4,7 +4,7 @@ import Footer from "../components/footer/Footer";
 import { Link } from "react-router-dom";
 import classes from "./forgotpassword.module.css";
 
-export default function ForgotPassword() {
+export default function ForgotUsername() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -19,20 +19,22 @@ export default function ForgotPassword() {
     }
 
     try {
-      const res = await fetch("/api/users/forgot-password", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
+      // שימוש ב-URL מלא כולל פורט של ה-backend
+      const res = await fetch(
+        "http://localhost:3002/api/users/forgot-username",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+        }
+      );
 
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || "Failed to send reset email.");
+        setError(data.error || "Failed to send username email.");
       } else {
-        setMessage(
-          "Check your email for the password reset link. The link is valid for 15 minutes."
-        );
+        setMessage("Check your email. Your username has been sent.");
       }
     } catch {
       setError("Connection error. Try again.");
@@ -49,7 +51,7 @@ export default function ForgotPassword() {
       </Link>
 
       <main className={classes.container}>
-        <h2>Forgot Password</h2>
+        <h2>Forgot Username</h2>
 
         <input
           type="email"
@@ -60,7 +62,7 @@ export default function ForgotPassword() {
         />
 
         <button className={classes.button} onClick={handleSubmit}>
-          Send Password Reset Email
+          Send Username Email
         </button>
 
         {message && <p className={classes.success}>{message}</p>}

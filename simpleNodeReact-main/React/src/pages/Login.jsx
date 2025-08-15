@@ -28,11 +28,9 @@ export default function Login({ setUser }) {
     setShowPassword(false);
   }, [isRegistration]);
 
-  // כאן כל שאר הפונקציות שלך: validateForm, handleLogin, handleRegistration וכו'
-
   const validateForm = () => {
     setError("");
-    if (!username || !/^[A-Za-z]{2,}$/.test(username)) {
+    if (!username || !/^[A-Za-z0-9]{2,}$/.test(username)) {
       setError("Username must contain at least 2 letters.");
       return false;
     }
@@ -113,7 +111,6 @@ export default function Login({ setUser }) {
 
   const handleSubmit = isRegistration ? handleRegistration : handleLogin;
 
-  // כאן ההבדל: לא מציגים NavBar בדף לוגין או הרשמה
   const showNavBar = !(
     location.pathname === "/" || location.pathname === "/signup"
   );
@@ -121,8 +118,7 @@ export default function Login({ setUser }) {
   return (
     <div className={classes.container}>
       <Header />
-      {showNavBar && <NavBar currentUser={null} />}{" "}
-      {/* לא מציגים NavBar בדף לוגין/הרשמה */}
+      {showNavBar && <NavBar currentUser={null} />}
       <main className={classes.main}>
         <h2 className={classes.title}>
           {isRegistration ? "Register" : "Login"}
@@ -187,11 +183,18 @@ export default function Login({ setUser }) {
         </p>
 
         {!isRegistration && (
-          <p>
-            <Link to="/forgot-password" className={classes.link}>
-              Forgot your password?
-            </Link>
-          </p>
+          <>
+            <p>
+              <Link to="/forgot-password" className={classes.link}>
+                Forgot your password?
+              </Link>
+            </p>
+            <p>
+              <Link to="/forgot-username" className={classes.link}>
+                Forgot your username?
+              </Link>
+            </p>
+          </>
         )}
 
         {showError && (

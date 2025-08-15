@@ -1,55 +1,69 @@
-// src/pages/ResetPassword.jsx
 import React, { useState } from "react";
-// useLocation to access URL query params, useHistory to navigate after success
 import { useLocation, useHistory } from "react-router-dom";
 import classes from "./resetpassword.module.css";
 
 export default function ResetPassword() {
-  // State variables for new password input, confirmation, error message, and success message
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
-  // React Router hooks for accessing URL and navigation
-  const history = useHistory();
   const location = useLocation();
+  const history = useHistory();
 
-  // Extract the 'token' query parameter from URL (e.g. ?token=abc123)
+  // קבלת token מה-query param
   const queryParams = new URLSearchParams(location.search);
   const token = queryParams.get("token");
 
-  // Handler for the reset password form submission
+  if (!token) {
+    return (
+      <div className={classes.container}>
+        <h2>Invalid or missing token</h2>
+        <p>Please use the link from your email to reset your password.</p>
+      </div>
+    );
+  }
+
+  const validatePassword = (password) => {
+    const lengthValid = password.length >= 8 && password.length <= 16;
+    const hasLetter = /[a-zA-Z]/.test(password);
+    const hasDigit = /\d/.test(password);
+    return lengthValid && hasLetter && hasDigit;
+  };
+
   const handleSubmit = async () => {
-    // Basic validation: check if passwords match before sending request
+    setError("");
+    setMessage("");
+
+    if (!validatePassword(newPassword)) {
+      setError(
+        "Password must be 8-16 characters long and contain at least one letter and one number."
+      );
+      return;
+    }
+
     if (newPassword !== confirmPassword) {
       setError("Passwords do not match.");
       return;
     }
 
     try {
-      // Send POST request to backend endpoint to reset password
       const res = await fetch("/api/users/reset-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        // Send the token and new password in the request body as JSON
         body: JSON.stringify({ token, newPassword }),
       });
 
-      // Parse JSON response
       const data = await res.json();
 
       if (!res.ok) {
-        // If HTTP response not OK, display error message from server or default
-        setError(data.error || "Reset failed.");
+        setError(data.error || "Password reset failed.");
       } else {
-        // On success, show success message
-        setMessage("Password reset successfully!");
-        // Redirect user to homepage after 3 seconds
+        setMessage("Password reset successfully! Redirecting to login...");
         setTimeout(() => history.push("/"), 3000);
       }
     } catch {
-      // Handle network or other unexpected errors
       setError("Connection error.");
     }
   };
@@ -58,33 +72,36 @@ export default function ResetPassword() {
     <div className={classes.container}>
       <h2>Reset Password</h2>
 
-      {/* Input for new password */}
       <input
-        type="password"
+        type={showPassword ? "text" : "password"}
         placeholder="New Password"
         className={classes.input}
         value={newPassword}
         onChange={(e) => setNewPassword(e.target.value)}
       />
 
-      {/* Input to confirm new password */}
       <input
-        type="password"
+        type={showPassword ? "text" : "password"}
         placeholder="Confirm Password"
         className={classes.input}
         value={confirmPassword}
         onChange={(e) => setConfirmPassword(e.target.value)}
       />
 
-      {/* Button to submit the password reset request */}
+      <label className={classes.showPassword}>
+        <input
+          type="checkbox"
+          checked={showPassword}
+          onChange={() => setShowPassword(!showPassword)}
+        />{" "}
+        Show Password
+      </label>
+
       <button className={classes.button} onClick={handleSubmit}>
         Reset Password
       </button>
 
-      {/* Display success message if available */}
       {message && <p className={classes.success}>{message}</p>}
-
-      {/* Display error message if available */}
       {error && <p className={classes.error}>{error}</p>}
     </div>
   );

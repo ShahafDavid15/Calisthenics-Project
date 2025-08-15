@@ -15,18 +15,16 @@ import Workout from "./pages/Workout";
 import WorkoutDetails from "./pages/WorkoutDetails";
 import PurchaseMembership from "./pages/PurchaseMembership";
 
-// Newly added pages for password recovery
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import ForgotUsername from "./pages/ForgotUsername"; // <-- ייבוא הקומפוננטה החדשה
 
 function App() {
-  // Initialize user state from sessionStorage if available
   const [user, setUser] = useState(() => {
     const savedUser = sessionStorage.getItem("user");
     return savedUser ? JSON.parse(savedUser) : null;
   });
 
-  // Sync user state changes to sessionStorage to persist login across refreshes
   useEffect(() => {
     if (user) {
       sessionStorage.setItem("user", JSON.stringify(user));
@@ -35,36 +33,32 @@ function App() {
     }
   }, [user]);
 
-  // Logout handler clears user state
-  const handleLogout = () => {
-    setUser(null);
-  };
+  const handleLogout = () => setUser(null);
 
   return (
-    // Router wraps the app to handle client-side routing
     <Router>
       <Switch>
-        {/* Root path: redirect logged-in users to /home, else show Login */}
         <Route exact path="/">
           {user ? <Redirect to="/home" /> : <Login setUser={setUser} />}
         </Route>
 
-        {/* Signup page uses the same Login component */}
         <Route path="/signup">
           <Login setUser={setUser} />
         </Route>
 
-        {/* Forgot Password page */}
         <Route path="/forgot-password">
           <ForgotPassword />
         </Route>
 
-        {/* Reset Password page */}
+        <Route path="/forgot-username">
+          <ForgotUsername /> {/* <-- Route חדש */}
+        </Route>
+
+        {/* Query param route */}
         <Route path="/reset-password">
           <ResetPassword />
         </Route>
 
-        {/* Home page, protected route: only accessible if logged in */}
         <Route path="/home">
           {user ? (
             <Home onLogout={handleLogout} currentUser={user} />
@@ -73,7 +67,6 @@ function App() {
           )}
         </Route>
 
-        {/* Profile page, protected route */}
         <Route path="/profile">
           {user ? (
             <Profile onLogout={handleLogout} currentUser={user} />
@@ -82,7 +75,6 @@ function App() {
           )}
         </Route>
 
-        {/* Membership page, protected route */}
         <Route path="/membership">
           {user ? (
             <Membership onLogout={handleLogout} currentUser={user} />
@@ -91,7 +83,6 @@ function App() {
           )}
         </Route>
 
-        {/* Workout page, protected route */}
         <Route path="/workout">
           {user ? (
             <Workout onLogout={handleLogout} currentUser={user} />
@@ -100,7 +91,6 @@ function App() {
           )}
         </Route>
 
-        {/* Workout Details page, protected route */}
         <Route path="/workoutdetails">
           {user ? (
             <WorkoutDetails onLogout={handleLogout} currentUser={user} />
@@ -109,7 +99,6 @@ function App() {
           )}
         </Route>
 
-        {/* Purchase Membership page, protected route */}
         <Route path="/purchase-membership">
           {user ? (
             <PurchaseMembership onLogout={handleLogout} currentUser={user} />
