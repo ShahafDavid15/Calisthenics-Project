@@ -34,10 +34,16 @@ app.use("/api/purchases", require("./routes/purchasesMembership"));
 // Route for handling PayPal payments and orders
 app.use("/api/paypal", require("./routes/paypal"));
 
-// Initial insertion of scheduled workouts into the database on server start
+// Route for user statistics
+app.use("/api/workout-stats", require("./routes/workoutStats"));
+
+// Route for admin statistics
+app.use("/api/admin-stats", require("./routes/adminStats"));
+
+// Insert initial workouts into the database when server starts
 insertWorkouts();
 
-// Schedule a daily job at 2:00 AM to insert workouts automatically
+// Schedule a daily job at 2:00 AM to automatically insert workouts
 cron.schedule("0 2 * * *", () => {
   console.log("Running daily workout insertion...");
   insertWorkouts();
