@@ -3,9 +3,9 @@ const router = express.Router();
 const db = require("../db");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const sendEmail = require("../utils/sendEmail");
+const { sendEmail } = require("../utils/sendEmail");
 
-// === Registration ===
+// Registration
 router.post("/", (req, res) => {
   const { username, password } = req.body;
   if (!username || !password)
@@ -43,7 +43,7 @@ router.post("/", (req, res) => {
   );
 });
 
-// === Login ===
+// Login
 router.post("/login", (req, res) => {
   const { username, password } = req.body;
   if (!username || !password)
@@ -73,13 +73,14 @@ router.post("/login", (req, res) => {
           message: "Login successful",
           user_id: user.user_id,
           username: user.username,
+          role: user.role,
         });
       });
     }
   );
 });
 
-// === Get user by ID ===
+// Get user by ID
 router.get("/:id", (req, res) => {
   const userId = req.params.id;
   db.query(
@@ -94,7 +95,28 @@ router.get("/:id", (req, res) => {
   );
 });
 
-// === Update user profile ===
+// Get all users with membership info (for admin)
+router.get("/", (req, res) => {
+  const sql = `
+    SELECT 
+      u.user_id,
+      u.username,
+      u.email,
+      m.name AS membership_type,
+      um.start_date,
+      um.end_date
+    FROM users u
+    LEFT JOIN user_membership um ON u.user_id = um.user_id
+    LEFT JOIN membership m ON um.membership_id = m.membership_id
+    ORDER BY u.user_id
+  `;
+  db.query(sql, (err, results) => {
+    if (err) return res.status(500).json({ error: "Database error" });
+    res.json(results);
+  });
+});
+
+// Update user profile
 router.put("/profile", (req, res) => {
   const { username, firstName, lastName, phone, email, birthDate, gender } =
     req.body;
@@ -114,18 +136,20 @@ router.put("/profile", (req, res) => {
       try {
         await sendEmail(
           email,
-          "Profile Updated",
-          `Hello ${firstName},\n\nYour profile was updated successfully.`
+          "עדכון פרופיל",
+          `שלום ${firstName}, הפרופיל עודכן`
         );
+        console.log("Email sent to", email);
         res.json({ message: "Profile updated and email sent successfully" });
-      } catch (mailErr) {
+      } catch (err) {
+        console.error("Failed to send email:", err);
         res.json({ message: "Profile updated, but failed to send email" });
       }
     }
   );
 });
 
-// === Forgot Password ===
+// Forgot Password
 router.post("/forgot-password", (req, res) => {
   const { email } = req.body;
   if (!email) return res.status(400).json({ error: "Email is required" });
@@ -153,7 +177,7 @@ router.post("/forgot-password", (req, res) => {
   });
 });
 
-// === Reset Password ===
+// Reset Password
 router.post("/reset-password", (req, res) => {
   const { token, newPassword } = req.body;
   if (!token || !newPassword)
@@ -181,7 +205,7 @@ router.post("/reset-password", (req, res) => {
   });
 });
 
-// === Update password from profile ===
+// Update password from profile
 router.put("/password", (req, res) => {
   const { username, currentPassword, newPassword } = req.body;
   if (!username || !currentPassword || !newPassword)
@@ -225,7 +249,7 @@ router.put("/password", (req, res) => {
   );
 });
 
-// === Forgot Username ===
+// Forgot Username
 router.post("/forgot-username", (req, res) => {
   const { email } = req.body;
   if (!email) return res.status(400).json({ error: "Email is required" });
@@ -239,7 +263,6 @@ router.post("/forgot-username", (req, res) => {
         return res.status(404).json({ error: "No user with that email" });
 
       const { username } = results[0];
-
       sendEmail(email, "Your Username", `Hello,\nYour username is: ${username}`)
         .then(() => res.json({ message: "Username sent to your email" }))
         .catch(() =>

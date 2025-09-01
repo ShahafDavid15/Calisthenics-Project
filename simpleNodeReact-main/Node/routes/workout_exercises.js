@@ -2,18 +2,16 @@ const express = require("express");
 const router = express.Router();
 const db = require("../db");
 
-// GET כל התרגילים של משתמש מסוים (עם user_id בפרמטר query)
+// GET all exercises for a specific user
 router.get("/", (req, res) => {
   const userId = req.query.user_id;
-  if (!userId) {
-    return res.status(400).json({ error: "Missing user_id" });
-  }
+  if (!userId) return res.status(400).json({ error: "Missing user_id" });
 
   const query = `
-    SELECT id, user_id, exercise, repetitions, duration, created_at
+    SELECT id, user_id, exercise, repetitions, workout_date
     FROM workout_exercises
     WHERE user_id = ?
-    ORDER BY created_at DESC
+    ORDER BY workout_date DESC
   `;
 
   db.query(query, [userId], (err, results) => {
@@ -25,49 +23,64 @@ router.get("/", (req, res) => {
   });
 });
 
-// POST - הוספת תרגיל חדש למשתמש
+// POST - Add a new exercise
 router.post("/", (req, res) => {
-  const { user_id, exercise, repetitions, duration } = req.body;
+  const { user_id, exercise, repetitions, workout_date } = req.body;
 
-  if (!user_id || !exercise || repetitions == null || duration == null) {
+  if (!user_id || !exercise || repetitions == null || !workout_date) {
     return res.status(400).json({ error: "Missing required fields" });
   }
 
-  // הוספה לטבלה
+  // Block future dates
+  const today = new Date().toISOString().split("T")[0];
+  if (workout_date > today) {
+    return res.status(400).json({ error: "לא ניתן להוסיף אימון בעתיד" });
+  }
+
   const query = `
-    INSERT INTO workout_exercises (user_id, exercise, repetitions, duration)
+    INSERT INTO workout_exercises (user_id, exercise, repetitions, workout_date)
     VALUES (?, ?, ?, ?)
   `;
 
-  db.query(query, [user_id, exercise, repetitions, duration], (err, result) => {
-    if (err) {
-      console.error("Insert error:", err);
-      return res.status(500).json({ error: "DB insert error" });
-    }
+  db.query(
+    query,
+    [user_id, exercise, repetitions, workout_date],
+    (err, result) => {
+      if (err) {
+        console.error("Insert error:", err);
+        return res.status(500).json({ error: "DB insert error" });
+      }
 
-    res.status(201).json({
-      message: "Exercise added successfully",
-      id: result.insertId,
-    });
-  });
+      res.status(201).json({
+        message: "Exercise added successfully",
+        id: result.insertId,
+      });
+    }
+  );
 });
 
-// PUT - עדכון תרגיל קיים לפי id
+// PUT - Update an exercise
 router.put("/:id", (req, res) => {
   const id = req.params.id;
-  const { exercise, repetitions, duration } = req.body;
+  const { exercise, repetitions, workout_date } = req.body;
 
-  if (!exercise || repetitions == null || duration == null) {
+  if (!exercise || repetitions == null || !workout_date) {
     return res.status(400).json({ error: "Missing fields to update" });
+  }
+
+  // Block future dates
+  const today = new Date().toISOString().split("T")[0];
+  if (workout_date > today) {
+    return res.status(400).json({ error: "לא ניתן לעדכן אימון לעתיד" });
   }
 
   const query = `
     UPDATE workout_exercises
-    SET exercise = ?, repetitions = ?, duration = ?
+    SET exercise = ?, repetitions = ?, workout_date = ?
     WHERE id = ?
   `;
 
-  db.query(query, [exercise, repetitions, duration, id], (err, result) => {
+  db.query(query, [exercise, repetitions, workout_date, id], (err, result) => {
     if (err) {
       console.error("Update error:", err);
       return res.status(500).json({ error: "DB update error" });
@@ -81,12 +94,11 @@ router.put("/:id", (req, res) => {
   });
 });
 
-// DELETE - מחיקת תרגיל לפי id
+// DELETE - Delete an exercise
 router.delete("/:id", (req, res) => {
   const id = req.params.id;
 
   const query = `DELETE FROM workout_exercises WHERE id = ?`;
-
   db.query(query, [id], (err, result) => {
     if (err) {
       console.error("Delete error:", err);

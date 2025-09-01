@@ -209,7 +209,7 @@
   padding-left: 0.5rem;
   padding-right: 0.5rem;
   text-align: left;
-  direction: ltr; /* משנה את כיוון הטקסט עבור תא זה בלבד */
+  direction: ltr;
 }
 
 /* Modal overlay background for errors */
@@ -245,7 +245,7 @@
   cursor: pointer;
 }
 
-/* Navigation buttons style (used for links or buttons in nav) */
+/* Navigation buttons style  */
 .navButton {
   background-color: #129990;
   color: white;

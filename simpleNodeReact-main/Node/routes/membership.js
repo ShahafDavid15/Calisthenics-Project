@@ -2,13 +2,17 @@ const express = require("express");
 const router = express.Router();
 const db = require("../db");
 
+// VAT percentage
+const VAT_PERCENT = 18;
+
 // GET all memberships
 router.get("/", (req, res) => {
   const query = `
-    SELECT membership_id, name, price, duration_days, entry_count
+    SELECT membership_id, name, price, price_with_vat, duration_days, entry_count
     FROM membership
     ORDER BY price ASC
   `;
+
   db.query(query, (err, results) => {
     if (err) {
       console.error("Error fetching memberships:", err);
@@ -30,9 +34,9 @@ router.post("/", (req, res) => {
     duration_days === undefined ||
     duration_days === null
   ) {
-    return res
-      .status(400)
-      .json({ error: "Name, price, and duration_days are required." });
+    return res.status(400).json({
+      error: "Name, price, and duration_days are required.",
+    });
   }
 
   if (
@@ -41,19 +45,21 @@ router.post("/", (req, res) => {
     price <= 0 ||
     duration_days <= 0
   ) {
-    return res
-      .status(400)
-      .json({ error: "Price and duration_days must be positive numbers." });
+    return res.status(400).json({
+      error: "Price and duration_days must be positive numbers.",
+    });
   }
 
+  const priceWithVat = (price * (1 + VAT_PERCENT / 100)).toFixed(2);
+
   const query = `
-    INSERT INTO membership (name, price, duration_days, entry_count)
-    VALUES (?, ?, ?, ?)
+    INSERT INTO membership (name, price, price_with_vat, duration_days, entry_count)
+    VALUES (?, ?, ?, ?, ?)
   `;
 
   db.query(
     query,
-    [name, price, duration_days, entry_count || 0],
+    [name, price, priceWithVat, duration_days, entry_count || 0],
     (err, result) => {
       if (err) {
         console.error("Error inserting membership:", err);
@@ -67,6 +73,7 @@ router.post("/", (req, res) => {
         membership_id: result.insertId,
         name,
         price,
+        price_with_vat: priceWithVat,
         duration_days,
         entry_count: entry_count || 0,
       });
@@ -102,15 +109,17 @@ router.put("/:id", (req, res) => {
     });
   }
 
+  const priceWithVat = (price * (1 + VAT_PERCENT / 100)).toFixed(2);
+
   const query = `
     UPDATE membership
-    SET name = ?, price = ?, duration_days = ?, entry_count = ?
+    SET name = ?, price = ?, price_with_vat = ?, duration_days = ?, entry_count = ?
     WHERE membership_id = ?
   `;
 
   db.query(
     query,
-    [name, price, duration_days, entry_count || 0, id],
+    [name, price, priceWithVat, duration_days, entry_count || 0, id],
     (err, result) => {
       if (err) {
         console.error("Error updating membership:", err);
@@ -128,6 +137,7 @@ router.put("/:id", (req, res) => {
         membership_id: id,
         name,
         price,
+        price_with_vat: priceWithVat,
         duration_days,
         entry_count: entry_count || 0,
       });
@@ -138,11 +148,7 @@ router.put("/:id", (req, res) => {
 // DELETE a membership
 router.delete("/:id", (req, res) => {
   const { id } = req.params;
-
-  const query = `
-    DELETE FROM membership
-    WHERE membership_id = ?
-  `;
+  const query = `DELETE FROM membership WHERE membership_id = ?`;
 
   db.query(query, [id], (err, result) => {
     if (err) {

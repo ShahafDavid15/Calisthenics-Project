@@ -7,18 +7,25 @@ import classes from "./login.module.css";
 import Cookies from "js-cookie";
 
 export default function Login({ setUser }) {
+  // State for form inputs
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
+  // State for displaying error messages
   const [error, setError] = useState("");
   const [showError, setShowError] = useState(false);
+
+  // Toggle to show/hide password
   const [showPassword, setShowPassword] = useState(false);
 
   const history = useHistory();
   const location = useLocation();
 
+  // Determine if the current page is the registration page
   const isRegistration = location.pathname === "/signup";
 
+  // Reset form when switching between login and signup
   useEffect(() => {
     setUsername("");
     setPassword("");
@@ -28,12 +35,17 @@ export default function Login({ setUser }) {
     setShowPassword(false);
   }, [isRegistration]);
 
+  // Form validation
   const validateForm = () => {
     setError("");
+
+    // Validate username: at least 2 letters/numbers
     if (!username || !/^[A-Za-z0-9]{2,}$/.test(username)) {
       setError("Username must contain at least 2 letters.");
       return false;
     }
+
+    // Validate password: 8-16 characters, at least one letter and one number
     if (
       !password ||
       !/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,16}$/.test(password)
@@ -43,52 +55,72 @@ export default function Login({ setUser }) {
       );
       return false;
     }
+
+    // Additional check for registration: passwords must match
     if (isRegistration && password !== confirmPassword) {
       setError("Passwords do not match.");
       return false;
     }
+
     return true;
   };
 
+  // Handle login form submission
   const handleLogin = async () => {
     if (!validateForm()) {
       setShowError(true);
       return;
     }
+
     try {
+      // Send login request to backend
       const response = await fetch("/api/users/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
       });
+
       const data = await response.json();
+
+      // Handle server errors
       if (!response.ok) {
         setError(data.error || "Login failed. Please try again.");
         setShowError(true);
         return;
       }
+
+      // Successful login: set user state and cookies
       setUser({ name: data.username, id: data.user_id });
       Cookies.set("username", data.username);
       Cookies.set("user_id", data.user_id);
+
+      // Navigate to home page
       history.push("/home");
     } catch (err) {
+      // Handle network errors
       setError("Connection error. Please check the server.");
       setShowError(true);
     }
   };
 
+  // Handle registration form submission
   const handleRegistration = async () => {
     if (!validateForm()) {
       setShowError(true);
       return;
     }
+
     try {
+      // Send registration request to backend
       const response = await fetch("/api/users", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
       });
+
       const data = await response.json();
+
+      // Handle server errors or username conflicts
       if (!response.ok) {
         if (response.status === 409) {
           setError("Username already exists. Please choose another.");
@@ -98,6 +130,8 @@ export default function Login({ setUser }) {
         setShowError(true);
         return;
       }
+
+      // Successful registration: navigate to login page
       history.push("/");
     } catch (err) {
       setError("Connection error. Please check the server.");
@@ -105,12 +139,15 @@ export default function Login({ setUser }) {
     }
   };
 
+  // Close error modal
   const closeErrorModal = () => {
     setShowError(false);
   };
 
+  // Choose the correct submit handler based on page type
   const handleSubmit = isRegistration ? handleRegistration : handleLogin;
 
+  // Show NavBar only on non-login/non-signup pages
   const showNavBar = !(
     location.pathname === "/" || location.pathname === "/signup"
   );
@@ -119,11 +156,13 @@ export default function Login({ setUser }) {
     <div className={classes.container}>
       <Header />
       {showNavBar && <NavBar currentUser={null} />}
+
       <main className={classes.main}>
         <h2 className={classes.title}>
           {isRegistration ? "Register" : "Login"}
         </h2>
 
+        {/* Username input */}
         <div className={classes.inputContainer}>
           <input
             id="username"
@@ -135,6 +174,7 @@ export default function Login({ setUser }) {
           />
         </div>
 
+        {/* Password input */}
         <div className={classes.inputContainer}>
           <input
             id="password"
@@ -146,6 +186,7 @@ export default function Login({ setUser }) {
           />
         </div>
 
+        {/* Confirm password input (registration only) */}
         {isRegistration && (
           <div className={classes.inputContainer}>
             <input
@@ -159,6 +200,7 @@ export default function Login({ setUser }) {
           </div>
         )}
 
+        {/* Show/hide password toggle */}
         <div className={classes.inputContainer}>
           <label>
             <input
@@ -170,10 +212,12 @@ export default function Login({ setUser }) {
           </label>
         </div>
 
+        {/* Submit button */}
         <button className={classes.button} onClick={handleSubmit}>
           {isRegistration ? "Register" : "Login"}
         </button>
 
+        {/* Link to switch between login and signup */}
         <p>
           <Link to={isRegistration ? "/" : "/signup"} className={classes.link}>
             {isRegistration
@@ -182,6 +226,7 @@ export default function Login({ setUser }) {
           </Link>
         </p>
 
+        {/* Forgot password / username links (login only) */}
         {!isRegistration && (
           <>
             <p>
@@ -197,6 +242,7 @@ export default function Login({ setUser }) {
           </>
         )}
 
+        {/* Error modal */}
         {showError && (
           <div className={classes.errorModel}>
             <div className={classes.errorContent}>

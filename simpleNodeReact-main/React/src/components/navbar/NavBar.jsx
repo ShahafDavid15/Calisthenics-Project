@@ -3,19 +3,21 @@ import { Link } from "react-router-dom";
 import classes from "./navbar.module.css";
 
 export default function NavBar({ currentUser }) {
+  // Determine if the current user is an admin
   const isAdmin =
     currentUser?.name === "admin" || currentUser?.role === "admin";
 
   return (
     <nav className={classes.navbar}>
       <ul className={classes.linkList}>
+        {/* Home link - always visible */}
         <li className={classes.linkItem}>
           <Link to="/" className={classes.link}>
             דף הבית
           </Link>
         </li>
 
-        {/* אם לא אדמין, מציגים את הקישורים האלו */}
+        {/* Links visible only to non-admin users */}
         {!isAdmin && (
           <>
             <li className={classes.linkItem}>
@@ -36,19 +38,26 @@ export default function NavBar({ currentUser }) {
           </>
         )}
 
-        {/* קישור ניהול מנויים רק אם אדמין */}
+        {/* Admin-only links */}
         {isAdmin && (
-          <li className={classes.linkItem}>
-            <Link to="/membership" className={classes.link}>
-              ניהול מנויים
-            </Link>
-          </li>
+          <>
+            <li className={classes.linkItem}>
+              <Link to="/membership" className={classes.link}>
+                ניהול מנויים {/* Membership Management */}
+              </Link>
+            </li>
+            <li className={classes.linkItem}>
+              <Link to="/members" className={classes.link}>
+                דף מנויים
+              </Link>
+            </li>
+          </>
         )}
 
-        {/* קישורים שמשותפים לכולם */}
+        {/* Link visible to all users: workouts page */}
         <li className={classes.linkItem}>
           <Link to="/workout" className={classes.link}>
-            אימונים
+            אימונים {/* Workouts */}
           </Link>
         </li>
       </ul>

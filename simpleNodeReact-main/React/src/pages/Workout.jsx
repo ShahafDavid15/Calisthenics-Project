@@ -5,60 +5,57 @@ import NavBar from "../components/navbar/NavBar";
 import MessageModal from "../components/messagemodal/MessageModal";
 import classes from "./workout.module.css";
 
-/**
- * Calculate the ISO 8601 week number for a given date
- * @param {Date} d - input date
- * @returns {number} week number in the year
- */
-function getWeekNumber(d) {
-  const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-  const dayNum = date.getUTCDay() || 7; // Sunday as 7 instead of 0
-  date.setUTCDate(date.getUTCDate() + 4 - dayNum);
-  const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
-  const weekNo = Math.ceil(((date - yearStart) / 86400000 + 1) / 7);
-  return weekNo;
-}
-
-/**
- * Returns a Date object representing the upcoming Friday (or today if it's Friday or later in week)
- * @param {Date} fromDate - the base date
- * @returns {Date} date of Friday this week or today if today is Friday or later
- */
+/** Returns upcoming Friday date from a given date */
 function getUpcomingFriday(fromDate) {
-  const day = fromDate.getDay(); // 0=Sunday ... 6=Saturday
-  // Calculate days to add to get Friday (5)
+  const day = fromDate.getDay();
   let daysToAdd = 5 - day;
-  if (daysToAdd < 0) daysToAdd = 0; // If today is Friday (5) or later (Sat 6), take today
+  if (daysToAdd < 0) daysToAdd = 0;
   const friday = new Date(fromDate);
   friday.setDate(friday.getDate() + daysToAdd);
   friday.setHours(0, 0, 0, 0);
   return friday;
 }
 
+/** Returns ISO week number */
+function getWeekNumber(d) {
+  const date = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  const day = date.getDay();
+  const dayNumber = day === 0 ? 1 : day + 1;
+  date.setDate(date.getDate() + (7 - dayNumber));
+  const firstDayOfYear = new Date(date.getFullYear(), 0, 1);
+  const diff = date - firstDayOfYear;
+  return Math.ceil((diff / 86400000 + 1) / 7);
+}
+
 export default function Workout({ onLogout, currentUser }) {
   const [showMessage, setShowMessage] = useState(false);
   const [message, setMessage] = useState({
     text: "",
-    type: "info", // info, error, warning, etc.
+    type: "info",
     confirmable: false,
     onConfirm: null,
     confirmText: "אישור",
     cancelText: "ביטול",
   });
-
   const [participants, setParticipants] = useState({});
   const [userWorkouts, setUserWorkouts] = useState([]);
-  const [refreshKey, setRefreshKey] = useState(0);
   const [scheduleData, setScheduleData] = useState([]);
-  const [newDate, setNewDate] = useState("");
-  const [newTime, setNewTime] = useState("");
-  const [confirmDelete, setConfirmDelete] = useState(null);
-  const [updateWorkout, setUpdateWorkout] = useState(null);
-  const [showAddForm, setShowAddForm] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
+  const [activeMembership, setActiveMembership] = useState(null);
+
+  const [isAdding, setIsAdding] = useState(false);
+  const [newWorkoutDate, setNewWorkoutDate] = useState("");
+  const [newWorkoutTime, setNewWorkoutTime] = useState("");
+  const [editingWorkout, setEditingWorkout] = useState(null);
+  const [editWorkoutTime, setEditWorkoutTime] = useState("");
+
+  const isAdmin =
+    currentUser?.name === "admin" || currentUser?.role === "admin";
 
   const normalizeDate = (dateStr) => dateStr.trim();
   const normalizeTime = (timeStr) => timeStr.trim().slice(0, 5);
 
+  // Fetch JSON from response or fallback to text
   async function fetchJsonOrText(res) {
     try {
       return await res.json();
@@ -67,6 +64,25 @@ export default function Workout({ onLogout, currentUser }) {
     }
   }
 
+  /* Load active membership for current user */
+  useEffect(() => {
+    if (!currentUser?.id) return;
+    const fetchMembership = async () => {
+      try {
+        const res = await fetch(
+          `http://localhost:3002/api/purchases/active-membership?user_id=${currentUser.id}`
+        );
+        if (!res.ok) throw new Error("Failed to fetch membership");
+        const data = await res.json();
+        setActiveMembership(data);
+      } catch {
+        setActiveMembership(null);
+      }
+    };
+    fetchMembership();
+  }, [currentUser]);
+
+  /* Load participants count */
   const loadParticipants = async () => {
     try {
       const res = await fetch(
@@ -74,26 +90,19 @@ export default function Workout({ onLogout, currentUser }) {
       );
       if (!res.ok) throw new Error(await res.text());
       const data = await res.json();
-
       const normalized = {};
       Object.entries(data).forEach(([key, count]) => {
-        // key כמו "Mon Aug 11 2025 00:00:00 GMT+0300 (שעון ישראל (קיץ))|17:00"
         const [dateStr, time] = key.split("|");
-
-        // המרת מחרוזת תאריך לפורמט ISO קצר YYYY-MM-DD
         const dateObj = new Date(dateStr);
-        const isoDate = dateObj.toISOString().slice(0, 10); // "2025-08-11"
-
-        const shortTime = time.slice(0, 5); // "17:00"
-
+        const isoDate = dateObj.toISOString().slice(0, 10);
+        const shortTime = time.slice(0, 5);
         normalized[`${isoDate}|${shortTime}`] = count;
       });
       setParticipants(normalized);
       setRefreshKey((prev) => prev + 1);
     } catch (err) {
-      console.error("Error fetching participants:", err);
       setMessage({
-        text: err.message || "שגיאה בטעינת משתתפים",
+        text: err.message || "Error loading participants",
         type: "error",
         confirmable: false,
       });
@@ -101,6 +110,7 @@ export default function Workout({ onLogout, currentUser }) {
     }
   };
 
+  /* Load workouts from DB */
   const loadWorkoutsFromDB = async () => {
     try {
       const res = await fetch("http://localhost:3002/api/workouts");
@@ -114,13 +124,13 @@ export default function Workout({ onLogout, currentUser }) {
       const filteredData = data.filter(({ workout_date }) => {
         const d = new Date(workout_date);
         d.setHours(0, 0, 0, 0);
-        return d >= today && d <= friday;
+        return d >= today && d <= friday && d.getDay() !== 6;
       });
 
       const grouped = {};
-      filteredData.forEach(({ workout_date, workout_time }) => {
+      filteredData.forEach(({ workout_date, workout_time, workout_id }) => {
         if (!grouped[workout_date]) grouped[workout_date] = [];
-        grouped[workout_date].push(workout_time);
+        grouped[workout_date].push({ time: workout_time, id: workout_id });
       });
 
       const formatted = Object.entries(grouped).map(([date, hours]) => {
@@ -128,15 +138,18 @@ export default function Workout({ onLogout, currentUser }) {
         const dayName = dateObj.toLocaleDateString("he-IL", {
           weekday: "long",
         });
-        return { day: dayName, date, hours: hours.sort() };
+        return {
+          day: dayName,
+          date,
+          hours: hours.sort((a, b) => a.time.localeCompare(b.time)),
+        };
       });
 
       formatted.sort((a, b) => new Date(a.date) - new Date(b.date));
       setScheduleData(formatted);
     } catch (err) {
-      console.error("Error loading workouts:", err);
       setMessage({
-        text: err.message || "שגיאה בטעינת אימונים",
+        text: err.message || "Error loading workouts",
         type: "error",
         confirmable: false,
       });
@@ -144,14 +157,9 @@ export default function Workout({ onLogout, currentUser }) {
     }
   };
 
+  /* Load user booked workouts and participant counts */
   useEffect(() => {
-    if (!currentUser?.id) {
-      setUserWorkouts([]);
-      setMessage({ text: "", type: "info", confirmable: false });
-      setShowMessage(false);
-      return;
-    }
-
+    if (!currentUser?.id) return;
     const fetchUserWorkouts = async () => {
       try {
         const res = await fetch(
@@ -160,18 +168,10 @@ export default function Workout({ onLogout, currentUser }) {
         if (!res.ok) throw new Error(await res.text());
         const data = await res.json();
         setUserWorkouts(data);
-      } catch (err) {
-        console.error("Error fetching user workouts:", err);
+      } catch {
         setUserWorkouts([]);
-        setMessage({
-          text: err.message || "",
-          type: "info",
-          confirmable: false,
-        });
-        setShowMessage(false);
       }
     };
-
     fetchUserWorkouts();
     loadParticipants();
     loadWorkoutsFromDB();
@@ -182,6 +182,7 @@ export default function Workout({ onLogout, currentUser }) {
     return () => clearInterval(interval);
   }, []);
 
+  // Check if the user has booked a specific slot
   const userHasBookedSlot = (date, hour) =>
     userWorkouts.some(
       (w) =>
@@ -189,24 +190,25 @@ export default function Workout({ onLogout, currentUser }) {
         normalizeTime(w.workout_time) === hour
     );
 
+  // Check if the user has any workout on a specific date
   const userHasWorkoutOnDate = (date) =>
     userWorkouts.some((w) => normalizeDate(w.workout_date) === date);
 
-  const isWorkoutExists = (date, time) => {
-    for (const day of scheduleData) {
-      if (day.date === date) {
-        if (day.hours.includes(time)) {
-          return true;
-        }
-      }
-    }
-    return false;
-  };
-
+  // Handler for user clicking on a workout hour
   const handleHourClick = (date, hour) => {
+    if (!activeMembership || !activeMembership.membership_name) {
+      setMessage({
+        text: "יש לרכוש מנוי כדי להירשם לאימון.",
+        type: "error",
+        confirmable: false,
+      });
+      setShowMessage(true);
+      return;
+    }
+
     const key = `${date}|${hour}`;
     const count = participants[key] ?? 0;
-    if (count >= 10) return;
+    if (count >= 5) return;
 
     const now = new Date();
     const currentWeek = getWeekNumber(now);
@@ -220,9 +222,22 @@ export default function Workout({ onLogout, currentUser }) {
       );
     });
 
-    if (workoutsThisWeek.length >= 3) {
+    let maxWorkouts = 3;
+    const membershipName = (
+      activeMembership.name ||
+      activeMembership.membership_name ||
+      ""
+    )
+      .trim()
+      .toLowerCase();
+
+    if (membershipName === "basic") maxWorkouts = 1;
+    else if (membershipName === "standard") maxWorkouts = 2;
+    else if (membershipName === "premium") maxWorkouts = 3;
+
+    if (workoutsThisWeek.length >= maxWorkouts) {
       setMessage({
-        text: "ניתן להירשם ל־3 אימונים בלבד בשבוע.",
+        text: `ניתן להירשם עד ${maxWorkouts} אימונים בשבוע.`,
         type: "error",
         confirmable: false,
       });
@@ -232,7 +247,7 @@ export default function Workout({ onLogout, currentUser }) {
 
     if (userHasWorkoutOnDate(date)) {
       setMessage({
-        text: "לא ניתן להירשם ליותר מאימון אחד ביום.",
+        text: "ניתן להירשם לאימון אחד בלבד ביום.",
         type: "error",
         confirmable: false,
       });
@@ -259,8 +274,10 @@ export default function Workout({ onLogout, currentUser }) {
     setShowMessage(true);
   };
 
+  // Confirm booking for a user
   const confirmBooking = async (date, hour) => {
     setShowMessage(false);
+
     try {
       const res = await fetch("http://localhost:3002/api/user-workouts", {
         method: "POST",
@@ -269,23 +286,19 @@ export default function Workout({ onLogout, currentUser }) {
           user_id: currentUser.id,
           workout_date: date,
           workout_time: hour,
+          membership_name:
+            activeMembership?.name?.trim() ||
+            activeMembership?.membership_name?.trim() ||
+            "",
         }),
       });
-      if (!res.ok) {
-        const errData = await fetchJsonOrText(res);
-        throw new Error(
-          typeof errData === "string" ? errData : JSON.stringify(errData)
-        );
-      }
+      if (!res.ok) throw new Error(await fetchJsonOrText(res));
 
       await loadParticipants();
-
       const userRes = await fetch(
         `http://localhost:3002/api/user-workouts?user_id=${currentUser.id}`
       );
-      if (!userRes.ok) throw new Error(await userRes.text());
-      const userData = await userRes.json();
-      setUserWorkouts(userData);
+      setUserWorkouts(await userRes.json());
 
       setMessage({
         text: "נרשמת בהצלחה לאימון!",
@@ -303,18 +316,59 @@ export default function Workout({ onLogout, currentUser }) {
     }
   };
 
-  const handleAddWorkout = async (e) => {
-    e.preventDefault();
+  // Delete a workout
+  const handleDeleteWorkout = async (workoutId) => {
+    setMessage({
+      text: "האם אתה בטוח שברצונך למחוק את האימון?",
+      type: "info",
+      confirmable: true,
+      onConfirm: async () => {
+        try {
+          const res = await fetch(
+            `http://localhost:3002/api/workouts/${workoutId}`,
+            {
+              method: "DELETE",
+            }
+          );
+          if (!res.ok) throw new Error(await fetchJsonOrText(res));
+          await loadWorkoutsFromDB();
+          setShowMessage(false);
+        } catch (err) {
+          setMessage({
+            text: err.message || "שגיאה במחיקה",
+            type: "error",
+            confirmable: false,
+          });
+          setShowMessage(true);
+        }
+      },
+    });
+    setShowMessage(true);
+  };
 
-    const today = new Date();
-    const selectedDate = new Date(newDate);
+  // adding a new workout
+  const handleAddWorkout = () => {
+    setNewWorkoutDate("");
+    setNewWorkoutTime("");
+    setIsAdding(true);
+  };
 
-    today.setHours(0, 0, 0, 0);
-    selectedDate.setHours(0, 0, 0, 0);
+  // Cancel adding new workout
+  const handleCancelAdd = () => {
+    setIsAdding(false);
+    setNewWorkoutDate("");
+    setNewWorkoutTime("");
+  };
 
-    if (selectedDate < today) {
+  // Submit new workout to DB
+  const submitAddWorkout = async () => {
+    if (!newWorkoutDate || !newWorkoutTime) return;
+
+    const selectedDateTime = new Date(`${newWorkoutDate}T${newWorkoutTime}`);
+    const dayOfWeek = selectedDateTime.getDay();
+    if (dayOfWeek === 6) {
       setMessage({
-        text: "לא ניתן להוסיף אימון לתאריך שעבר.",
+        text: "לא ניתן להוסיף אימון בשבת.",
         type: "error",
         confirmable: false,
       });
@@ -322,9 +376,25 @@ export default function Workout({ onLogout, currentUser }) {
       return;
     }
 
-    if (isWorkoutExists(newDate, newTime)) {
+    const now = new Date();
+    if (selectedDateTime < now) {
       setMessage({
-        text: "כבר קיים אימון בשעה ובתאריך האלה.",
+        text: "לא ניתן להוסיף אימון לתאריך שכבר עבר.",
+        type: "error",
+        confirmable: false,
+      });
+      setShowMessage(true);
+      return;
+    }
+
+    const exists = scheduleData.some(
+      (day) =>
+        day.date === newWorkoutDate &&
+        day.hours.some((hour) => hour.time === newWorkoutTime)
+    );
+    if (exists) {
+      setMessage({
+        text: "כבר קיים אימון באותו תאריך ושעה.",
         type: "error",
         confirmable: false,
       });
@@ -336,82 +406,57 @@ export default function Workout({ onLogout, currentUser }) {
       const res = await fetch("http://localhost:3002/api/workouts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ workout_date: newDate, workout_time: newTime }),
+        body: JSON.stringify({
+          workout_date: newWorkoutDate,
+          workout_time: newWorkoutTime,
+        }),
       });
-      if (!res.ok) {
-        const errData = await fetchJsonOrText(res);
-        throw new Error(
-          typeof errData === "string" ? errData : JSON.stringify(errData)
-        );
-      }
-
+      if (!res.ok) throw new Error(await fetchJsonOrText(res));
+      setIsAdding(false);
+      await loadWorkoutsFromDB();
+    } catch (err) {
       setMessage({
-        text: "האימון נוסף בהצלחה!",
-        type: "info",
+        text: err.message || "שגיאה ביצירת אימון",
+        type: "error",
         confirmable: false,
       });
-      setShowMessage(true);
-      setNewDate("");
-      setNewTime("");
-      loadWorkoutsFromDB();
-      loadParticipants();
-      setShowAddForm(false);
-    } catch (err) {
-      setMessage({ text: err.message, type: "error", confirmable: false });
       setShowMessage(true);
     }
   };
 
-  const requestDeleteWorkout = (date, hour, e) => {
-    e.stopPropagation();
-    setConfirmDelete({ date, hour });
+  // editing an existing workout
+  const startEditWorkout = (workout) => {
+    setEditingWorkout(workout);
+    setEditWorkoutTime(workout.time);
   };
 
-  const confirmDeleteWorkout = async () => {
-    if (!confirmDelete) return;
-    const { date, hour } = confirmDelete;
-    setShowMessage(false);
-    try {
-      const res = await fetch("http://localhost:3002/api/workouts", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ workout_date: date, workout_time: hour }),
-      });
-      if (!res.ok) {
-        const errData = await fetchJsonOrText(res);
-        throw new Error(
-          typeof errData === "string" ? errData : JSON.stringify(errData)
-        );
-      }
+  const submitEditWorkout = async () => {
+    if (!editWorkoutTime) return;
 
+    const exists = scheduleData.some(
+      (day) =>
+        day.date === editingWorkout.date &&
+        day.hours.some(
+          (hour) =>
+            hour.time === editWorkoutTime && hour.id !== editingWorkout.id
+        )
+    );
+    if (exists) {
       setMessage({
-        text: "האימון נמחק בהצלחה!",
-        type: "info",
+        text: "כבר קיים אימון בשעה הזאת ביום זה.",
+        type: "error",
         confirmable: false,
       });
       setShowMessage(true);
-      loadWorkoutsFromDB();
-      loadParticipants();
-    } catch (err) {
-      setMessage({ text: err.message, type: "error", confirmable: false });
-      setShowMessage(true);
+      return;
     }
-    setConfirmDelete(null);
-  };
 
-  const handleUpdateWorkout = (date, hour, e) => {
-    e.stopPropagation();
-    setUpdateWorkout({
-      workout_date: date,
-      workout_time: hour,
-      new_time: hour,
-    });
-  };
-
-  const saveUpdatedWorkout = async (date, hour, newTime) => {
-    if (isWorkoutExists(date, newTime)) {
+    const selectedDateTime = new Date(
+      `${editingWorkout.date}T${editWorkoutTime}`
+    );
+    if (selectedDateTime < new Date()) {
       setMessage({
-        text: "כבר קיים אימון בשעה ובתאריך האלה.",
+        text: "לא ניתן לעדכן אימון לשעה שכבר עברה.",
         type: "error",
         confirmable: false,
       });
@@ -420,37 +465,48 @@ export default function Workout({ onLogout, currentUser }) {
     }
 
     try {
-      const res = await fetch("http://localhost:3002/api/workouts", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          workout_date: date,
-          workout_time: hour,
-          new_time: newTime,
-        }),
-      });
+      const res = await fetch(
+        `http://localhost:3002/api/workouts/${editingWorkout.id}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            workout_time: editWorkoutTime,
+          }),
+        }
+      );
+
       if (!res.ok) {
-        const errData = await fetchJsonOrText(res);
-        throw new Error(
-          typeof errData === "string" ? errData : JSON.stringify(errData)
-        );
+        const errorText = await res.text();
+        throw new Error(errorText || "שגיאה בעדכון האימון");
       }
 
+      setEditingWorkout(null);
+      await loadWorkoutsFromDB();
+
       setMessage({
-        text: "האימון עודכן בהצלחה!",
+        text: "האימון עודכן בהצלחה.",
         type: "info",
         confirmable: false,
       });
       setShowMessage(true);
-      setUpdateWorkout(null);
-      loadWorkoutsFromDB();
-      loadParticipants();
     } catch (err) {
-      setMessage({ text: err.message, type: "error", confirmable: false });
+      setMessage({
+        text: err.message || "שגיאה בעדכון האימון",
+        type: "error",
+        confirmable: false,
+      });
       setShowMessage(true);
     }
   };
 
+  // function that checks if the workout time has already passed
+  const hasWorkoutPassed = (date, time) => {
+    const workoutDateTime = new Date(`${date}T${time}`);
+    return workoutDateTime < new Date();
+  };
+
+  // Render component
   return (
     <div className={classes.container}>
       <Header />
@@ -471,152 +527,125 @@ export default function Workout({ onLogout, currentUser }) {
           />
         )}
 
-        {confirmDelete && (
-          <MessageModal
-            message={`למחוק את האימון בתאריך ${confirmDelete.date} בשעה ${confirmDelete.hour}?`}
-            type="warning"
-            onClose={() => setConfirmDelete(null)}
-            onConfirm={confirmDeleteWorkout}
-            confirmText="כן, מחק"
-            cancelText="ביטול"
-          />
+        <h2 className={classes.title}>אימונים</h2>
+
+        {/* Add workout button */}
+        {isAdmin && !isAdding && (
+          <button
+            onClick={handleAddWorkout}
+            className={classes.addWorkoutButton}
+          >
+            הוספת אימון חדש
+          </button>
         )}
 
-        <h2 className={classes.title}>לוח אימונים</h2>
+        {/* Inline add workout form */}
+        {isAdmin && isAdding && (
+          <div className={classes.addWorkoutForm}>
+            <h3>הוספת אימון חדש</h3>
+            <input
+              type="date"
+              value={newWorkoutDate}
+              onChange={(e) => {
+                setNewWorkoutDate(e.target.value);
+              }}
+            />
 
-        {currentUser?.name === "admin" && (
-          <>
-            <button
-              onClick={() => setShowAddForm(!showAddForm)}
-              className={classes.button}
-              style={{ marginBottom: "1rem" }}
-            >
-              {showAddForm ? "בטל הוספת אימון" : "הוסף אימון חדש"}
-            </button>
-
-            {showAddForm && (
-              <form onSubmit={handleAddWorkout} className={classes.form}>
-                <div className={classes.inputContainer}>
-                  <label className={classes.label}>תאריך:</label>
-                  <input
-                    type="date"
-                    value={newDate}
-                    onChange={(e) => setNewDate(e.target.value)}
-                    className={classes.input}
-                    required
-                  />
-                </div>
-                <div className={classes.inputContainer}>
-                  <label className={classes.label}>שעה:</label>
-                  <input
-                    type="time"
-                    value={newTime}
-                    onChange={(e) => setNewTime(e.target.value)}
-                    className={classes.input}
-                    required
-                  />
-                </div>
-                <button type="submit" className={classes.button}>
-                  הוסף
-                </button>
-              </form>
-            )}
-          </>
+            <input
+              type="time"
+              value={newWorkoutTime}
+              onChange={(e) => setNewWorkoutTime(e.target.value)}
+            />
+            <div className={classes.editButtons}>
+              <button className={classes.saveBtn} onClick={submitAddWorkout}>
+                הוספה
+              </button>
+              <button className={classes.cancelBtn} onClick={handleCancelAdd}>
+                ביטול
+              </button>
+            </div>
+          </div>
         )}
 
         <div key={refreshKey} className={classes.scheduleGrid}>
           {scheduleData.map(({ day, date, hours }) => (
             <div key={date} className={classes.dayRow}>
               <div className={classes.dayLabel}>
-                {day} -{" "}
-                <span style={{ direction: "ltr", display: "inline-block" }}>
-                  {date.split("-")[2]} / {date.split("-")[1]} /{" "}
-                  {date.split("-")[0]}
-                </span>
+                {day} - <span>{date.split("-").reverse().join("/")}</span>
               </div>
               <div className={classes.hoursRow}>
-                {hours.map((hour) => {
-                  const key = `${date}|${hour.slice(0, 5)}`;
+                {hours.map(({ time, id }) => {
+                  const key = `${date}|${time}`;
                   const count = participants[key] ?? 0;
-                  const isFull = count >= 10;
-                  const isBookedByUser = userHasBookedSlot(date, hour);
-                  const status = isBookedByUser
-                    ? "אתה רשום לאימון זה"
-                    : isFull
-                    ? "הרשימה סגורה"
-                    : `${count} מתוך 10 נרשמו`;
+                  const isFull = count >= 5;
+                  const isBookedByUser = userHasBookedSlot(date, time);
+                  const isPassed = hasWorkoutPassed(date, time);
 
                   return (
-                    <div key={hour} className={classes.hourContainer}>
+                    <div key={id} className={classes.hourContainer}>
                       <div
-                        className={`${classes.hourBox} ${
-                          isFull ? classes.full : ""
-                        } ${isBookedByUser ? classes.bookedByUser : ""}`}
-                        onClick={() => handleHourClick(date, hour)}
-                        style={{ cursor: isFull ? "not-allowed" : "pointer" }}
+                        className={`${classes.hourBox} 
+                          ${isFull ? classes.full : ""} 
+                          ${isBookedByUser ? classes.bookedByUser : ""} 
+                          ${isPassed ? classes.passed : ""}`}
+                        onClick={() => {
+                          if (!isAdmin && !isPassed)
+                            handleHourClick(date, time);
+                        }}
                       >
-                        {hour}
-                        <div className={classes.participantCount}>{status}</div>
+                        {editingWorkout?.id === id ? (
+                          <input
+                            type="time"
+                            value={editWorkoutTime}
+                            onChange={(e) => setEditWorkoutTime(e.target.value)}
+                          />
+                        ) : (
+                          <>
+                            <span className={classes.timeText}>{time}</span>
+                            <span className={classes.participantsText}>
+                              {isBookedByUser
+                                ? "אתה רשום לאימון זה"
+                                : isFull
+                                ? "מלא"
+                                : isPassed
+                                ? "עבר"
+                                : `נרשמו ${count}/5`}
+                            </span>
+                          </>
+                        )}
                       </div>
 
-                      {currentUser?.name === "admin" && (
-                        <div className={classes.actionButtons}>
-                          {updateWorkout &&
-                          updateWorkout.workout_date === date &&
-                          updateWorkout.workout_time === hour ? (
-                            <>
-                              <input
-                                type="time"
-                                value={updateWorkout.new_time ?? hour}
-                                onChange={(e) =>
-                                  setUpdateWorkout((prev) => ({
-                                    ...prev,
-                                    new_time: e.target.value,
-                                  }))
-                                }
-                                className={classes.timeInput}
-                              />
-                              <button
-                                onClick={() =>
-                                  saveUpdatedWorkout(
-                                    date,
-                                    hour,
-                                    updateWorkout.new_time
-                                  )
-                                }
-                                className={classes.updateButton}
-                              >
-                                שמור
-                              </button>
-                              <button
-                                onClick={() => setUpdateWorkout(null)}
-                                className={classes.deleteButton}
-                              >
-                                ביטול
-                              </button>
-                            </>
-                          ) : (
-                            <>
-                              <button
-                                onClick={(e) =>
-                                  handleUpdateWorkout(date, hour, e)
-                                }
-                                className={classes.updateButton}
-                              >
-                                ערוך
-                              </button>
-                              <button
-                                onClick={(e) =>
-                                  requestDeleteWorkout(date, hour, e)
-                                }
-                                className={classes.deleteButton}
-                              >
-                                מחק
-                              </button>
-                            </>
-                          )}
+                      {isAdmin && editingWorkout?.id === id ? (
+                        <div className={classes.editButtons}>
+                          <button
+                            className={classes.saveBtn}
+                            onClick={submitEditWorkout}
+                          >
+                            שמור
+                          </button>
+                          <button
+                            className={classes.cancelBtn}
+                            onClick={() => setEditingWorkout(null)}
+                          >
+                            ביטול
+                          </button>
                         </div>
-                      )}
+                      ) : isAdmin ? (
+                        <div className={classes.adminButtons}>
+                          <button
+                            className={classes.editBtn}
+                            onClick={() => startEditWorkout({ id, date, time })}
+                          >
+                            עריכה
+                          </button>
+                          <button
+                            className={classes.deleteBtn}
+                            onClick={() => handleDeleteWorkout(id)}
+                          >
+                            מחיקה
+                          </button>
+                        </div>
+                      ) : null}
                     </div>
                   );
                 })}

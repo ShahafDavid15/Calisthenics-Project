@@ -5,138 +5,102 @@ import NavBar from "../components/navbar/NavBar";
 import classes from "./purchaseMembership.module.css";
 
 export default function PurchaseMembership({ currentUser, onLogout }) {
-  // State for list of memberships fetched from backend
   const [memberships, setMemberships] = useState([]);
-
-  // Currently selected membership ID (from radio list)
-  const [selectedMembershipId, setSelectedMembershipId] = useState(null);
-
-  // Status or error messages to show to user
+  const [selectedMembershipName, setSelectedMembershipName] = useState("");
   const [message, setMessage] = useState("");
-
-  // Flag to control whether PayPal buttons are rendered
-  const [showPaypalButtons, setShowPaypalButtons] = useState(false);
-
-  // Ref to container DOM element for PayPal buttons
+  const [isPaypalLoaded, setIsPaypalLoaded] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [loadingSdk, setLoadingSdk] = useState(true);
+  const [activeMembership, setActiveMembership] = useState(null);
   const paypalRef = useRef();
 
-  // PayPal client ID from environment variables (for SDK loading)
-  const paypalClientId = process.env.REACT_APP_PAYPAL_CLIENT_ID;
+  const VAT_PERCENT = 18;
 
-  // On component mount: fetch memberships from backend API
+  // calculate price with VAT and round to integer
+  const calculatePriceWithVAT = (price) => {
+    return Math.round(price * (1 + VAT_PERCENT / 100));
+  };
+
+  // Fetch memberships from backend
   useEffect(() => {
-    const fetchMemberships = async () => {
-      try {
-        const res = await fetch("/api/memberships");
-
-        if (!res.ok) throw new Error("Failed to load memberships");
-
-        const data = await res.json();
-
-        // Sort memberships by price ascending for UI display
-        const sorted = data.sort((a, b) => a.price - b.price);
-
-        setMemberships(sorted);
-
-        // Automatically select the first membership if available
-        if (sorted.length > 0) {
-          setSelectedMembershipId(sorted[0].membership_id);
-        }
-      } catch (err) {
-        // Show error message if fetching fails
-        setMessage("שגיאה בטעינת המנויים");
-        console.error("fetchMemberships error:", err);
-      }
-    };
-
-    fetchMemberships();
+    fetch("http://localhost:3002/api/memberships")
+      .then((res) => res.json())
+      .then((data) => {
+        setMemberships(data);
+        if (data.length > 0) setSelectedMembershipName(data[0].name);
+      })
+      .catch((err) => console.error("Error fetching memberships:", err));
   }, []);
 
-  // Effect triggered when selected membership or memberships list changes
+  // Fetch active membership for current user
   useEffect(() => {
-    // If no membership selected, hide PayPal buttons
-    if (!selectedMembershipId) {
-      setShowPaypalButtons(false);
-      return;
-    }
+    if (!currentUser?.user_id && !currentUser?.id) return;
 
-    // Find membership object from selected ID
-    const selectedMembership = memberships.find(
-      (m) => m.membership_id === selectedMembershipId
-    );
-
-    if (!selectedMembership) {
-      // If selection is invalid, hide PayPal buttons
-      setShowPaypalButtons(false);
-      return;
-    }
-
-    // Clear any messages and hide PayPal buttons while loading script
-    setMessage("");
-    setShowPaypalButtons(false);
-
-    // Function to dynamically add PayPal SDK script tag to document
-    const addPaypalScript = () => {
-      return new Promise((resolve) => {
-        if (window.paypal) {
-          // SDK already loaded - resolve immediately
-          resolve();
-          return;
+    const userId = currentUser?.user_id || currentUser?.id;
+    fetch(
+      `http://localhost:3002/api/purchases/active-membership?user_id=${userId}`
+    )
+      .then((res) => res.json())
+      .then((active) => {
+        if (active) {
+          setActiveMembership(active.membership_name);
+          setMessage(`יש לך כבר מנוי פעיל: ${active.membership_name}`);
+        } else {
+          setActiveMembership(null);
+          setMessage("");
         }
+      })
+      .catch((err) => console.error(err));
+  }, [currentUser]);
 
-        // Create script element
-        const script = document.createElement("script");
-
-        // Set PayPal SDK URL with client ID and currency (ILS - Israeli Shekel)
-        script.src = `https://www.paypal.com/sdk/js?client-id=${paypalClientId}&currency=ILS`;
-
-        // Resolve promise when script loads successfully
-        script.addEventListener("load", resolve);
-
-        // Handle script loading errors by showing message but still resolve to avoid hanging
-        script.addEventListener("error", () => {
-          setMessage("לא ניתן לטעון את PayPal, נסה שוב מאוחר יותר");
-          resolve();
-        });
-
-        // Append script to document body
-        document.body.appendChild(script);
-      });
-    };
-
-    // Load PayPal SDK, then show buttons if available
-    addPaypalScript().then(() => {
-      if (!window.paypal) {
-        setMessage("PayPal לא זמין כרגע.");
-        setShowPaypalButtons(false);
-        return;
-      }
-      setShowPaypalButtons(true);
-    });
-  }, [selectedMembershipId, memberships, paypalClientId]);
-
-  // Effect to render PayPal buttons whenever showPaypalButtons is true
+  // Load PayPal SDK
   useEffect(() => {
-    // Only run if PayPal buttons should be shown and ref is ready
-    if (!showPaypalButtons || !paypalRef.current) return;
+    const paypalClientId = process.env.REACT_APP_PAYPAL_CLIENT_ID;
+    if (!paypalClientId) {
+      setMessage("PayPal Client ID לא מוגדר. בדוק את .env");
+      setLoadingSdk(false);
+      return;
+    }
+
+    const existingScript = document.querySelector(
+      'script[src*="paypal.com/sdk/js"]'
+    );
+    if (existingScript) existingScript.remove();
+
+    const script = document.createElement("script");
+    script.src = `https://www.paypal.com/sdk/js?client-id=${paypalClientId}&currency=ILS&intent=capture&enable-funding=card`;
+    script.async = true;
+    script.onload = () => {
+      setIsPaypalLoaded(true);
+      setLoadingSdk(false);
+    };
+    script.onerror = () => {
+      setMessage("לא ניתן לטעון את PayPal SDK, נסה שוב מאוחר יותר");
+      setLoadingSdk(false);
+    };
+    document.body.appendChild(script);
+
+    // Cleanup the script when component unmounts
+    return () => document.body.removeChild(script);
+  }, []);
+
+  // Render PayPal Buttons
+  useEffect(() => {
+    if (!isPaypalLoaded || !paypalRef.current || !selectedMembershipName)
+      return;
 
     const container = paypalRef.current;
-
-    // Find selected membership info again
-    const selectedMembership = memberships.find(
-      (m) => m.membership_id === selectedMembershipId
-    );
-
-    if (!selectedMembership) {
-      setShowPaypalButtons(false);
-      return;
-    }
-
-    // Clear previous PayPal buttons if any
     container.innerHTML = "";
+    const selectedMembership = memberships.find(
+      (m) => m.name === selectedMembershipName
+    );
+    if (!selectedMembership) return;
 
-    // Initialize and render PayPal Buttons with config and event handlers
-    const paypalButtons = window.paypal.Buttons({
+    const priceWithVAT = calculatePriceWithVAT(selectedMembership.price);
+
+    let isCancelled = false;
+
+    const buttons = window.paypal.Buttons({
       style: {
         layout: "vertical",
         color: "blue",
@@ -144,156 +108,179 @@ export default function PurchaseMembership({ currentUser, onLogout }) {
         label: "paypal",
       },
 
-      // Called when creating the order (payment details)
-      createOrder: (data, actions) => {
-        return actions.order.create({
-          purchase_units: [
+      // Create an order when user clicks PayPal button
+      createOrder: async () => {
+        if (isCancelled) throw new Error("Payment cancelled");
+
+        const userId = currentUser?.user_id || currentUser?.id;
+        if (!userId) {
+          setMessage("שגיאה: משתמש לא מזוהה");
+          throw new Error("User ID missing");
+        }
+
+        if (activeMembership) {
+          setMessage(`כבר יש לך מנוי פעיל: ${activeMembership}`);
+          throw new Error("Cannot purchase active membership");
+        }
+
+        setIsProcessing(true);
+        try {
+          const res = await fetch(
+            "http://localhost:3002/api/purchases/create-order",
             {
-              amount: {
-                value: selectedMembership.price.toString(),
-                currency_code: "ILS",
-              },
-              description: selectedMembership.name,
-            },
-          ],
-        });
-      },
-
-      // Called on payment approval - finalize the transaction
-      onApprove: (data, actions) => {
-        setMessage("מעבד את התשלום...");
-
-        return actions.order.capture().then(async (details) => {
-          try {
-            // Send purchase details to backend for recording
-            const res = await fetch("/api/purchases", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
-                user_id: currentUser.user_id || currentUser.id,
-                membership_id: selectedMembershipId,
-                paypal_order_id: data.orderID,
-                payer_id: data.payerID,
+                membership_name: selectedMembershipName.trim(),
+                price: priceWithVAT,
               }),
-            });
-
-            if (!res.ok) {
-              const err = await res.json();
-              throw new Error(err.error || "Failed to record purchase");
             }
+          );
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || "Failed to create order");
+          return data.orderID;
+        } catch (err) {
+          setMessage("שגיאה ביצירת הזמנה: " + err.message);
+          setIsProcessing(false);
+          throw err;
+        }
+      },
 
-            // Success message and reset selection/buttons
-            setMessage("המנוי נרכש בהצלחה!");
-            setSelectedMembershipId(null);
-            setShowPaypalButtons(false);
-          } catch (err) {
-            setMessage("שגיאה ברישום הרכישה: " + err.message);
-            setShowPaypalButtons(false);
+      // Capture payment after approval
+      onApprove: async (data) => {
+        if (isCancelled) return;
+        try {
+          const captureRes = await fetch(
+            "http://localhost:3002/api/purchases/capture-order",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ orderID: data.orderID }),
+            }
+          );
+          const captureData = await captureRes.json();
+          if (!captureRes.ok)
+            throw new Error(captureData.error || "Failed to capture payment");
+
+          const userId = currentUser?.user_id || currentUser?.id;
+          const purchaseRes = await fetch(
+            "http://localhost:3002/api/purchases/purchase-membership",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                user_id: userId,
+                membership_name: selectedMembershipName.trim(),
+                paypal_order_id: data.orderID,
+                payer_id: data.payerID || data.payerId,
+                price: priceWithVAT,
+              }),
+            }
+          );
+          const purchaseData = await purchaseRes.json();
+          if (!purchaseRes.ok) {
+            if (purchaseRes.status === 409) throw new Error(purchaseData.error);
+            throw new Error(purchaseData.error || "Failed to record purchase");
           }
-        });
+
+          if (!isCancelled) {
+            setMessage(
+              `המנוי "${selectedMembershipName}" נרכש בהצלחה! מחיר לתשלום: ₪${priceWithVAT}`
+            );
+            setActiveMembership(selectedMembershipName);
+          }
+        } catch (err) {
+          if (!isCancelled)
+            setMessage("אירעה שגיאה בתהליך התשלום: " + err.message);
+        } finally {
+          if (!isCancelled) setIsProcessing(false);
+        }
       },
 
-      // Called on PayPal error
+      // Handle PayPal errors
       onError: (err) => {
-        setMessage("אירעה שגיאה בתשלום: " + err);
-        setShowPaypalButtons(false);
+        if (!isCancelled) {
+          setMessage("אירעה שגיאה: " + err);
+          setIsProcessing(false);
+        }
       },
 
-      // Called if user cancels the payment
+      // Handle user canceling the payment
       onCancel: () => {
-        setMessage("התשלום בוטל.");
-        setShowPaypalButtons(false);
+        if (!isCancelled) {
+          setMessage("התשלום בוטל.");
+          setIsProcessing(false);
+        }
       },
     });
 
-    // Render buttons into container
-    paypalButtons.render(container);
+    buttons.render(container).catch((err) => {
+      if (!isCancelled) console.error("PayPal render error:", err);
+    });
 
-    // Cleanup function to remove buttons when dependencies change or component unmounts
     return () => {
-      if (container) {
-        container.innerHTML = "";
-      }
+      isCancelled = true;
+      if (container) container.innerHTML = "";
     };
-  }, [showPaypalButtons, selectedMembershipId, memberships, currentUser]);
+  }, [
+    isPaypalLoaded,
+    selectedMembershipName,
+    memberships,
+    currentUser,
+    activeMembership,
+  ]);
 
   return (
     <div className={classes.container}>
       <Header />
       <NavBar />
-
-      {/* Logout button */}
-      <button onClick={onLogout} className={classes.logoutButton}>
+      <button
+        onClick={onLogout}
+        className={classes.logoutButton}
+        disabled={isProcessing}
+      >
         התנתקות
       </button>
 
       <main className={classes.main}>
         <h2 className={classes.title}>רכישת מנוי</h2>
-
-        {/* Display status or error message */}
         {message && <div className={classes.message}>{message}</div>}
 
         <div className={classes.membershipsList}>
           {memberships.length === 0 ? (
-            // Show loading message while memberships load
             <p>טוען מנויים...</p>
           ) : (
-            // List memberships as selectable radio group with accessible roles and keyboard handlers
-            <ul
-              className={classes.membershipCards}
-              role="radiogroup"
-              aria-label="בחירת מנוי"
-            >
+            <ul className={classes.membershipCards} role="radiogroup">
               {memberships.map((m) => (
                 <li
                   key={m.membership_id}
                   className={`${classes.membershipItem} ${
-                    selectedMembershipId === m.membership_id
-                      ? classes.selected
-                      : ""
-                  } ${
-                    m.name.toLowerCase() === "basic" ? classes.basicItem : ""
-                  }`}
-                  onClick={() => setSelectedMembershipId(m.membership_id)}
+                    selectedMembershipName === m.name ? classes.selected : ""
+                  } ${activeMembership ? classes.disabled : ""}`}
+                  onClick={() =>
+                    !isProcessing &&
+                    !activeMembership &&
+                    setSelectedMembershipName(m.name)
+                  }
                   tabIndex={0}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      setSelectedMembershipId(m.membership_id);
-                    }
-                  }}
-                  role="radio"
-                  aria-checked={selectedMembershipId === m.membership_id}
                 >
-                  {/* Hidden radio input for form semantics */}
                   <input
                     type="radio"
                     name="membership"
-                    value={m.membership_id}
-                    checked={selectedMembershipId === m.membership_id}
-                    onChange={() => setSelectedMembershipId(m.membership_id)}
+                    value={m.name}
+                    checked={selectedMembershipName === m.name}
+                    onChange={() =>
+                      !isProcessing &&
+                      !activeMembership &&
+                      setSelectedMembershipName(m.name)
+                    }
                     onClick={(e) => e.stopPropagation()}
-                    aria-label={`בחר מנוי ${m.name}`}
                   />
                   <div className={classes.membershipInfo}>
                     <span className={classes.membershipName}>{m.name}</span>
-
                     <span className={classes.membershipPrice}>
-                      <span className={classes.currency}>₪</span>
-                      <span>{m.price}</span>
-                    </span>
-
-                    <span
-                      className={classes.membershipDuration}
-                      style={{
-                        display: "inline-flex",
-                        direction: "rtl",
-                        gap: "0.25rem",
-                        justifyContent: "flex-end",
-                        alignItems: "center",
-                      }}
-                    >
-                      <span>{m.duration_days}</span>
-                      <span className={classes.durationText}>ימים</span>
+                      {m.entry_count} כניסות, {m.duration_days} ימים, ₪
+                      {calculatePriceWithVAT(m.price).toLocaleString("he-IL")}
                     </span>
                   </div>
                 </li>
@@ -302,17 +289,8 @@ export default function PurchaseMembership({ currentUser, onLogout }) {
           )}
         </div>
 
-        {/* Render PayPal buttons container when enabled */}
-        {showPaypalButtons && (
-          <div ref={paypalRef} style={{ marginTop: "1rem" }}></div>
-        )}
-
-        {/* If no membership selected, show a warning */}
-        {!selectedMembershipId && (
-          <p style={{ marginTop: "1rem", color: "red" }}>
-            אנא בחר מנוי כדי להציג את אפשרות התשלום
-          </p>
-        )}
+        {loadingSdk && <p>טוען PayPal...</p>}
+        <div ref={paypalRef} className={classes.paypalButtons} />
       </main>
 
       <Footer />

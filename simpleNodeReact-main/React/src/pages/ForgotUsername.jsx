@@ -5,21 +5,28 @@ import { Link } from "react-router-dom";
 import classes from "./forgotpassword.module.css";
 
 export default function ForgotUsername() {
+  // State to store user email input
   const [email, setEmail] = useState("");
+  // State to show success message
   const [message, setMessage] = useState("");
+  // State to show error message
   const [error, setError] = useState("");
 
+  // Handle click on "Send Username Email" button
   const handleSubmit = async () => {
+    // Reset previous messages
     setError("");
     setMessage("");
 
+    // Basic validation: check if email is entered
     if (!email) {
       setError("Please enter your email.");
       return;
     }
 
     try {
-      // שימוש ב-URL מלא כולל פורט של ה-backend
+      // Send POST request to backend to send the username to the user's email
+      // Using full URL with port for the backend
       const res = await fetch(
         "http://localhost:3002/api/users/forgot-username",
         {
@@ -31,12 +38,15 @@ export default function ForgotUsername() {
 
       const data = await res.json();
 
+      // Check for backend errors
       if (!res.ok) {
         setError(data.error || "Failed to send username email.");
       } else {
+        // Show success message
         setMessage("Check your email. Your username has been sent.");
       }
     } catch {
+      // Handle network/connection errors
       setError("Connection error. Try again.");
     }
   };
@@ -45,7 +55,7 @@ export default function ForgotUsername() {
     <div className={classes.pageWrapper}>
       <Header />
 
-      {/* Link back to login page */}
+      {/* Link to navigate back to login page */}
       <Link to="/" className={classes.link}>
         Back to Login
       </Link>
@@ -53,6 +63,7 @@ export default function ForgotUsername() {
       <main className={classes.container}>
         <h2>Forgot Username</h2>
 
+        {/* Email input field */}
         <input
           type="email"
           placeholder="Enter your email"
@@ -61,10 +72,12 @@ export default function ForgotUsername() {
           onChange={(e) => setEmail(e.target.value)}
         />
 
+        {/* Submit button */}
         <button className={classes.button} onClick={handleSubmit}>
           Send Username Email
         </button>
 
+        {/* Display messages */}
         {message && <p className={classes.success}>{message}</p>}
         {error && <p className={classes.error}>{error}</p>}
       </main>

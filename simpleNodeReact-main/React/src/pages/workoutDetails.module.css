@@ -5,7 +5,6 @@
   align-items: center;
   justify-content: flex-start;
   min-height: 100vh;
-  padding: 4rem;
   background-color: #fffbde;
   direction: rtl;
 }
@@ -23,6 +22,7 @@
   align-items: center;
   justify-content: center;
   width: 100%;
+  padding-bottom: 70px;
 }
 
 /* Title style */

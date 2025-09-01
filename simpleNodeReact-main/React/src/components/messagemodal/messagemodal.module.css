@@ -1,4 +1,4 @@
-/* Overlay that covers the entire screen with a semi-transparent black background */
+/* Overlay */
 .modalOverlay {
   position: fixed;
   top: 0;
@@ -12,7 +12,7 @@
   z-index: 1000;
 }
 
-/* Modal container with white background, padding, rounded corners, and centered text */
+/* Modal container */
 .modalContent {
   background-color: white;
   padding: 2rem;
@@ -22,15 +22,15 @@
   width: 90%;
 }
 
-/* Container for buttons with horizontal layout and spacing between them */
+/* Button group */
 .buttonGroup {
   display: flex;
   justify-content: center;
-  gap: 8px; /* space between buttons */
+  gap: 8px;
   margin-top: 20px;
 }
 
-/* Confirm button styling: teal background, white text, padding, rounded corners */
+/* Confirm button */
 .confirmBtn {
   background-color: #129990;
   color: white;
@@ -39,16 +39,29 @@
   border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.2s ease;
+  order: 2;
 }
-
-/* Confirm button hover effect: darker teal */
 .confirmBtn:hover {
   background-color: #096b68;
 }
 
-/* Cancel button styling: red background, white text, padding, rounded corners */
-.cancelBtn {
-  background-color: #dc3545;
+/* Neutral cancel button */
+.neutralCancelBtn {
+  background-color: #cccccc;
+  color: #000;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+.neutralCancelBtn:hover {
+  background-color: #aaaaaa;
+}
+
+/* Error cancel button */
+.errorCancelBtn {
+  background-color: #c82333;
   color: white;
   padding: 0.5rem 1rem;
   border: none;
@@ -56,8 +69,21 @@
   cursor: pointer;
   transition: background-color 0.2s ease;
 }
+.errorCancelBtn:hover {
+  background-color: #a71d2a;
+}
 
-/* Cancel button hover effect: darker red */
-.cancelBtn:hover {
+/* Delete cancel button */
+.deleteCancelBtn {
   background-color: #c82333;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  order: 1;
+}
+.deleteCancelBtn:hover {
+  background-color: #a71d2a;
 }

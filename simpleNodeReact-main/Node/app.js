@@ -3,7 +3,7 @@ const express = require("express");
 const cors = require("cors");
 const cron = require("node-cron");
 const insertWorkouts = require("./utils/seedWorkouts");
-
+const { notifyExpiringMemberships } = require("./utils/sendEmail");
 const app = express();
 const PORT = 3002;
 
@@ -31,9 +31,6 @@ app.use("/api/user-workouts", require("./routes/userWorkouts"));
 // Route for membership purchases
 app.use("/api/purchases", require("./routes/purchasesMembership"));
 
-// Route for handling PayPal payments and orders
-app.use("/api/paypal", require("./routes/paypal"));
-
 // Route for user statistics
 app.use("/api/workout-stats", require("./routes/workoutStats"));
 
@@ -47,6 +44,12 @@ insertWorkouts();
 cron.schedule("0 2 * * *", () => {
   console.log("Running daily workout insertion...");
   insertWorkouts();
+});
+
+// Schedule a daily job at 8:00 AM to notify expiring memberships
+cron.schedule("0 8 * * *", () => {
+  console.log("Checking expiring memberships...");
+  notifyExpiringMemberships();
 });
 
 // Start the Express server and listen on the defined port

@@ -6,30 +6,43 @@ import { useState, useEffect } from "react";
 import React from "react";
 
 export default function Membership({ onLogout, currentUser }) {
+  // State for all memberships
   const [memberships, setMemberships] = useState([]);
+
+  // Error handling state
   const [showError, setShowError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+
+  // Editing state
   const [editingMembershipId, setEditingMembershipId] = useState(null);
   const [currentEditData, setCurrentEditData] = useState({
     name: "",
     price: "",
     duration_days: "",
     entry_count: 0,
+    price_with_vat: 0,
   });
+
+  // State for showing add-new-membership form
   const [showAddForm, setShowAddForm] = useState(false);
   const [newMembershipData, setNewMembershipData] = useState({
     name: "",
     price: "",
     duration_days: "",
     entry_count: 0,
+    price_with_vat: 0,
   });
 
+  const VAT_RATE = 0.18;
+
+  // Fetch memberships from backend on component mount
   useEffect(() => {
     const fetchMemberships = async () => {
       try {
         const response = await fetch("/api/memberships");
         if (!response.ok) throw new Error("Failed to fetch memberships");
         const data = await response.json();
+        // Sort memberships by price ascending
         const sorted = data.sort((a, b) => a.price - b.price);
         setMemberships(sorted);
       } catch (error) {
@@ -39,26 +52,31 @@ export default function Membership({ onLogout, currentUser }) {
     fetchMemberships();
   }, []);
 
+  // Display an error modal with a given message
   const showErrorMessage = (message) => {
     setErrorMessage(message);
     setShowError(true);
   };
 
+  // Handle submission of new membership
   const handleAddSubmit = async () => {
+    // Validate required fields
     if (
       !newMembershipData.name ||
       !newMembershipData.price ||
       !newMembershipData.duration_days
     ) {
-      showErrorMessage("אנא מלא את כל השדות עבור המנוי החדש.");
+      showErrorMessage("אנא מלא את כל השדות.");
       return;
     }
 
+    // Convert input strings to numbers
     const priceValue = parseFloat(newMembershipData.price);
     const durationValue = parseInt(newMembershipData.duration_days);
 
+    // Validate positive numbers
     if (priceValue <= 0) {
-      showErrorMessage("מחיר מנוי חייב להיות חיובי.");
+      showErrorMessage("מחיר חייב להיות חיובי.");
       return;
     }
     if (durationValue <= 0) {
@@ -67,6 +85,7 @@ export default function Membership({ onLogout, currentUser }) {
     }
 
     try {
+      // Send POST request to backend to add membership
       const response = await fetch("/api/memberships", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -80,11 +99,13 @@ export default function Membership({ onLogout, currentUser }) {
 
       if (!response.ok) throw new Error("Failed to add membership");
 
+      // Refresh the memberships list
       const res = await fetch("/api/memberships");
       const data = await res.json();
       const sorted = data.sort((a, b) => a.price - b.price);
       setMemberships(sorted);
 
+      // Reset form
       setNewMembershipData({
         name: "",
         price: "",
@@ -97,7 +118,9 @@ export default function Membership({ onLogout, currentUser }) {
     }
   };
 
+  // Start editing a selected membership
   const startEditing = (membership) => {
+    // Close add form if open
     if (showAddForm) {
       setShowAddForm(false);
       setNewMembershipData({
@@ -116,6 +139,7 @@ export default function Membership({ onLogout, currentUser }) {
     });
   };
 
+  // Cancel editing
   const cancelEditing = () => {
     setEditingMembershipId(null);
     setCurrentEditData({
@@ -126,23 +150,36 @@ export default function Membership({ onLogout, currentUser }) {
     });
   };
 
+  // Update state when editing membership input changes
   const handleEditChange = (e) => {
     const { name, value } = e.target;
     setCurrentEditData((prev) => ({ ...prev, [name]: value }));
   };
 
+  // Update state when adding new membership input changes
   const handleNewMembershipChange = (e) => {
     const { name, value } = e.target;
-    setNewMembershipData((prev) => ({ ...prev, [name]: value }));
+
+    setNewMembershipData((prev) => {
+      const updated = { ...prev, [name]: value };
+
+      if (name === "price") {
+        const numericPrice = parseFloat(value) || 0;
+        updated.price_with_vat = numericPrice * (1 + VAT_RATE);
+      }
+
+      return updated;
+    });
   };
 
+  // Submit updates to an existing membership
   const handleUpdate = async (id) => {
     if (
       !currentEditData.name ||
       currentEditData.price === "" ||
       currentEditData.duration_days === ""
     ) {
-      showErrorMessage("אנא מלא את כל השדות לעדכון המנוי.");
+      showErrorMessage("אנא מלא את כל השדות.");
       return;
     }
 
@@ -151,7 +188,7 @@ export default function Membership({ onLogout, currentUser }) {
     const entryValue = parseInt(currentEditData.entry_count);
 
     if (priceValue <= 0 || durationValue <= 0 || entryValue < 0) {
-      showErrorMessage("הזן ערכים תקינים לכל השדות.");
+      showErrorMessage("לא ניתן להזין ערכים שליליים.");
       return;
     }
 
@@ -169,6 +206,7 @@ export default function Membership({ onLogout, currentUser }) {
 
       if (!response.ok) throw new Error("Failed to update membership");
 
+      // Refresh memberships list after update
       const res = await fetch("/api/memberships");
       const data = await res.json();
       const sorted = data.sort((a, b) => a.price - b.price);
@@ -180,6 +218,7 @@ export default function Membership({ onLogout, currentUser }) {
     }
   };
 
+  // Delete a membership
   const handleDelete = async (id) => {
     try {
       const response = await fetch(`/api/memberships/${id}`, {
@@ -187,6 +226,7 @@ export default function Membership({ onLogout, currentUser }) {
       });
       if (!response.ok) throw new Error("Failed to delete membership");
 
+      // Refresh memberships list
       const res = await fetch("/api/memberships");
       const data = await res.json();
       const sorted = data.sort((a, b) => a.price - b.price);
@@ -196,6 +236,7 @@ export default function Membership({ onLogout, currentUser }) {
     }
   };
 
+  // Toggle display of the add-new-membership form
   const toggleAddForm = () => {
     if (editingMembershipId) cancelEditing();
     setShowAddForm((prev) => !prev);
@@ -213,6 +254,7 @@ export default function Membership({ onLogout, currentUser }) {
     <div className={classes.container}>
       <Header />
       <NavBar currentUser={currentUser} />
+      {/* Logout button */}
       <button onClick={onLogout} className={classes.logoutButton}>
         התנתקות
       </button>
@@ -226,9 +268,10 @@ export default function Membership({ onLogout, currentUser }) {
               <tr>
                 <th>שם</th>
                 <th>מחיר</th>
-                <th>ימים</th>
-                <th>מס' כניסות בשבוע</th>
+                <th>ימים </th>
+                <th>מספר כניסות בשבוע</th>
                 <th>
+                  {/* Button to toggle add-new-membership form */}
                   <button
                     onClick={toggleAddForm}
                     className={classes.actionButtonAdd}
@@ -239,13 +282,14 @@ export default function Membership({ onLogout, currentUser }) {
               </tr>
             </thead>
             <tbody>
+              {/* Add membership form row */}
               {showAddForm && (
                 <tr>
                   <td>
                     <input
                       type="text"
                       name="name"
-                      placeholder="שם המנוי"
+                      placeholder="שם מנוי"
                       value={newMembershipData.name}
                       onChange={handleNewMembershipChange}
                       className={classes.inlineInput}
@@ -262,12 +306,23 @@ export default function Membership({ onLogout, currentUser }) {
                       className={classes.inlineInput}
                       required
                     />
+                    {newMembershipData.price && (
+                      <div className={classes.priceWithVat}>
+                        מחיר כולל מע"מ: ₪
+                        {Number(
+                          newMembershipData.price_with_vat
+                        ).toLocaleString("he-IL", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
+                      </div>
+                    )}
                   </td>
                   <td>
                     <input
                       type="number"
                       name="duration_days"
-                      placeholder="מספר ימים"
+                      placeholder="ימים"
                       value={newMembershipData.duration_days}
                       onChange={handleNewMembershipChange}
                       className={classes.inlineInput}
@@ -278,7 +333,7 @@ export default function Membership({ onLogout, currentUser }) {
                     <input
                       type="number"
                       name="entry_count"
-                      placeholder="מס' כניסות"
+                      placeholder="מספר כניסות"
                       value={newMembershipData.entry_count}
                       onChange={handleNewMembershipChange}
                       className={classes.inlineInput}
@@ -301,8 +356,10 @@ export default function Membership({ onLogout, currentUser }) {
                 </tr>
               )}
 
+              {/* List memberships */}
               {memberships.map((membership) => (
                 <tr key={membership.membership_id}>
+                  {/* Editable row */}
                   {editingMembershipId === membership.membership_id ? (
                     <>
                       <td>
@@ -384,6 +441,7 @@ export default function Membership({ onLogout, currentUser }) {
           </table>
         </div>
 
+        {/* Error modal */}
         {showError && (
           <div className={classes.errorModal}>
             <div className={classes.errorContent}>

@@ -9,35 +9,46 @@ import axios from "axios";
 export default function WorkoutEntry({ onLogout, currentUser }) {
   const userId = currentUser?.id;
 
+  // Form state
   const [selectedExercise, setSelectedExercise] = useState("");
   const [repetitions, setRepetitions] = useState("");
-  const [duration, setDuration] = useState("");
+  const [workoutDate, setWorkoutDate] = useState(
+    new Date().toISOString().slice(0, 10)
+  );
 
+  // Workouts list state
   const [workouts, setWorkouts] = useState([]);
 
+  // Edit mode state
   const [editWorkoutId, setEditWorkoutId] = useState(null);
   const [editedExercise, setEditedExercise] = useState("");
   const [editedReps, setEditedReps] = useState("");
-  const [editedDuration, setEditedDuration] = useState("");
+  const [editedDate, setEditedDate] = useState("");
 
+  // Modal state
   const [modalMessage, setModalMessage] = useState("");
   const [modalType, setModalType] = useState("error");
   const [showModal, setShowModal] = useState(false);
 
+  // Search state
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredWorkouts, setFilteredWorkouts] = useState([]);
 
   const API_BASE = "http://localhost:3002/api/workout_exercises";
 
+  // Predefined exercises for dropdown
   const predefinedExercises = [
     "עליות כוח",
     "שכיבות שמיכה",
     "סקוואטים",
     "דיפס",
-    "בטן",
+    "כפיפות בטן",
+    "מתח",
+    "לאנג' בולגרי",
+    "ג'אמפ סקוואט",
   ];
 
-  // טעינת אימונים של המשתמש
+  // Fetch user workouts from API
   useEffect(() => {
     if (!userId) return;
 
@@ -54,30 +65,36 @@ export default function WorkoutEntry({ onLogout, currentUser }) {
     fetchData();
   }, [userId]);
 
+  // Show error modal
   const showError = (msg) => {
     setModalType("error");
     setModalMessage(msg);
     setShowModal(true);
   };
 
+  // Show success modal
   const showSuccess = (msg) => {
     setModalType("success");
     setModalMessage(msg);
     setShowModal(true);
   };
 
-  // הוספת אימון חדש - POST
+  // Add new workout
   const handleSubmitExercise = async () => {
-    if (!selectedExercise || !repetitions || !duration) {
+    if (!selectedExercise || !repetitions || !workoutDate) {
       showError("יש למלא את כל השדות");
       return;
     }
 
     const repsValue = Number(repetitions);
-    const durationValue = Number(duration);
+    if (repsValue < 0) {
+      showError("מספר חזרות חייב להיות חיובי");
+      return;
+    }
 
-    if (repsValue < 0 || durationValue < 0) {
-      showError("מספר חזרות וזמן חייבים להיות חיוביים");
+    const today = new Date().toISOString().slice(0, 10);
+    if (workoutDate > today) {
+      showError("לא ניתן להזין תאריך עתידי");
       return;
     }
 
@@ -91,17 +108,16 @@ export default function WorkoutEntry({ onLogout, currentUser }) {
         user_id: userId,
         exercise: selectedExercise,
         repetitions: repsValue,
-        duration: durationValue,
+        workout_date: workoutDate,
       });
 
-      // רענון הרשימה לאחר הוספה
       const response = await axios.get(`${API_BASE}?user_id=${userId}`);
       setWorkouts(response.data);
 
       showSuccess("התרגיל נשלח ונשמר בהצלחה!");
       setSelectedExercise("");
       setRepetitions("");
-      setDuration("");
+      setWorkoutDate(today);
       setSearchTerm("");
       setFilteredWorkouts([]);
     } catch (error) {
@@ -110,15 +126,12 @@ export default function WorkoutEntry({ onLogout, currentUser }) {
     }
   };
 
-  // מחיקת אימון לפי id
+  // Delete a workout
   const handleDelete = async (workoutId) => {
     try {
       await axios.delete(`${API_BASE}/${workoutId}`);
-
-      // רענון הרשימה לאחר מחיקה
       const response = await axios.get(`${API_BASE}?user_id=${userId}`);
       setWorkouts(response.data);
-
       showSuccess("האימון נמחק בהצלחה!");
       setFilteredWorkouts((prev) => prev.filter((w) => w.id !== workoutId));
     } catch (error) {
@@ -127,28 +140,33 @@ export default function WorkoutEntry({ onLogout, currentUser }) {
     }
   };
 
-  // התחלת עריכה של אימון קיים
+  // Enter edit mode for a workout
   const handleEdit = (workout) => {
     setEditWorkoutId(workout.id);
     setEditedExercise(workout.exercise);
     setEditedReps(workout.repetitions);
-    setEditedDuration(workout.duration);
+    setEditedDate(workout.workout_date?.slice(0, 10) || "");
   };
 
+  // Cancel edit mode
   const handleCancel = () => {
     setEditWorkoutId(null);
     setEditedExercise("");
     setEditedReps("");
-    setEditedDuration("");
+    setEditedDate("");
   };
 
-  // שמירת עריכות
+  // Save edited workout
   const handleSave = async (id) => {
     const repsValue = Number(editedReps);
-    const durationValue = Number(editedDuration);
+    if (repsValue < 0) {
+      showError("מספר חזרות חייב להיות חיובי");
+      return;
+    }
 
-    if (repsValue < 0 || durationValue < 0) {
-      showError("מספר חזרות וזמן חייבים להיות חיוביים");
+    const today = new Date().toISOString().slice(0, 10);
+    if (editedDate > today) {
+      showError("לא ניתן להזין תאריך עתידי");
       return;
     }
 
@@ -156,14 +174,12 @@ export default function WorkoutEntry({ onLogout, currentUser }) {
       await axios.put(`${API_BASE}/${id}`, {
         exercise: editedExercise,
         repetitions: repsValue,
-        duration: durationValue,
+        workout_date: editedDate,
       });
 
-      // רענון הרשימה אחרי שמירה
       const response = await axios.get(`${API_BASE}?user_id=${userId}`);
       setWorkouts(response.data);
       setEditWorkoutId(null);
-
       showSuccess("העדכון נשמר בהצלחה!");
     } catch (error) {
       console.error(error);
@@ -171,7 +187,7 @@ export default function WorkoutEntry({ onLogout, currentUser }) {
     }
   };
 
-  // חיפוש לפי שם אימון מדויק
+  // Search workouts by exercise
   const handleSearch = () => {
     const trimmed = searchTerm.trim();
     if (!trimmed) {
@@ -182,11 +198,13 @@ export default function WorkoutEntry({ onLogout, currentUser }) {
     setFilteredWorkouts(results);
   };
 
+  // Clear search input and results
   const handleClear = () => {
     setSearchTerm("");
     setFilteredWorkouts([]);
   };
 
+  // Determine which workouts to display
   const displayedWorkouts =
     filteredWorkouts.length > 0 ? filteredWorkouts : workouts;
 
@@ -230,12 +248,11 @@ export default function WorkoutEntry({ onLogout, currentUser }) {
 
         <div className={classes.inputContainer}>
           <input
-            type="number"
-            min="0"
-            placeholder="זמן (בשניות)"
+            type="date"
             className={classes.input}
-            value={duration}
-            onChange={(e) => setDuration(e.target.value)}
+            value={workoutDate}
+            onChange={(e) => setWorkoutDate(e.target.value)}
+            max={new Date().toISOString().slice(0, 10)}
           />
         </div>
 
@@ -273,19 +290,19 @@ export default function WorkoutEntry({ onLogout, currentUser }) {
               <tr>
                 <th>תרגיל</th>
                 <th>מספר חזרות</th>
-                <th>זמן (שניות)</th>
-                <th>תאריך</th>
+                <th>תאריך האימון</th>
                 <th>פעולות</th>
               </tr>
             </thead>
             <tbody>
               {displayedWorkouts.length === 0 && (
                 <tr>
-                  <td colSpan="5" className={classes.noResultsCell}>
+                  <td colSpan="4" className={classes.noResultsCell}>
                     לא נמצאו תוצאות לתרגיל "{searchTerm}"
                   </td>
                 </tr>
               )}
+
               {displayedWorkouts.map((w) => (
                 <tr key={w.id}>
                   <td>
@@ -321,17 +338,16 @@ export default function WorkoutEntry({ onLogout, currentUser }) {
                   <td>
                     {editWorkoutId === w.id ? (
                       <input
-                        type="number"
-                        min="0"
-                        value={editedDuration}
-                        onChange={(e) => setEditedDuration(e.target.value)}
+                        type="date"
+                        value={editedDate}
+                        onChange={(e) => setEditedDate(e.target.value)}
+                        max={new Date().toISOString().slice(0, 10)}
                         className={classes.inlineInput}
                       />
                     ) : (
-                      w.duration
+                      new Date(w.workout_date).toLocaleDateString("he-IL")
                     )}
                   </td>
-                  <td>{new Date(w.created_at).toLocaleDateString("he-IL")}</td>
                   <td>
                     {editWorkoutId === w.id ? (
                       <>
@@ -374,6 +390,7 @@ export default function WorkoutEntry({ onLogout, currentUser }) {
 
       <Footer />
 
+      {/* Modal for displaying messages */}
       {showModal && (
         <MessageModal
           type={modalType}

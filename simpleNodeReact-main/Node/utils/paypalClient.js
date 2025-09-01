@@ -1,26 +1,36 @@
-require("dotenv").config();
 const checkoutNodeJssdk = require("@paypal/checkout-server-sdk");
 
-// Create PayPal environment based on credentials from .env file
-function environment() {
+/**
+ * Selects the PayPal environment (Sandbox or Live)
+ * based on the PAYPAL_ENV environment variable.
+ */
+const environment = () => {
+  const env = process.env.PAYPAL_ENV || "sandbox"; // default to Sandbox
   const clientId = process.env.PAYPAL_CLIENT_ID;
   const clientSecret = process.env.PAYPAL_CLIENT_SECRET;
 
-  // Check that credentials exist, otherwise throw error
+  // Check if client ID and secret are provided
   if (!clientId || !clientSecret) {
-    throw new Error("PayPal client ID or secret is missing in .env file");
+    throw new Error(
+      "PayPal client ID or secret missing in .env. Check PAYPAL_CLIENT_ID and PAYPAL_CLIENT_SECRET"
+    );
   }
 
-  // Use SandboxEnvironment for testing
-  return new checkoutNodeJssdk.core.SandboxEnvironment(clientId, clientSecret);
+  // Return the appropriate environment object for the SDK
+  if (env === "live") {
+    return new checkoutNodeJssdk.core.LiveEnvironment(clientId, clientSecret);
+  } else {
+    return new checkoutNodeJssdk.core.SandboxEnvironment(
+      clientId,
+      clientSecret
+    );
+  }
+};
 
-  // For production, use LiveEnvironment instead:
-  // return new checkoutNodeJssdk.core.LiveEnvironment(clientId, clientSecret);
-}
-
-// Create and return PayPal HTTP client instance with the environment
-function client() {
-  return new checkoutNodeJssdk.core.PayPalHttpClient(environment());
-}
+/**
+ * Creates a PayPal client using the selected environment.
+ * This client is used to execute requests such as order creation and capture.
+ */
+const client = () => new checkoutNodeJssdk.core.PayPalHttpClient(environment());
 
 module.exports = { client };
