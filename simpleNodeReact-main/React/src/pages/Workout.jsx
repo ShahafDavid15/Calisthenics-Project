@@ -589,7 +589,7 @@ export default function Workout({ onLogout, currentUser }) {
                           ${isBookedByUser ? classes.bookedByUser : ""} 
                           ${isPassed ? classes.passed : ""}`}
                         onClick={() => {
-                          if (!isAdmin && !isPassed)
+                          if (!isAdmin && !isPassed && !isBookedByUser)
                             handleHourClick(date, time);
                         }}
                       >
