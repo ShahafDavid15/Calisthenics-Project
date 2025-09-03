@@ -1,3 +1,11 @@
+/**
+ * This module manages user-related operations:
+ * - User registration and login.
+ * - Fetching user data.
+ * - Updating user profile and sending confirmation email.
+ * - Handling password and username recovery via email.
+ */
+
 const express = require("express");
 const router = express.Router();
 const db = require("../db");
@@ -95,7 +103,7 @@ router.get("/:id", (req, res) => {
   );
 });
 
-// Get all users with membership info (for admin)
+// Get all users with membership info 
 router.get("/", (req, res) => {
   const sql = `
     SELECT 

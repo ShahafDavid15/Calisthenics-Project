@@ -1,3 +1,11 @@
+/**
+ * Workout.jsx
+ * Page for managing and booking workouts.
+ * Users can register for workouts.
+ * Admins can add, edit, or delete workouts.
+ * Includes participants counter, validations, and error handling.
+ */
+
 import React, { useState, useEffect } from "react";
 import Header from "../components/header/Header";
 import Footer from "../components/footer/Footer";

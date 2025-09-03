@@ -1,3 +1,10 @@
+/**
+ * This module provides workout exercise statistics.
+ * exercise-stats: per-user statistics.
+ * Optional month filter.
+ * general-stats: overall statistics for all users.
+ */
+
 const express = require("express");
 const router = express.Router();
 const db = require("../db");

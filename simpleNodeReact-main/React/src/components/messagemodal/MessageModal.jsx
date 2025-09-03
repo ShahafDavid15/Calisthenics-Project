@@ -1,8 +1,20 @@
+/**
+ * MessageModal component
+ * Displays a modal dialog with a message and action buttons.
+ * Props:
+ * message: the text content to display
+ * onClose: callback when the modal is closed
+ * type: "error" or "info"/"success" , affects header and button styling
+ * onConfirm: optional callback for confirm action
+ * confirmText: text for confirm button
+ * cancelText: text for cancel button
+ *
+ * Can be used for error messages, informational messages, or confirmations.
+ */
+
 import React from "react";
 import classes from "./messagemodal.module.css";
 
-// MessageModal component displays a modal dialog with a message.
-// type: "error" (red button) or "success"/"info" (gray button)
 const MessageModal = ({
   message,
   onClose,
@@ -10,38 +22,36 @@ const MessageModal = ({
   onConfirm,
   confirmText = "אישור",
   cancelText = "ביטול",
-}) => {
-  return (
-    <div className={classes.modalOverlay}>
-      <div className={classes.modalContent}>
-        <h3>{type === "error" ? "שגיאה" : "הודעה"}</h3>
-        <p>{message}</p>
-        <div className={classes.buttonGroup}>
-          {onConfirm ? (
-            <>
-              <button onClick={onConfirm} className={classes.confirmBtn}>
-                {confirmText}
-              </button>
-              <button onClick={onClose} className={classes.deleteCancelBtn}>
-                {cancelText}
-              </button>
-            </>
-          ) : (
-            <button
-              onClick={onClose}
-              className={
-                type === "error"
-                  ? classes.errorCancelBtn
-                  : classes.neutralCancelBtn
-              }
-            >
-              סגור
+}) => (
+  <div className={classes.modalOverlay}>
+    <div className={classes.modalContent}>
+      <h3>{type === "error" ? "שגיאה" : "הודעה"}</h3>
+      <p>{message}</p>
+      <div className={classes.buttonGroup}>
+        {onConfirm ? (
+          <>
+            <button onClick={onConfirm} className={classes.confirmBtn}>
+              {confirmText}
             </button>
-          )}
-        </div>
+            <button onClick={onClose} className={classes.deleteCancelBtn}>
+              {cancelText}
+            </button>
+          </>
+        ) : (
+          <button
+            onClick={onClose}
+            className={
+              type === "error"
+                ? classes.errorCancelBtn
+                : classes.neutralCancelBtn
+            }
+          >
+            סגור
+          </button>
+        )}
       </div>
     </div>
-  );
-};
+  </div>
+);
 
 export default MessageModal;

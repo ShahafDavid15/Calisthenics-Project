@@ -1,3 +1,9 @@
+/**
+ * Main React application component.
+ * Sets up routing for all pages and handles user session.
+ * Protects routes for logged-in users and admin-only pages.
+ */
+
 import {
   BrowserRouter as Router,
   Switch,

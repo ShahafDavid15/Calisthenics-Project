@@ -1,3 +1,11 @@
+/**
+ * Members.jsx
+ * Admin page for viewing all users and their memberships.
+ * Fetches users from the backend
+ * Displays membership details and expiration
+ * Highlights memberships expiring soon
+ */
+
 import React, { useState, useEffect } from "react";
 import Header from "../components/header/Header";
 import NavBar from "../components/navbar/NavBar";

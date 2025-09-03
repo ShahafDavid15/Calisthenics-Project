@@ -1,3 +1,10 @@
+/**
+ * This module sets up a PayPal client for interacting with PayPal APIs.
+ *  Selects environment based on PAYPAL_ENV
+ *  Reads credentials from environment variables
+ *  Exports a `client` function to create a PayPal SDK client
+ */
+
 const checkoutNodeJssdk = require("@paypal/checkout-server-sdk");
 
 /**
@@ -5,7 +12,7 @@ const checkoutNodeJssdk = require("@paypal/checkout-server-sdk");
  * based on the PAYPAL_ENV environment variable.
  */
 const environment = () => {
-  const env = process.env.PAYPAL_ENV || "sandbox"; // default to Sandbox
+  const env = process.env.PAYPAL_ENV || "sandbox";
   const clientId = process.env.PAYPAL_CLIENT_ID;
   const clientSecret = process.env.PAYPAL_CLIENT_SECRET;
 

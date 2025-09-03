@@ -1,3 +1,11 @@
+/**
+ * This module seeds the database with default workout slots.
+ * Generates a schedule for the next 7 days, skipping Saturdays.
+ * Uses special hours for Fridays, default hours for other days.
+ * Checks the database to avoid duplicate entries.
+ * Inserts new workouts into the `workouts` table if they do not already exist.
+ */
+
 const db = require("../db");
 
 // Default workout hours for most days
@@ -24,7 +32,7 @@ function getScheduleDates() {
     dateObj.setDate(today.getDate() + i);
 
     const day = dateObj.getDay();
-    // Skip Saturday (day 6)
+    // Skip Saturday 
     if (day === 6) continue;
 
     // Format date as YYYY-MM-DD

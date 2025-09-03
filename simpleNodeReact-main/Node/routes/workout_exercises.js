@@ -1,3 +1,15 @@
+/**
+ * This Module managing user workout exercises.
+ * - fetch exercises for a user
+ * - add new exercise 
+ * - update an exercise
+ * - DELETE an exercise
+ * 
+ * Validations:
+ * - Required fields check
+ * - Future dates blocked
+ */
+
 const express = require("express");
 const router = express.Router();
 const db = require("../db");

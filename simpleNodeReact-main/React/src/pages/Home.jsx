@@ -1,3 +1,13 @@
+/**
+ * Home page
+ * Displays user dashboard or admin statistics.
+ * Props:
+ * currentUser: object with logged-in user info
+ * onLogout: callback to handle user logout
+ * Fetches workouts, exercise stats, active membership for users,
+ * and admin statistics for admin users.
+ */
+
 import React, { useEffect, useState } from "react";
 import Header from "../components/header/Header";
 import Footer from "../components/footer/Footer";

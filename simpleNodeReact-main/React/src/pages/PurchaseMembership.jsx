@@ -1,3 +1,8 @@
+/**
+ PurchaseMembership.jsx
+ This page fetches membership options from the backend, checks if the user already has an active membership, and integrates PayPal payment.
+ */
+
 import React, { useState, useEffect, useRef } from "react";
 import Header from "../components/header/Header";
 import Footer from "../components/footer/Footer";

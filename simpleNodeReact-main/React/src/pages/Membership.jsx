@@ -1,3 +1,13 @@
+/**
+ * Membership.jsx
+ * Page for managing memberships in the system.
+ * Provides full CRUD functionality for the admin:
+ * View all memberships
+ * Add a new membership
+ * Update existing membership details
+ * Delete memberships
+ */
+
 import Header from "../components/header/Header";
 import Footer from "../components/footer/Footer";
 import NavBar from "../components/navbar/NavBar";

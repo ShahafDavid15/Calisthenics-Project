@@ -1,3 +1,10 @@
+/**
+ * ForgotPassword.jsx
+ * This page allows a user to request a password reset link.
+ * The user enters their email, and a POST request is sent to the backend.
+ * If successful, a confirmation message is displayed; otherwise, an error is shown.
+ */
+
 import React, { useState } from "react";
 import Header from "../components/header/Header";
 import Footer from "../components/footer/Footer";

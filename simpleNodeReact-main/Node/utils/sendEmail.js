@@ -1,3 +1,10 @@
+/**
+ * This module handles email notifications for the Calisthenics system.
+ * Sends emails via Gmail
+ * Notifies users when their membership is about to expire
+ * Schedules daily notifications using cron
+ */
+
 require("dotenv").config();
 const nodemailer = require("nodemailer");
 const db = require("../db");
@@ -12,13 +19,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-/**
- * sendEmail
- * Sends an email to a specific recipient.
- * @param {string} to - Recipient email address
- * @param {string} subject - Email subject
- * @param {string} text - Email body text
- */
+/** Sends an email to a specific recipient. */
 async function sendEmail(to, subject, text) {
   try {
     await transporter.sendMail({
@@ -35,7 +36,7 @@ async function sendEmail(to, subject, text) {
 /**
  * notifyExpiringMemberships
  * Checks the database for memberships expiring within 3 days
- * and sends an email notification to the users in Hebrew.
+ * and sends an email notification to the users.
  * The expiration date is formatted as DD/MM/YYYY.
  */
 async function notifyExpiringMemberships() {

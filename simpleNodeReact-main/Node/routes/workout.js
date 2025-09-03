@@ -1,3 +1,18 @@
+/**
+ * This module manages CRUD operations for the "workouts" table.
+ *
+ * Responsibilities:
+ * - Retrieve all workouts.
+ * - Add a new workout.
+ * - Update an existing workout's time.
+ * - Remove a workout by ID.
+ *
+ * Additional functionality:
+ * - Validates that no workout is created/updated on Saturday.
+ * - Ensures no duplicate workout exists on the same date & time.
+ * - Standardized success/error messages returned to client.
+ */
+
 const express = require("express");
 const router = express.Router();
 const db = require("../db");

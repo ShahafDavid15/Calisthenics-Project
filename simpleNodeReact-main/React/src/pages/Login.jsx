@@ -1,3 +1,12 @@
+/**
+ * Login page
+ * Handles user login and registration forms.
+ * Props:
+ * setUser: callback to update the login user state
+ * Uses Header, Footer, NavBar components.
+ * Validates input and communicates with backend endpoints.
+ */
+
 import React, { useState, useEffect } from "react";
 import { Link, useHistory, useLocation } from "react-router-dom";
 import Header from "../components/header/Header";

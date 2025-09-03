@@ -1,3 +1,16 @@
+/**
+ * This module Manages workout bookings for users.
+ * - fetches all workouts for a user
+ * - books a new workout with membership checks
+ * - DELETE a workout by ID
+ * - GET all-participants returns participant counts per workout
+ *
+ * Validations include:
+ * - One workout per day per user
+ * - Max workouts per week according to membership
+ * - Prevent duplicate bookings for the same slot
+ */
+
 const express = require("express");
 const router = express.Router();
 const db = require("../db");

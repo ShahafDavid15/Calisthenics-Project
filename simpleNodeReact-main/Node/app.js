@@ -1,3 +1,12 @@
+/**
+ * app.js
+ * Entry point for the Express backend server.
+ * Configures middleware 
+ * Registers all API routes
+ * Sets up automated tasks (cron) for inserting workouts and notifying expiring memberships
+ * Starts the server and listens on the defined port
+ */
+
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");

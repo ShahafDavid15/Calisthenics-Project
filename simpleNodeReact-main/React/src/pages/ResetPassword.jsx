@@ -1,3 +1,11 @@
+/**
+ * ResetPassword.jsx
+ * This page allows a user to reset their password using a token received by email.
+ * The user enters a new password, confirms it, and submits.
+ * The form validates the password strength and checks that both inputs match.
+ * On success, the user is redirected back to the login page.
+ */
+
 import React, { useState } from "react";
 import { useLocation, useHistory } from "react-router-dom";
 import classes from "./resetpassword.module.css";

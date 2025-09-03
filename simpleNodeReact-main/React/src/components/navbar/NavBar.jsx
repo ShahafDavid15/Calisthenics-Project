@@ -1,3 +1,9 @@
+/**
+ * NavBar component
+ * Displays navigation links based on the user's role (admin or regular user).
+ * Props: currentUser - the logged-in user object
+ */
+
 import React from "react";
 import { Link } from "react-router-dom";
 import classes from "./navbar.module.css";

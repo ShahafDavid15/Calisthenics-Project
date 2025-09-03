@@ -1,3 +1,10 @@
+/**
+ * ForgotUsername.jsx
+ * This page allows users who forgot their username to request it via email.
+ * The user provides their registered email, the system sends a request to the backend,
+ * and if the email exists, their username is sent to them via email.
+ */
+
 import React, { useState } from "react";
 import Header from "../components/header/Header";
 import Footer from "../components/footer/Footer";

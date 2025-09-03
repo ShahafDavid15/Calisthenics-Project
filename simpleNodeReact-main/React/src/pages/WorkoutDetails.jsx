@@ -1,3 +1,13 @@
+/**
+ * WorkoutEntry.jsx
+ * Page for managing user workouts details:
+ * Add a new exercise.
+ * Display workout history in a table.
+ * Search exercise.
+ * Edit and delete exercise.
+ * Show success/error messages in a modal.
+ */
+
 import React, { useState, useEffect } from "react";
 import Header from "../components/header/Header";
 import Footer from "../components/footer/Footer";

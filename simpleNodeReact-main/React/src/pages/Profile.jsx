@@ -1,3 +1,9 @@
+/**
+ * Profile.jsx
+ * Page for viewing and updating user profile.
+ * Includes personal details form and password change.
+ */
+
 import React, { useState, useEffect } from "react";
 import Cookies from "js-cookie";
 

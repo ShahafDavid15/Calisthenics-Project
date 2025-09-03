@@ -1,11 +1,11 @@
+/**
+ * Footer component for the application.
+ * Displays a footer section with the current year and author name.
+ */
+
 import classes from "./footer.module.css";
 import React from "react";
 
-/**
- * Footer component
- * Displays a footer with the current year and author name
- * @returns JSX element representing the footer
- */
 export default function Footer() {
   // Get the current year dynamically
   const date = new Date().getFullYear();

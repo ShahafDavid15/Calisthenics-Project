@@ -1,3 +1,11 @@
+/**
+ * This module manages CRUD operations for the "membership" table.
+ * - Retrieve all memberships.
+ * - Add new memberships with automatic VAT calculation.
+ * - Update existing memberships with validations.
+ * - Delete memberships by ID.
+ */
+
 const express = require("express");
 const router = express.Router();
 const db = require("../db");
@@ -5,7 +13,7 @@ const db = require("../db");
 // VAT percentage
 const VAT_PERCENT = 18;
 
-// GET all memberships
+// GET all memberships sorted by price
 router.get("/", (req, res) => {
   const query = `
     SELECT membership_id, name, price, price_with_vat, duration_days, entry_count

@@ -1,3 +1,12 @@
+/**
+ * Admin statistics module
+ *  total users.
+ *  active memberships by type.
+ *  total workout registrations.
+ *  most popular workout day and time.
+ *  monthly income from memberships.
+ */
+
 const express = require("express");
 const router = express.Router();
 const db = require("../db");
