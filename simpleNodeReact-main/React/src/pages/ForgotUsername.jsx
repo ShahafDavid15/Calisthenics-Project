@@ -19,13 +19,13 @@ export default function ForgotUsername() {
   // State to show error message
   const [error, setError] = useState("");
 
-  // Handle click on "Send Username Email" button
+  // Handle click on Send Username Email button
   const handleSubmit = async () => {
     // Reset previous messages
     setError("");
     setMessage("");
 
-    // Basic validation: check if email is entered
+    // Basic validation check if email is entered
     if (!email) {
       setError("Please enter your email.");
       return;
@@ -53,7 +53,7 @@ export default function ForgotUsername() {
         setMessage("Check your email. Your username has been sent.");
       }
     } catch {
-      // Handle network/connection errors
+      // Handle network connection errors
       setError("Connection error. Try again.");
     }
   };

@@ -1,7 +1,7 @@
 /**
  * app.js
- * Entry point for the Express backend server.
- * Configures middleware 
+ * Entry point for the Express backend server
+ * Configures middleware
  * Registers all API routes
  * Sets up automated tasks (cron) for inserting workouts and notifying expiring memberships
  * Starts the server and listens on the defined port

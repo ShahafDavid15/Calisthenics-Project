@@ -1,5 +1,5 @@
 /**
- * Workout.jsx
+ * Workout.jsx.
  * Page for managing and booking workouts.
  * Users can register for workouts.
  * Admins can add, edit, or delete workouts.

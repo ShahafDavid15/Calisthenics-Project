@@ -2,16 +2,16 @@
  * This module Handles membership purchases via PayPal and email notifications.
  *
  * Responsibilities:
- * - Create PayPal order.
- * - Capture PayPal payment.
- * - Record purchased membership in the database.
- * - Send confirmation email to the user.
- * - Fetch active membership for a given user.
+ *  Create PayPal order.
+ *  Capture PayPal payment.
+ *  Record purchased membership in the database.
+ *  Send confirmation email to the user.
+ *  Fetch active membership for a given user.
  *
  * Additional functionality:
- * - Validates membership names and prices.
- * - Prevents multiple active memberships per user.
- * - Uses Promises for database queries.
+ *  Validates membership names and prices.
+ *  Prevents multiple active memberships per user.
+ *  Uses Promises for database queries.
  */
 
 require("dotenv").config();
@@ -33,7 +33,6 @@ const query = (sql, params) =>
 
 // Fixed membership prices for validation only
 const MEMBERSHIP_PRICES = {
-  Test: 1,
   Basic: 127.12,
   Standard: 211.86,
   Premium: 338.98,

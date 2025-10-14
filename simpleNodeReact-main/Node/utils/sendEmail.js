@@ -1,5 +1,5 @@
 /**
- * This module handles email notifications for the Calisthenics system.
+ * This module handles email notifications for the Calisthenics system
  * Sends emails via Gmail
  * Notifies users when their membership is about to expire
  * Schedules daily notifications using cron

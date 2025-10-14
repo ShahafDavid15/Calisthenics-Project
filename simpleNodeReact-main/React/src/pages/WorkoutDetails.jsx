@@ -1,5 +1,5 @@
 /**
- * WorkoutEntry.jsx
+ * WorkoutEntry.jsx.
  * Page for managing user workouts details:
  * Add a new exercise.
  * Display workout history in a table.

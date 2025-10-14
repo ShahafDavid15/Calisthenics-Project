@@ -369,7 +369,6 @@ export default function Membership({ onLogout, currentUser }) {
               {/* List memberships */}
               {memberships.map((membership) => (
                 <tr key={membership.membership_id}>
-                  {/* Editable row */}
                   {editingMembershipId === membership.membership_id ? (
                     <>
                       <td>

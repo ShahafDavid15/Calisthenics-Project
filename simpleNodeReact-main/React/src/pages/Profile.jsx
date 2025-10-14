@@ -1,5 +1,5 @@
 /**
- * Profile.jsx
+ * Profile.jsx.
  * Page for viewing and updating user profile.
  * Includes personal details form and password change.
  */

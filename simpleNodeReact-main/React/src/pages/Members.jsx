@@ -28,7 +28,7 @@ export default function Members({ currentUser, onLogout }) {
     cancelText: "ביטול",
   });
 
-  /** Fetch all users with membership info */
+  /* Fetch all users with membership info */
   const loadUsers = async () => {
     try {
       const res = await fetch("http://localhost:3002/api/users");

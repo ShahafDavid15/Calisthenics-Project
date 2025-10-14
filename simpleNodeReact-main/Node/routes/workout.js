@@ -2,15 +2,15 @@
  * This module manages CRUD operations for the "workouts" table.
  *
  * Responsibilities:
- * - Retrieve all workouts.
- * - Add a new workout.
- * - Update an existing workout's time.
- * - Remove a workout by ID.
+ *  Retrieve all workouts.
+ *  Add a new workout.
+ *  Update an existing workout's time.
+ *  Remove a workout by ID.
  *
  * Additional functionality:
- * - Validates that no workout is created/updated on Saturday.
- * - Ensures no duplicate workout exists on the same date & time.
- * - Standardized success/error messages returned to client.
+ *  Validates that no workout is created/updated on Saturday.
+ *  Ensures no duplicate workout exists on the same date & time.
+ *  Standardized success/error messages returned to client.
  */
 
 const express = require("express");
@@ -49,7 +49,7 @@ router.get("/", (req, res) => {
   });
 });
 
-// POST - Add new workout
+// POST Add new workout
 router.post("/", (req, res) => {
   const { workout_date, workout_time } = req.body;
   if (!workout_date || !workout_time) {
@@ -95,7 +95,7 @@ router.post("/", (req, res) => {
   });
 });
 
-// PUT - Update workout time by ID
+// PUT Update workout time by ID
 router.put("/:id", (req, res) => {
   const { id } = req.params;
   const { workout_time } = req.body;
@@ -164,7 +164,7 @@ router.put("/:id", (req, res) => {
   });
 });
 
-// DELETE - Delete workout by ID
+// DELETE Delete workout by ID
 router.delete("/:id", (req, res) => {
   const { id } = req.params;
   const query = `DELETE FROM workouts WHERE workout_id = ?`;

@@ -1,5 +1,5 @@
 /**
- PurchaseMembership.jsx
+ PurchaseMembership.jsx.
  This page fetches membership options from the backend, checks if the user already has an active membership, and integrates PayPal payment.
  */
 

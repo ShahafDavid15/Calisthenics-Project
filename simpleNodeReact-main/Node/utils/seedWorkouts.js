@@ -32,7 +32,7 @@ function getScheduleDates() {
     dateObj.setDate(today.getDate() + i);
 
     const day = dateObj.getDay();
-    // Skip Saturday 
+    // Skip Saturday
     if (day === 6) continue;
 
     // Format date as YYYY-MM-DD
@@ -60,7 +60,7 @@ function insertWorkouts() {
   const checkQuery = `SELECT * FROM workouts WHERE workout_date = ? AND workout_time = ?`;
   const insertQuery = `INSERT INTO workouts (workout_date, workout_time) VALUES (?, ?)`;
 
-  // For each date/time pair, check if it exists, then insert if not found
+  // For each date/time pair check if it exists, then insert if not found
   schedule.forEach(({ date, time }) => {
     db.query(checkQuery, [date, time], (err, results) => {
       if (err) {

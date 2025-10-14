@@ -98,7 +98,7 @@ export default function Login({ setUser }) {
         return;
       }
 
-      // Successful login: set user state and cookies
+      // Successful login set user state and cookies
       setUser({ name: data.username, id: data.user_id });
       Cookies.set("username", data.username);
       Cookies.set("user_id", data.user_id);
@@ -235,7 +235,7 @@ export default function Login({ setUser }) {
           </Link>
         </p>
 
-        {/* Forgot password / username links (login only) */}
+        {/* Forgot password username links */}
         {!isRegistration && (
           <>
             <p>

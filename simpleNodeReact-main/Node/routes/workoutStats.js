@@ -9,7 +9,7 @@ const express = require("express");
 const router = express.Router();
 const db = require("../db");
 
-/* GET exercise-statsReturns exercise statistics for a specific user. */
+/* GET exercise-statsReturns exercise statistics for a specific user */
 router.get("/exercise-stats", (req, res) => {
   const { user_id, month } = req.query;
 

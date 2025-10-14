@@ -1,9 +1,9 @@
 /**
  * This module manages user-related operations:
- * - User registration and login.
- * - Fetching user data.
- * - Updating user profile and sending confirmation email.
- * - Handling password and username recovery via email.
+ *  User registration and login.
+ *  Fetching user data.
+ *  Updating user profile and sending confirmation email.
+ *  Handling password and username recovery via email.
  */
 
 const express = require("express");
@@ -103,7 +103,7 @@ router.get("/:id", (req, res) => {
   );
 });
 
-// Get all users with membership info 
+// Get all users with their latest membership info
 router.get("/", (req, res) => {
   const sql = `
     SELECT 
@@ -114,10 +114,18 @@ router.get("/", (req, res) => {
       um.start_date,
       um.end_date
     FROM users u
-    LEFT JOIN user_membership um ON u.user_id = um.user_id
-    LEFT JOIN membership m ON um.membership_id = m.membership_id
-    ORDER BY u.user_id
+    LEFT JOIN user_membership um 
+      ON um.user_id = u.user_id
+      AND um.end_date = (
+        SELECT MAX(um2.end_date)
+        FROM user_membership um2
+        WHERE um2.user_id = u.user_id
+      )
+    LEFT JOIN membership m 
+      ON um.membership_id = m.membership_id
+    ORDER BY u.user_id;
   `;
+
   db.query(sql, (err, results) => {
     if (err) return res.status(500).json({ error: "Database error" });
     res.json(results);

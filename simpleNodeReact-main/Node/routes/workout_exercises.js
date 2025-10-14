@@ -1,13 +1,13 @@
 /**
  * This Module managing user workout exercises.
- * - fetch exercises for a user
- * - add new exercise 
- * - update an exercise
- * - DELETE an exercise
+ *  fetch exercises for a user
+ *  add new exercise 
+ *  update an exercise
+ *  DELETE an exercise
  * 
  * Validations:
- * - Required fields check
- * - Future dates blocked
+ *  Required fields check
+ *  Future dates blocked
  */
 
 const express = require("express");
@@ -35,7 +35,7 @@ router.get("/", (req, res) => {
   });
 });
 
-// POST - Add a new exercise
+// POST Add a new exercise
 router.post("/", (req, res) => {
   const { user_id, exercise, repetitions, workout_date } = req.body;
 
@@ -71,7 +71,7 @@ router.post("/", (req, res) => {
   );
 });
 
-// PUT - Update an exercise
+// PUT Update an exercise
 router.put("/:id", (req, res) => {
   const id = req.params.id;
   const { exercise, repetitions, workout_date } = req.body;
@@ -106,7 +106,7 @@ router.put("/:id", (req, res) => {
   });
 });
 
-// DELETE - Delete an exercise
+// DELETE Delete an exercise
 router.delete("/:id", (req, res) => {
   const id = req.params.id;
 

@@ -26,7 +26,7 @@ export default function ResetPassword() {
   const queryParams = new URLSearchParams(location.search);
   const token = queryParams.get("token");
 
-  // If no token is present, show error message
+  // If no token is present show error message
   if (!token) {
     return (
       <div className={classes.container}>

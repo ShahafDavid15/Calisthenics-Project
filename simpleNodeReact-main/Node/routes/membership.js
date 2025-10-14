@@ -1,9 +1,9 @@
 /**
  * This module manages CRUD operations for the "membership" table.
- * - Retrieve all memberships.
- * - Add new memberships with automatic VAT calculation.
- * - Update existing memberships with validations.
- * - Delete memberships by ID.
+ *  Retrieve all memberships.
+ *  Add new memberships with automatic VAT calculation.
+ *  Update existing memberships with validations.
+ *  Delete memberships by ID.
  */
 
 const express = require("express");

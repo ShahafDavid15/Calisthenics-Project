@@ -107,7 +107,7 @@ export default function Home({ onLogout, currentUser }) {
     }
   }, [currentUser, isAdmin]);
 
-  // NEW: Fetch exercise stats when selectedMonth changes
+  // Fetch exercise stats when selectedMonth changes
   useEffect(() => {
     if (!currentUser?.id || isAdmin) return;
 

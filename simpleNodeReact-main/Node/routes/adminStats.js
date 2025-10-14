@@ -1,5 +1,5 @@
 /**
- * Admin statistics module
+ * Admin statistics module.
  *  total users.
  *  active memberships by type.
  *  total workout registrations.
