@@ -1,0 +1,262 @@
+/* Container: main wrapper, vertical flex layout centered horizontally,
+   with RTL text direction and padding for spacing */
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 100vh;
+  background-color: #fffbde;
+  direction: rtl;
+}
+
+/* Main content area, flex column centered with padding */
+.main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  width: 100%;
+
+  box-sizing: border-box;
+}
+
+/* Title text styling */
+.title {
+  color: #096b68;
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+/* Form wrapper: max width with centered column layout */
+.form {
+  width: 100%;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Container for each input field: centers content horizontally */
+.inputContainer {
+  margin-bottom: 15px;
+  width: 100%;
+  max-width: 350px;
+  display: flex;
+  justify-content: center;
+}
+
+/* Common styles for inputs: full width, padding, border, rounded corners, right-aligned text */
+.input {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  text-align: right;
+}
+
+/* Styling select inputs with consistent padding and font size */
+select.input {
+  padding: 10px;
+  font-size: 16px;
+}
+
+/* Email and telephone inputs: left-aligned text and LTR direction */
+input[type="email"],
+input[type="tel"] {
+  text-align: left;
+  direction: ltr;
+}
+
+/* General button styles: background, text color, padding, rounded corners, full width max 350px */
+.button {
+  background-color: #129990;
+  color: white;
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 100%;
+  max-width: 350px;
+  transition: background-color 0.3s ease;
+}
+
+/* Hover effect for buttons */
+.button:hover {
+  background-color: #096b68;
+}
+
+/* Link style for inline links with margin and color */
+.link {
+  margin-top: 15px;
+  text-decoration: none;
+  color: #129990;
+  font-size: 14px;
+}
+
+/* Hover effect for links */
+.link:hover {
+  text-decoration: underline;
+}
+
+/* Top link style for prominent navigation links */
+.topLink {
+  display: block;
+  width: 100%;
+  max-width: 400px;
+  padding: 1rem;
+  font-size: 1.2rem;
+  color: #129990;
+  background-color: #fffbde;
+  text-align: center;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  margin-top: 15px;
+}
+
+/* Center align all h1 headings */
+h1 {
+  text-align: center;
+}
+
+/* Hover effect for top navigation link: color change, underline, and slight upward move */
+.topLink:hover {
+  color: #096b68;
+  text-decoration: underline;
+  transform: translateY(-3px);
+}
+
+/* Logout button positioning and style */
+.logoutButton {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background-color: #129990;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  text-decoration: none;
+  font-size: 12px;
+  cursor: pointer;
+  z-index: 1000;
+}
+
+/* Logout button hover effect */
+.logoutButton:hover {
+  background-color: #096b68;
+}
+
+/* Modal overlay background for error or message modals */
+.errorModal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* Modal content box styling */
+.errorContent {
+  background-color: white;
+  padding: 20px;
+  border-radius: 5px;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  direction: rtl;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Modal heading color and spacing */
+.errorContent h3 {
+  color: #e74c3c;
+  margin-top: 0;
+  margin-bottom: 15px;
+}
+
+/* Modal paragraph text style */
+.errorContent p {
+  color: #333;
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+/* Modal button styling */
+.errorContent button {
+  background-color: #129990;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+/* Modal button hover effect */
+.errorContent button:hover {
+  background-color: #096b68;
+}
+
+/* Button group container for update/cancel buttons: flex row with gap */
+.buttonGroup {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  max-width: 350px;
+  margin-top: 10px;
+}
+
+/* Update button styling */
+.updateButton {
+  background-color: #129990;
+  color: white;
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  flex: 1;
+  transition: background-color 0.3s ease;
+}
+
+/* Update button hover */
+.updateButton:hover {
+  background-color: #096b68;
+}
+
+/* Cancel button styling */
+.cancelButton {
+  background-color: #c0392b;
+  color: white;
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  flex: 1;
+  transition: background-color 0.3s ease;
+}
+
+/* Cancel button hover */
+.cancelButton:hover {
+  background-color: #7a1f18;
+}
+
+/* Order buttons so update comes first, cancel second */
+.buttonGroup .updateButton {
+  order: 1;
+}
+
+.buttonGroup .cancelButton {
+  order: 2;
+}

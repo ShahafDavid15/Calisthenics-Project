@@ -1,0 +1,145 @@
+/* Main page container */
+.container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  position: relative;
+}
+
+/* Main content area */
+.main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding-bottom: 50px;
+}
+
+/* Logout button */
+.logoutButton {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background-color: #129990;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  z-index: 1000;
+}
+
+.logoutButton:hover {
+  background-color: #096b68;
+}
+
+/* User workouts container */
+.userWorkouts {
+  margin-top: 2rem;
+  background-color: #fdf8e8;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  max-width: 600px;
+  width: 90%;
+  text-align: right;
+  direction: rtl;
+}
+
+/* Membership info */
+.membershipInfo p {
+  margin: 0.3rem 0;
+  font-weight: bold;
+  color: #129990;
+}
+
+/* Membership title and value */
+.membershipTitle {
+  color: inherit;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.label {
+  color: inherit;
+}
+
+.value {
+  color: black;
+  font-weight: bold;
+}
+
+/* Workouts title */
+.workoutsTitle {
+  color: #129990;
+  margin-bottom: 1rem;
+}
+
+/* List of workouts */
+.workoutList {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.workoutList li {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.75rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  direction: rtl;
+}
+
+/* Cancel button */
+.cancelButton {
+  background-color: #e74c3c;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.cancelButton:hover {
+  background-color: #c0392b;
+}
+
+/* Past workout styling */
+.pastWorkout {
+  color: gray;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* Stats container */
+.statsContainer {
+  margin: 2rem 0;
+  padding: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #fff8e1;
+  text-align: right;
+  direction: rtl;
+}
+
+/* Stats table */
+.statsTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  direction: rtl;
+}
+
+.statsTable th,
+.statsTable td {
+  border: 1px solid #ccc;
+  padding: 0.5rem;
+  text-align: right;
+}
