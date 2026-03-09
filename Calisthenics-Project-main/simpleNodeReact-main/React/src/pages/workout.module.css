@@ -1,0 +1,269 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 100vh;
+  background-color: #fffbde;
+  direction: rtl;
+}
+
+/* Main content area */
+.main {
+  flex: 1;
+  padding: 5px 20px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  direction: rtl;
+}
+
+/* Page title styling */
+.title {
+  color: #096b68;
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+/* Add Workout button */
+.addWorkoutButton {
+  background-color: #129990;
+  color: white;
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-bottom: 15px;
+  transition: background-color 0.3s ease;
+}
+
+.addWorkoutButton:hover {
+  background-color: #096b68;
+}
+
+/* Logout button */
+.logoutButton {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background-color: #129990;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  z-index: 1000;
+}
+
+.logoutButton:hover {
+  background-color: #096b68;
+}
+
+/* Schedule grid for workouts */
+.scheduleGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  max-width: 700px;
+}
+
+/* Each day's row in the schedule */
+.dayRow {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 10px;
+}
+
+/* Day label styling */
+.dayLabel {
+  font-weight: bold;
+  font-size: 18px;
+  color: #129990;
+  text-align: right;
+}
+
+/* Row containing workout hours */
+.hoursRow {
+  display: flex;
+  justify-content: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Container for each hour box */
+.hourContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Hour box styling */
+.hourBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: 1px solid #129990;
+  border-radius: 8px;
+  padding: 0.5rem;
+  min-width: 100px;
+  min-height: 60px;
+  background-color: #e0f0ef;
+  color: #096b68;
+  font-weight: 600;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.hourBox:hover {
+  background-color: #129990;
+  color: white;
+}
+
+/* Full class when max participants reached */
+.full {
+  background-color: #f8d7da;
+  color: #777;
+  cursor: not-allowed;
+  border: 1px solid #aaa;
+}
+
+/* Styling for hour box booked by the current user */
+.bookedByUser {
+  background-color: #d1e7dd;
+  color: #333;
+  border-color: #66cc66;
+}
+
+/* Time and participants text inside hour box */
+.timeText {
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+.participantsText {
+  font-size: 0.8rem;
+  margin-top: 4px;
+  color: #555;
+}
+
+/* Admin controls under each hour box */
+.adminButtons {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* Edit button for admin */
+.editBtn {
+  padding: 6px 10px;
+  font-size: 0.85rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  background-color: #129990;
+  color: white;
+  transition: background-color 0.3s ease;
+}
+
+.editBtn:hover {
+  background-color: #096b68;
+}
+
+/* Delete button for admin */
+.deleteBtn {
+  padding: 4px 8px;
+  font-size: 0.85rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  background-color: #c0392b;
+  color: white;
+  transition: background-color 0.3s ease;
+}
+
+.deleteBtn:hover {
+  background-color: #7a1f18;
+}
+
+/* Inline form for adding/editing a workout */
+.addWorkoutForm {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+  padding: 10px;
+  border: 1px solid #129990;
+  border-radius: 8px;
+  background-color: #e0f0ef;
+  align-items: center;
+}
+
+/* Input fields inside the add/edit form */
+.addWorkoutForm input[type="date"],
+.addWorkoutForm input[type="time"] {
+  padding: 6px;
+  font-size: 14px;
+  border: 1px solid #129990;
+  border-radius: 4px;
+  outline: none;
+  width: 120px;
+  text-align: center;
+}
+
+/* Container for save/cancel buttons in add/edit form */
+.editButtons {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 4px;
+}
+
+/* Save button inside add/edit form */
+.editButtons .saveBtn {
+  padding: 6px 10px;
+  font-size: 0.85rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  background-color: #129990;
+  color: white;
+  transition: background-color 0.3s ease;
+}
+
+.editButtons .saveBtn:hover {
+  background-color: #096b68;
+}
+
+/* Cancel button inside add/edit form */
+.editButtons .cancelBtn {
+  padding: 4px 8px;
+  font-size: 0.85rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  background-color: #c0392b;
+  color: white;
+  transition: background-color 0.3s ease;
+}
+
+.editButtons .cancelBtn:hover {
+  background-color: #7a1f18;
+}
+
+/* Show "not-allowed" cursor on hover for workouts that have passed, are fully booked, or the user is already registered */
+.hourBox.passed:hover,
+.hourBox.bookedByUser:hover,
+.hourBox.full:hover {
+  cursor: not-allowed;
+}

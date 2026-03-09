@@ -1,0 +1,249 @@
+/* Chart color variables */
+:global(:root) {
+  --chart-primary: #129990;
+  --chart-secondary: #e67e22;
+  --pie-color-0: #129990;
+  --pie-color-1: #e67e22;
+  --pie-color-2: #8e44ad;
+  --pie-color-3: #2980b9;
+}
+
+/* Main page container */
+.container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  position: relative;
+}
+
+/* Main content area */
+.main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding-bottom: 50px;
+}
+
+/* Logout button */
+.logoutButton {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background-color: #129990;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  z-index: 1000;
+}
+
+.logoutButton:hover {
+  background-color: #096b68;
+}
+
+/* User workouts container */
+.userWorkouts {
+  margin-top: 2rem;
+  background-color: #fdf8e8;
+  padding: 1.5rem 2rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  max-width: 900px;
+  width: 95%;
+  text-align: right;
+  direction: rtl;
+  box-sizing: border-box;
+}
+
+/* Membership info */
+.membershipInfo p {
+  margin: 0.3rem 0;
+  font-weight: bold;
+  color: #129990;
+}
+
+/* Membership title and value */
+.membershipTitle {
+  color: inherit;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.label {
+  color: inherit;
+}
+
+.value {
+  color: black;
+  font-weight: bold;
+}
+
+/* Workouts title */
+.workoutsTitle {
+  color: #129990;
+  margin-bottom: 1rem;
+}
+
+/* List of workouts */
+.workoutList {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.workoutList li {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.75rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  direction: rtl;
+}
+
+/* Cancel button */
+.cancelButton {
+  background-color: #e74c3c;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.cancelButton:hover {
+  background-color: #c0392b;
+}
+
+/* Past workout styling */
+.pastWorkout {
+  color: gray;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.workoutItemPast {
+  color: gray;
+  opacity: 0.6;
+}
+
+/* Stats container */
+.statsContainer {
+  margin: 2rem 0;
+  padding: 1.5rem 2rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #fff8e1;
+  text-align: right;
+  direction: rtl;
+  max-width: 900px;
+  width: 95%;
+  box-sizing: border-box;
+  overflow: visible;
+}
+
+.statsTitle {
+  color: #129990;
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+}
+
+/* Summary stat cards */
+.statsCards {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.statCard {
+  background: #fff;
+  border: 1px solid #d4edeb;
+  border-radius: 10px;
+  padding: 1rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 140px;
+  flex: 1;
+  box-shadow: 0 2px 6px rgba(18, 153, 144, 0.1);
+}
+
+.statNumber {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #129990;
+  line-height: 1;
+}
+
+.statLabel {
+  font-size: 0.8rem;
+  color: #666;
+  margin-top: 0.4rem;
+  text-align: center;
+}
+
+.chartTitle {
+  color: #333;
+  margin: 1.5rem 0 0.75rem;
+  font-size: 1.1rem;
+  border-bottom: 2px solid #129990;
+  padding-bottom: 0.3rem;
+}
+
+/* Filter label & select */
+.filterLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+  color: #444;
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+}
+
+.filterSelect {
+  padding: 0.3rem 0.6rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+/* Recharts axis tick text */
+.axisTick {
+  font-size: 12px;
+  fill: #444;
+}
+
+/* Recharts pie chart inner label */
+.pieLabel {
+  fill: white;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+/* Bar chart value label above each bar */
+.barLabel {
+  fill: #333;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+/* Legend spacing - gap between color box and text */
+.statsContainer :global(.recharts-legend-item-text) {
+  margin-right: 8px;
+}
+
+.statsContainer :global(.recharts-legend-item) {
+  margin-left: 16px;
+}
