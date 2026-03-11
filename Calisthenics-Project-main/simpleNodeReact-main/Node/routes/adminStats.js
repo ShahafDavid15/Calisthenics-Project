@@ -10,6 +10,7 @@
 const express = require("express");
 const router = express.Router();
 const db = require("../db");
+const { authMiddleware, requireAdmin } = require("../middleware/authMiddleware");
 
 // wrap db.query in a Promise
 const query = (sql, params) =>
@@ -20,8 +21,8 @@ const query = (sql, params) =>
     });
   });
 
-// GET /api/admin-stats
-router.get("/", async (req, res) => {
+// GET /api/admin-stats (admin only)
+router.get("/", authMiddleware, requireAdmin, async (req, res) => {
   try {
     // Count total users (excluding admin)
     const users = await query(

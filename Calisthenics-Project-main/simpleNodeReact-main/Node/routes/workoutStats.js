@@ -8,14 +8,14 @@
 const express = require("express");
 const router = express.Router();
 const db = require("../db");
+const { authMiddleware } = require("../middleware/authMiddleware");
 
-/* GET exercise-statsReturns exercise statistics for a specific user */
+router.use(authMiddleware);
+
+/* GET exercise-stats - returns exercise statistics for the logged-in user */
 router.get("/exercise-stats", (req, res) => {
-  const { user_id, month } = req.query;
-
-  if (!user_id) {
-    return res.status(400).json({ error: "Missing user_id" });
-  }
+  const userId = req.user.userId;
+  const { month } = req.query;
 
   // Base query
   let query = `
@@ -26,7 +26,7 @@ router.get("/exercise-stats", (req, res) => {
     FROM workout_exercises
     WHERE user_id = ?
   `;
-  const params = [user_id];
+  const params = [userId];
 
   // Add month filter if provided
   if (month) {

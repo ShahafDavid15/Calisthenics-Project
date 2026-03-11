@@ -13,11 +13,13 @@
 const express = require("express");
 const router = express.Router();
 const db = require("../db");
+const { authMiddleware } = require("../middleware/authMiddleware");
+
+router.use(authMiddleware);
 
 // GET all exercises for a specific user
 router.get("/", (req, res) => {
-  const userId = req.query.user_id;
-  if (!userId) return res.status(400).json({ error: "Missing user_id" });
+  const userId = req.user.userId;
 
   const query = `
     SELECT id, user_id, exercise, repetitions, workout_date
@@ -37,9 +39,10 @@ router.get("/", (req, res) => {
 
 // POST Add a new exercise
 router.post("/", (req, res) => {
-  const { user_id, exercise, repetitions, workout_date } = req.body;
+  const userId = req.user.userId;
+  const { exercise, repetitions, workout_date } = req.body;
 
-  if (!user_id || !exercise || repetitions == null || !workout_date) {
+  if (!exercise || repetitions == null || !workout_date) {
     return res.status(400).json({ error: "Missing required fields" });
   }
 
@@ -56,7 +59,7 @@ router.post("/", (req, res) => {
 
   db.query(
     query,
-    [user_id, exercise, repetitions, workout_date],
+    [userId, exercise, repetitions, workout_date],
     (err, result) => {
       if (err) {
         console.error("Insert error:", err);
@@ -74,6 +77,7 @@ router.post("/", (req, res) => {
 // PUT Update an exercise
 router.put("/:id", (req, res) => {
   const id = req.params.id;
+  const userId = req.user.userId;
   const { exercise, repetitions, workout_date } = req.body;
 
   if (!exercise || repetitions == null || !workout_date) {
@@ -89,10 +93,10 @@ router.put("/:id", (req, res) => {
   const query = `
     UPDATE workout_exercises
     SET exercise = ?, repetitions = ?, workout_date = ?
-    WHERE id = ?
+    WHERE id = ? AND user_id = ?
   `;
 
-  db.query(query, [exercise, repetitions, workout_date, id], (err, result) => {
+  db.query(query, [exercise, repetitions, workout_date, id, userId], (err, result) => {
     if (err) {
       console.error("Update error:", err);
       return res.status(500).json({ error: "DB update error" });
@@ -109,9 +113,10 @@ router.put("/:id", (req, res) => {
 // DELETE Delete an exercise
 router.delete("/:id", (req, res) => {
   const id = req.params.id;
+  const userId = req.user.userId;
 
-  const query = `DELETE FROM workout_exercises WHERE id = ?`;
-  db.query(query, [id], (err, result) => {
+  const query = `DELETE FROM workout_exercises WHERE id = ? AND user_id = ?`;
+  db.query(query, [id, userId], (err, result) => {
     if (err) {
       console.error("Delete error:", err);
       return res.status(500).json({ error: "DB delete error" });

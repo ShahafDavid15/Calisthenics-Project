@@ -6,7 +6,7 @@
 
 import React, { useState, useEffect } from "react";
 import Cookies from "js-cookie";
-
+import { apiFetch } from "../utils/api";
 import Header from "../components/header/Header";
 import Footer from "../components/footer/Footer";
 import NavBar from "../components/navbar/NavBar";
@@ -43,7 +43,7 @@ export default function Profile({ onLogout }) {
 
     const fetchUserProfile = async (id) => {
       try {
-        const response = await fetch(`/api/users/${id}`);
+        const response = await apiFetch(`/api/users/${id}`);
         if (!response.ok) {
           const errorData = await response.json();
           throw new Error(errorData.error || "Failed to fetch user profile");
@@ -103,7 +103,7 @@ export default function Profile({ onLogout }) {
       gender,
     };
     try {
-      const response = await fetch("/api/users/profile", {
+      const response = await apiFetch("/api/users/profile", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(userDetails),
@@ -138,7 +138,7 @@ export default function Profile({ onLogout }) {
       return;
     }
     try {
-      const response = await fetch("/api/users/password", {
+      const response = await apiFetch("/api/users/password", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

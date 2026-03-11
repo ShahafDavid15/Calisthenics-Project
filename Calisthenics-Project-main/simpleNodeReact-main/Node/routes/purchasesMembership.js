@@ -18,7 +18,10 @@ require("dotenv").config();
 const express = require("express");
 const router = express.Router();
 const db = require("../db");
+const { authMiddleware } = require("../middleware/authMiddleware");
 const { client } = require("../utils/paypalClient");
+
+router.use(authMiddleware);
 const checkoutNodeJssdk = require("@paypal/checkout-server-sdk");
 const nodemailer = require("nodemailer");
 
@@ -104,9 +107,9 @@ router.post("/capture-order", async (req, res) => {
 
 // PURCHASE MEMBERSHIP & SEND EMAIL
 router.post("/purchase-membership", async (req, res) => {
-  const { user_id, membership_name, paypal_order_id, payer_id, price } =
-    req.body;
-  if (!user_id || !membership_name || !paypal_order_id || !payer_id || !price) {
+  const userId = req.user.userId;
+  const { membership_name, paypal_order_id, payer_id, price } = req.body;
+  if (!membership_name || !paypal_order_id || !payer_id || !price) {
     return res.status(400).json({ error: "Missing required fields" });
   }
 
@@ -118,7 +121,7 @@ router.post("/purchase-membership", async (req, res) => {
        JOIN membership m ON um.membership_id = m.membership_id
        WHERE um.user_id = ? AND CURDATE() BETWEEN um.start_date AND um.end_date
        LIMIT 1`,
-      [user_id]
+      [userId]
     );
 
     if (activeMembership.length) {
@@ -147,7 +150,7 @@ router.post("/purchase-membership", async (req, res) => {
         (?, ?, CURDATE(), DATE_ADD(CURDATE(), INTERVAL ? DAY), ?, ?, NOW())
     `;
     const result = await query(insertQuery, [
-      user_id,
+      userId,
       membership_id,
       duration,
       paypal_order_id,
@@ -157,7 +160,7 @@ router.post("/purchase-membership", async (req, res) => {
     // Send confirmation email
     const userRows = await query(
       "SELECT email, first_name FROM users WHERE user_id = ?",
-      [user_id]
+      [userId]
     );
     if (userRows.length && userRows[0].email) {
       const userEmail = userRows[0].email;
@@ -192,7 +195,7 @@ router.post("/purchase-membership", async (req, res) => {
         console.error("Mail error:", mailErr.message);
       }
     } else {
-      console.warn(`No email found for user_id ${user_id} - skipping email`);
+      console.warn(`No email found for user_id ${userId} - skipping email`);
     }
 
     res.status(201).json({
@@ -208,8 +211,7 @@ router.post("/purchase-membership", async (req, res) => {
 
 // GET ACTIVE MEMBERSHIP BY USER
 router.get("/active-membership", async (req, res) => {
-  const { user_id } = req.query;
-  if (!user_id) return res.status(400).json({ error: "Missing user_id" });
+  const userId = req.user.userId;
 
   try {
     const results = await query(
@@ -219,7 +221,7 @@ router.get("/active-membership", async (req, res) => {
        WHERE um.user_id = ? AND CURDATE() BETWEEN um.start_date AND um.end_date
        ORDER BY um.start_date DESC
        LIMIT 1`,
-      [user_id]
+      [userId]
     );
 
     if (!results.length) return res.json(null);

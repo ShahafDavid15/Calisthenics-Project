@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect, useRef } from "react";
+import { apiFetch } from "../utils/api";
 import Header from "../components/header/Header";
 import Footer from "../components/footer/Footer";
 import NavBar from "../components/navbar/NavBar";
@@ -28,7 +29,7 @@ export default function PurchaseMembership({ currentUser, onLogout }) {
 
   // Fetch memberships from backend
   useEffect(() => {
-    fetch("http://localhost:3002/api/memberships")
+    apiFetch("http://localhost:3002/api/memberships")
       .then((res) => res.json())
       .then((data) => {
         setMemberships(data);
@@ -42,7 +43,7 @@ export default function PurchaseMembership({ currentUser, onLogout }) {
     if (!currentUser?.user_id && !currentUser?.id) return;
 
     const userId = currentUser?.user_id || currentUser?.id;
-    fetch(
+    apiFetch(
       `http://localhost:3002/api/purchases/active-membership?user_id=${userId}`
     )
       .then((res) => res.json())
@@ -130,7 +131,7 @@ export default function PurchaseMembership({ currentUser, onLogout }) {
 
         setIsProcessing(true);
         try {
-          const res = await fetch(
+          const res = await apiFetch(
             "http://localhost:3002/api/purchases/create-order",
             {
               method: "POST",
@@ -155,7 +156,7 @@ export default function PurchaseMembership({ currentUser, onLogout }) {
       onApprove: async (data) => {
         if (isCancelled) return;
         try {
-          const captureRes = await fetch(
+          const captureRes = await apiFetch(
             "http://localhost:3002/api/purchases/capture-order",
             {
               method: "POST",
@@ -168,7 +169,7 @@ export default function PurchaseMembership({ currentUser, onLogout }) {
             throw new Error(captureData.error || "Failed to capture payment");
 
           const userId = currentUser?.user_id || currentUser?.id;
-          const purchaseRes = await fetch(
+          const purchaseRes = await apiFetch(
             "http://localhost:3002/api/purchases/purchase-membership",
             {
               method: "POST",
@@ -283,9 +284,10 @@ export default function PurchaseMembership({ currentUser, onLogout }) {
                   />
                   <div className={classes.membershipInfo}>
                     <span className={classes.membershipName}>{m.name}</span>
+                    <span className={classes.membershipEntries}>{m.entry_count} כניסות</span>
+                    <span className={classes.membershipDays}>{m.duration_days} ימים</span>
                     <span className={classes.membershipPrice}>
-                      {m.entry_count} כניסות, {m.duration_days} ימים, ₪
-                      {calculatePriceWithVAT(m.price).toLocaleString("he-IL")}
+                      ₪{calculatePriceWithVAT(m.price).toLocaleString("he-IL")}
                     </span>
                   </div>
                 </li>

@@ -16,6 +16,9 @@
 const express = require("express");
 const router = express.Router();
 const db = require("../db");
+const { authMiddleware } = require("../middleware/authMiddleware");
+
+router.use(authMiddleware);
 
 // create a standardized message object
 function createMessage(type, text) {

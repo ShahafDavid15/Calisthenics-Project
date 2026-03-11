@@ -14,6 +14,7 @@ import NavBar from "../components/navbar/NavBar";
 import classes from "./membership.module.css";
 import { useState, useEffect } from "react";
 import React from "react";
+import { apiFetch } from "../utils/api";
 
 export default function Membership({ onLogout, currentUser }) {
   // State for all memberships
@@ -49,7 +50,7 @@ export default function Membership({ onLogout, currentUser }) {
   useEffect(() => {
     const fetchMemberships = async () => {
       try {
-        const response = await fetch("/api/memberships");
+        const response = await apiFetch("/api/memberships");
         if (!response.ok) throw new Error("Failed to fetch memberships");
         const data = await response.json();
         // Sort memberships by price ascending
@@ -96,7 +97,7 @@ export default function Membership({ onLogout, currentUser }) {
 
     try {
       // Send POST request to backend to add membership
-      const response = await fetch("/api/memberships", {
+      const response = await apiFetch("/api/memberships", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -110,7 +111,7 @@ export default function Membership({ onLogout, currentUser }) {
       if (!response.ok) throw new Error("Failed to add membership");
 
       // Refresh the memberships list
-      const res = await fetch("/api/memberships");
+      const res = await apiFetch("/api/memberships");
       const data = await res.json();
       const sorted = data.sort((a, b) => a.price - b.price);
       setMemberships(sorted);
@@ -203,7 +204,7 @@ export default function Membership({ onLogout, currentUser }) {
     }
 
     try {
-      const response = await fetch(`/api/memberships/${id}`, {
+      const response = await apiFetch(`/api/memberships/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -217,7 +218,7 @@ export default function Membership({ onLogout, currentUser }) {
       if (!response.ok) throw new Error("Failed to update membership");
 
       // Refresh memberships list after update
-      const res = await fetch("/api/memberships");
+      const res = await apiFetch("/api/memberships");
       const data = await res.json();
       const sorted = data.sort((a, b) => a.price - b.price);
       setMemberships(sorted);
@@ -231,13 +232,13 @@ export default function Membership({ onLogout, currentUser }) {
   // Delete a membership
   const handleDelete = async (id) => {
     try {
-      const response = await fetch(`/api/memberships/${id}`, {
+      const response = await apiFetch(`/api/memberships/${id}`, {
         method: "DELETE",
       });
       if (!response.ok) throw new Error("Failed to delete membership");
 
       // Refresh memberships list
-      const res = await fetch("/api/memberships");
+      const res = await apiFetch("/api/memberships");
       const data = await res.json();
       const sorted = data.sort((a, b) => a.price - b.price);
       setMemberships(sorted);

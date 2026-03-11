@@ -14,7 +14,7 @@ const cron = require("node-cron");
 const insertWorkouts = require("./utils/seedWorkouts");
 const { notifyExpiringMemberships } = require("./utils/sendEmail");
 const app = express();
-const PORT = 3002;
+const PORT = process.env.PORT || 3002;
 
 // Enable CORS for all routes to allow cross-origin requests
 app.use(cors());

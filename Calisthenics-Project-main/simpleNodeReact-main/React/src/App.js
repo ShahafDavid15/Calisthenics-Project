@@ -44,9 +44,11 @@ function App() {
     }
   }, [user]);
 
-  // Logout handler
-  // Clears user state and sessionStorage
-  const handleLogout = () => setUser(null);
+  // Logout handler - clears user, token and sessionStorage
+  const handleLogout = () => {
+    sessionStorage.removeItem("token");
+    setUser(null);
+  };
 
   return (
     <Router>

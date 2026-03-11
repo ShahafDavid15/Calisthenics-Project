@@ -14,7 +14,7 @@ import Footer from "../components/footer/Footer";
 import NavBar from "../components/navbar/NavBar";
 import MessageModal from "../components/messagemodal/MessageModal";
 import classes from "./workoutDetails.module.css";
-import axios from "axios";
+import { apiAxios } from "../utils/api";
 
 export default function WorkoutEntry({ onLogout, currentUser }) {
   const userId = currentUser?.id;
@@ -64,7 +64,7 @@ export default function WorkoutEntry({ onLogout, currentUser }) {
 
     const fetchData = async () => {
       try {
-        const response = await axios.get(`${API_BASE}?user_id=${userId}`);
+        const response = await apiAxios.get(`${API_BASE}?user_id=${userId}`);
         setWorkouts(response.data);
       } catch (error) {
         console.error(error);
@@ -114,14 +114,14 @@ export default function WorkoutEntry({ onLogout, currentUser }) {
     }
 
     try {
-      await axios.post(API_BASE, {
+      await apiAxios.post(API_BASE, {
         user_id: userId,
         exercise: selectedExercise,
         repetitions: repsValue,
         workout_date: workoutDate,
       });
 
-      const response = await axios.get(`${API_BASE}?user_id=${userId}`);
+      const response = await apiAxios.get(`${API_BASE}?user_id=${userId}`);
       setWorkouts(response.data);
 
       showSuccess("התרגיל נשלח ונשמר בהצלחה!");
@@ -139,8 +139,8 @@ export default function WorkoutEntry({ onLogout, currentUser }) {
   // Delete a workout
   const handleDelete = async (workoutId) => {
     try {
-      await axios.delete(`${API_BASE}/${workoutId}`);
-      const response = await axios.get(`${API_BASE}?user_id=${userId}`);
+      await apiAxios.delete(`${API_BASE}/${workoutId}`);
+      const response = await apiAxios.get(`${API_BASE}?user_id=${userId}`);
       setWorkouts(response.data);
       showSuccess("האימון נמחק בהצלחה!");
       setFilteredWorkouts((prev) => prev.filter((w) => w.id !== workoutId));
@@ -150,12 +150,16 @@ export default function WorkoutEntry({ onLogout, currentUser }) {
     }
   };
 
-  // Enter edit mode for a workout
+  // Enter edit mode for a workout (use local date to avoid timezone shift)
   const handleEdit = (workout) => {
     setEditWorkoutId(workout.id);
     setEditedExercise(workout.exercise);
     setEditedReps(workout.repetitions);
-    setEditedDate(workout.workout_date?.slice(0, 10) || "");
+    const d = workout.workout_date ? new Date(workout.workout_date) : null;
+    const dateStr = d
+      ? `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`
+      : "";
+    setEditedDate(dateStr);
   };
 
   // Cancel edit mode
@@ -181,13 +185,13 @@ export default function WorkoutEntry({ onLogout, currentUser }) {
     }
 
     try {
-      await axios.put(`${API_BASE}/${id}`, {
+      await apiAxios.put(`${API_BASE}/${id}`, {
         exercise: editedExercise,
         repetitions: repsValue,
         workout_date: editedDate,
       });
 
-      const response = await axios.get(`${API_BASE}?user_id=${userId}`);
+      const response = await apiAxios.get(`${API_BASE}?user_id=${userId}`);
       setWorkouts(response.data);
       setEditWorkoutId(null);
       showSuccess("העדכון נשמר בהצלחה!");

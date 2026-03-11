@@ -1,32 +1,29 @@
 /**
  * This module handles the connection to the MySQL database.
- * It creates and exports a single `db` object that can be used
- * to execute queries from other modules.
- *
- * Connection details:
- * - host: database server address
- * - user: database username
- * - password: database password
- * - database: the name of the database
- *
- * On connection, it logs success or any error encountered.
+ * Uses a connection pool for better concurrency.
+ * Credentials from env: DB_HOST, DB_USER, DB_PASSWORD, DB_NAME
  */
 
+require("dotenv").config();
 const mysql = require("mysql2");
 
-const db = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "",
-  database: "calisthenics",
+const pool = mysql.createPool({
+  host: process.env.DB_HOST || "localhost",
+  user: process.env.DB_USER || "root",
+  password: process.env.DB_PASSWORD || "",
+  database: process.env.DB_NAME || "calisthenics",
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
 });
 
-db.connect((err) => {
+pool.getConnection((err, conn) => {
   if (err) {
     console.error("MySQL connection error:", err.message);
   } else {
-    console.log("Connected to MySQL database.");
+    console.log("Connected to MySQL database (pool).");
+    conn.release();
   }
 });
 
-module.exports = db;
+module.exports = pool;

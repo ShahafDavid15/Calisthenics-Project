@@ -85,8 +85,14 @@ class UserService {
       throw new AppError("Username or password is incorrect", 401);
     }
 
+    const token = await signJwt(
+      { userId: user.user_id, username: user.username, role: user.role },
+      { expiresIn: "7d" }
+    );
+
     return {
       message: "Login successful",
+      token,
       user_id: user.user_id,
       username: user.username,
       role: user.role,

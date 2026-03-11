@@ -94,27 +94,32 @@
   cursor: pointer;
 }
 
-/* Layout for membership info (name, price, etc.) */
+/* Layout for membership info - grid for aligned columns across all rows */
 .membershipInfo {
-  display: flex;
-  flex-direction: row;
+  display: grid;
+  grid-template-columns: 80px 90px 70px 1fr;
   align-items: center;
   gap: 1rem;
   font-weight: bold;
+  width: 100%;
+}
+
+.membershipName {
+  min-width: 80px;
+  text-align: left;
+}
+
+.membershipEntries {
+  min-width: 90px;
+}
+
+.membershipDays {
+  min-width: 70px;
 }
 
 /* Price layout inside membership info */
 .membershipPrice {
-  display: inline-flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 0.25rem;
-}
-.currency {
-  order: 0;
-}
-.membershipPrice > span:last-child {
-  order: 1;
+  text-align: start;
 }
 
 /* Duration layout for membership (days) */
@@ -187,12 +192,3 @@
   border-radius: 8px 8px 0 0;
 }
 
-/* Price layout repeated to ensure inline-flex for correct order */
-.membershipPrice {
-  display: inline-flex;
-  flex-direction: row;
-  gap: 0.25rem;
-  align-items: center;
-  direction: rtl;
-  font-weight: bold;
-}

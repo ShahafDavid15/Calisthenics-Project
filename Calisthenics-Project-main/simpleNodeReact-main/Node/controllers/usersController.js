@@ -29,7 +29,12 @@ class UsersController {
 
   async getUserById(req, res) {
     try {
-      const user = await userService.getUserById(req.params.id);
+      const requestedId = parseInt(req.params.id, 10);
+      const { userId, role } = req.user;
+      if (requestedId !== userId && role !== "admin") {
+        return res.status(403).json({ error: "אין הרשאה לצפות בפרופיל זה" });
+      }
+      const user = await userService.getUserById(requestedId);
       return res.json(user);
     } catch (err) {
       return handleError(res, err);
@@ -47,7 +52,8 @@ class UsersController {
 
   async updateProfile(req, res) {
     try {
-      const result = await userService.updateUserProfile(req.body);
+      const data = { ...req.body, username: req.user.username };
+      const result = await userService.updateUserProfile(data);
       return res.json(result);
     } catch (err) {
       return handleError(res, err);
@@ -74,7 +80,8 @@ class UsersController {
 
   async updatePassword(req, res) {
     try {
-      const result = await userService.updatePasswordFromProfile(req.body);
+      const data = { ...req.body, username: req.user.username };
+      const result = await userService.updatePasswordFromProfile(data);
       return res.json(result);
     } catch (err) {
       return handleError(res, err);

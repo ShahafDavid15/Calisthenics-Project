@@ -7,6 +7,7 @@
  */
 
 import React, { useState, useEffect } from "react";
+import { apiFetch } from "../utils/api";
 import Header from "../components/header/Header";
 import NavBar from "../components/navbar/NavBar";
 import Footer from "../components/footer/Footer";
@@ -31,7 +32,7 @@ export default function Members({ currentUser, onLogout }) {
   /* Fetch all users with membership info */
   const loadUsers = async () => {
     try {
-      const res = await fetch("http://localhost:3002/api/users");
+      const res = await apiFetch("http://localhost:3002/api/users");
       if (!res.ok) throw new Error(await res.text());
       const data = await res.json();
       setUsers(data);

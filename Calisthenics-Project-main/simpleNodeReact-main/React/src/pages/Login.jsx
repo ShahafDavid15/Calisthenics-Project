@@ -98,8 +98,11 @@ export default function Login({ setUser }) {
         return;
       }
 
-      // Successful login set user state and cookies
-      setUser({ name: data.username, id: data.user_id });
+      // Successful login - save token and user
+      if (data.token) {
+        sessionStorage.setItem("token", data.token);
+      }
+      setUser({ name: data.username, id: data.user_id, role: data.role });
       Cookies.set("username", data.username);
       Cookies.set("user_id", data.user_id);
 

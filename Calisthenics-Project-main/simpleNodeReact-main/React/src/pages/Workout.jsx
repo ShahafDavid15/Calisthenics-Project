@@ -7,6 +7,7 @@
  */
 
 import React, { useState, useEffect } from "react";
+import { apiFetch } from "../utils/api";
 import Header from "../components/header/Header";
 import Footer from "../components/footer/Footer";
 import NavBar from "../components/navbar/NavBar";
@@ -77,7 +78,7 @@ export default function Workout({ onLogout, currentUser }) {
     if (!currentUser?.id) return;
     const fetchMembership = async () => {
       try {
-        const res = await fetch(
+        const res = await apiFetch(
           `http://localhost:3002/api/purchases/active-membership?user_id=${currentUser.id}`
         );
         if (!res.ok) throw new Error("Failed to fetch membership");
@@ -93,7 +94,7 @@ export default function Workout({ onLogout, currentUser }) {
   /* Load participants count */
   const loadParticipants = async () => {
     try {
-      const res = await fetch(
+      const res = await apiFetch(
         "http://localhost:3002/api/user-workouts/all-participants"
       );
       if (!res.ok) throw new Error(await res.text());
@@ -121,7 +122,7 @@ export default function Workout({ onLogout, currentUser }) {
   /* Load workouts from DB */
   const loadWorkoutsFromDB = async () => {
     try {
-      const res = await fetch("http://localhost:3002/api/workouts");
+      const res = await apiFetch("http://localhost:3002/api/workouts");
       if (!res.ok) throw new Error(await res.text());
       const data = await res.json();
 
@@ -170,7 +171,7 @@ export default function Workout({ onLogout, currentUser }) {
     if (!currentUser?.id) return;
     const fetchUserWorkouts = async () => {
       try {
-        const res = await fetch(
+        const res = await apiFetch(
           `http://localhost:3002/api/user-workouts?user_id=${currentUser.id}`
         );
         if (!res.ok) throw new Error(await res.text());
@@ -287,7 +288,7 @@ export default function Workout({ onLogout, currentUser }) {
     setShowMessage(false);
 
     try {
-      const res = await fetch("http://localhost:3002/api/user-workouts", {
+      const res = await apiFetch("http://localhost:3002/api/user-workouts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -303,7 +304,7 @@ export default function Workout({ onLogout, currentUser }) {
       if (!res.ok) throw new Error(await fetchJsonOrText(res));
 
       await loadParticipants();
-      const userRes = await fetch(
+      const userRes = await apiFetch(
         `http://localhost:3002/api/user-workouts?user_id=${currentUser.id}`
       );
       setUserWorkouts(await userRes.json());
@@ -332,7 +333,7 @@ export default function Workout({ onLogout, currentUser }) {
       confirmable: true,
       onConfirm: async () => {
         try {
-          const res = await fetch(
+          const res = await apiFetch(
             `http://localhost:3002/api/workouts/${workoutId}`,
             {
               method: "DELETE",
@@ -411,7 +412,7 @@ export default function Workout({ onLogout, currentUser }) {
     }
 
     try {
-      const res = await fetch("http://localhost:3002/api/workouts", {
+      const res = await apiFetch("http://localhost:3002/api/workouts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -473,7 +474,7 @@ export default function Workout({ onLogout, currentUser }) {
     }
 
     try {
-      const res = await fetch(
+      const res = await apiFetch(
         `http://localhost:3002/api/workouts/${editingWorkout.id}`,
         {
           method: "PUT",

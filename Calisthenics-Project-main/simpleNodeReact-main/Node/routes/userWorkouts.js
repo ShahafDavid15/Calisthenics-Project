@@ -14,13 +14,15 @@
 const express = require("express");
 const router = express.Router();
 const db = require("../db");
+const { authMiddleware } = require("../middleware/authMiddleware");
+
+router.use(authMiddleware);
 
 /**
  GET all workouts booked by a specific user
  */
 router.get("/", (req, res) => {
-  const userId = req.query.user_id;
-  if (!userId) return res.status(400).json({ error: "Missing user_id" });
+  const userId = req.user.userId;
 
   const query = `
     SELECT id, 
@@ -44,11 +46,12 @@ router.get("/", (req, res) => {
  POST a new workout booking 
  */
 router.post("/", async (req, res) => {
-  const { user_id, workout_date, workout_time, membership_name } = req.body;
+  const userId = req.user.userId;
+  const { workout_date, workout_time, membership_name } = req.body;
 
-  if (!user_id || !workout_date || !workout_time || !membership_name) {
+  if (!workout_date || !workout_time || !membership_name) {
     return res.status(400).json({
-      error: "Missing user_id, workout_date, workout_time or membership_name",
+      error: "Missing workout_date, workout_time or membership_name",
     });
   }
 
@@ -62,7 +65,7 @@ router.post("/", async (req, res) => {
     const [slotResult] = await new Promise((resolve, reject) =>
       db.query(
         slotQuery,
-        [user_id, workout_date, workout_time],
+        [userId, workout_date, workout_time],
         (err, results) => (err ? reject(err) : resolve(results))
       )
     );
@@ -80,7 +83,7 @@ router.post("/", async (req, res) => {
       WHERE user_id = ? AND workout_date = ?
     `;
     const [dayResult] = await new Promise((resolve, reject) =>
-      db.query(dayQuery, [user_id, workout_date], (err, results) =>
+      db.query(dayQuery, [userId, workout_date], (err, results) =>
         err ? reject(err) : resolve(results)
       )
     );
@@ -105,13 +108,13 @@ router.post("/", async (req, res) => {
         AND YEARWEEK(workout_date, 1) = YEARWEEK(?, 1)
     `;
     const [weekResult] = await new Promise((resolve, reject) =>
-      db.query(weekQuery, [user_id, workout_date], (err, results) =>
+      db.query(weekQuery, [userId, workout_date], (err, results) =>
         err ? reject(err) : resolve(results)
       )
     );
 
     console.log("Weekly check:", {
-      user_id,
+      userId,
       workout_date,
       countThisWeek: weekResult.count,
       maxWorkouts,
@@ -130,7 +133,7 @@ router.post("/", async (req, res) => {
     `;
     db.query(
       insertQuery,
-      [user_id, workout_date, workout_time],
+      [userId, workout_date, workout_time],
       (err, result) => {
         if (err) {
           console.error("Insert error:", err);
@@ -154,10 +157,11 @@ router.post("/", async (req, res) => {
  */
 router.delete("/:id", (req, res) => {
   const id = req.params.id;
+  const userId = req.user.userId;
   if (!id) return res.status(400).json({ error: "Missing id" });
 
-  const query = `DELETE FROM user_workouts WHERE id = ?`;
-  db.query(query, [id], (err, result) => {
+  const query = `DELETE FROM user_workouts WHERE id = ? AND user_id = ?`;
+  db.query(query, [id, userId], (err, result) => {
     if (err) {
       console.error("Delete error:", err);
       return res.status(500).json({ error: "Delete error" });

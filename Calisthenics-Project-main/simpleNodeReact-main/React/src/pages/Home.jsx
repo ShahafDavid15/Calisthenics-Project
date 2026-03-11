@@ -9,6 +9,7 @@
  */
 
 import React, { useEffect, useState } from "react";
+import { apiFetch } from "../utils/api";
 import Header from "../components/header/Header";
 import Footer from "../components/footer/Footer";
 import NavBar from "../components/navbar/NavBar";
@@ -36,7 +37,9 @@ export default function Home({ onLogout, currentUser }) {
   const [adminStats, setAdminStats] = useState(null);
   const [selectedMonth, setSelectedMonth] = useState(null);
 
-  const isAdmin = currentUser?.name?.toLowerCase() === "admin";
+  const isAdmin =
+    currentUser?.name?.toLowerCase() === "admin" ||
+    currentUser?.role === "admin";
 
   const MONTH_NAMES = [
     "ינואר",
@@ -61,7 +64,7 @@ export default function Home({ onLogout, currentUser }) {
       // Fetch statistics for admin dashboard
       const fetchAdminStats = async () => {
         try {
-          const res = await fetch("http://localhost:3002/api/admin-stats");
+          const res = await apiFetch("http://localhost:3002/api/admin-stats");
           if (!res.ok) throw new Error("Failed to fetch admin stats");
           const data = await res.json();
           setAdminStats(data);
@@ -74,7 +77,7 @@ export default function Home({ onLogout, currentUser }) {
       // Fetch the workouts for the current user
       const fetchUserWorkouts = async () => {
         try {
-          const res = await fetch(
+          const res = await apiFetch(
             `http://localhost:3002/api/user-workouts?user_id=${currentUser.id}`
           );
           if (!res.ok) throw new Error("Failed to fetch workouts");
@@ -88,7 +91,7 @@ export default function Home({ onLogout, currentUser }) {
       // Fetch exercise statistics for the current user
       const fetchStats = async () => {
         try {
-          const res = await fetch(
+          const res = await apiFetch(
             `http://localhost:3002/api/workout-stats/exercise-stats?user_id=${currentUser.id}`
           );
           if (!res.ok) throw new Error("Failed to fetch stats");
@@ -102,7 +105,7 @@ export default function Home({ onLogout, currentUser }) {
       // Fetch the active membership for the current user
       const fetchMembership = async () => {
         try {
-          const res = await fetch(
+          const res = await apiFetch(
             `http://localhost:3002/api/purchases/active-membership?user_id=${currentUser.id}`
           );
           if (!res.ok) throw new Error("Failed to fetch membership");
@@ -130,7 +133,7 @@ export default function Home({ onLogout, currentUser }) {
           url += `&month=${selectedMonth}`;
         }
 
-        const res = await fetch(url);
+        const res = await apiFetch(url);
         if (!res.ok) throw new Error("Failed to fetch stats");
         const data = await res.json();
         setExerciseStats(data);
@@ -184,7 +187,7 @@ export default function Home({ onLogout, currentUser }) {
     }
 
     try {
-      const res = await fetch(`http://localhost:3002/api/user-workouts/${id}`, {
+      const res = await apiFetch(`http://localhost:3002/api/user-workouts/${id}`, {
         method: "DELETE",
       });
       if (!res.ok) throw new Error("Delete failed");
