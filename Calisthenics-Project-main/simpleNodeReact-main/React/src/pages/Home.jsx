@@ -9,8 +9,9 @@
  */
 
 import React, { useEffect, useState } from "react";
-import { apiFetch } from "../utils/api";
+import { apiFetch, getErrorMessage } from "../utils/api";
 import Header from "../components/header/Header";
+import LoadingSpinner from "../components/loading/LoadingSpinner";
 import Footer from "../components/footer/Footer";
 import NavBar from "../components/navbar/NavBar";
 import MessageModal from "../components/messagemodal/MessageModal";
@@ -36,6 +37,8 @@ export default function Home({ onLogout, currentUser }) {
   const [activeMembership, setActiveMembership] = useState(null);
   const [adminStats, setAdminStats] = useState(null);
   const [selectedMonth, setSelectedMonth] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
 
   const isAdmin =
     currentUser?.name?.toLowerCase() === "admin" ||
@@ -60,65 +63,50 @@ export default function Home({ onLogout, currentUser }) {
   useEffect(() => {
     if (!currentUser?.id) return;
 
+    setLoading(true);
+    setLoadError("");
+
     if (isAdmin) {
-      // Fetch statistics for admin dashboard
       const fetchAdminStats = async () => {
         try {
           const res = await apiFetch("http://localhost:3002/api/admin-stats");
-          if (!res.ok) throw new Error("Failed to fetch admin stats");
+          if (!res.ok) {
+            setLoadError(await getErrorMessage(res));
+            return;
+          }
           const data = await res.json();
           setAdminStats(data);
         } catch (err) {
-          console.error("Failed to fetch admin stats:", err);
+          setLoadError("שגיאה בטעינת הנתונים. נסה לרענן את הדף.");
+        } finally {
+          setLoading(false);
         }
       };
       fetchAdminStats();
     } else {
-      // Fetch the workouts for the current user
-      const fetchUserWorkouts = async () => {
+      const fetchAll = async () => {
         try {
-          const res = await apiFetch(
-            `http://localhost:3002/api/user-workouts?user_id=${currentUser.id}`
-          );
-          if (!res.ok) throw new Error("Failed to fetch workouts");
-          const data = await res.json();
-          setUserWorkouts(data);
+          const [workoutsRes, statsRes, membershipRes] = await Promise.all([
+            apiFetch("http://localhost:3002/api/user-workouts"),
+            apiFetch("http://localhost:3002/api/workout-stats/exercise-stats"),
+            apiFetch("http://localhost:3002/api/purchases/active-membership"),
+          ]);
+
+          if (workoutsRes.ok) setUserWorkouts(await workoutsRes.json());
+          else setUserWorkouts([]);
+
+          if (statsRes.ok) setExerciseStats(await statsRes.json());
+          else setExerciseStats([]);
+
+          if (membershipRes.ok) setActiveMembership(await membershipRes.json());
+          else setActiveMembership(null);
         } catch {
-          setUserWorkouts([]);
+          setLoadError("שגיאה בטעינת הנתונים. נסה לרענן את הדף.");
+        } finally {
+          setLoading(false);
         }
       };
-
-      // Fetch exercise statistics for the current user
-      const fetchStats = async () => {
-        try {
-          const res = await apiFetch(
-            `http://localhost:3002/api/workout-stats/exercise-stats?user_id=${currentUser.id}`
-          );
-          if (!res.ok) throw new Error("Failed to fetch stats");
-          const data = await res.json();
-          setExerciseStats(data);
-        } catch {
-          setExerciseStats([]);
-        }
-      };
-
-      // Fetch the active membership for the current user
-      const fetchMembership = async () => {
-        try {
-          const res = await apiFetch(
-            `http://localhost:3002/api/purchases/active-membership?user_id=${currentUser.id}`
-          );
-          if (!res.ok) throw new Error("Failed to fetch membership");
-          const data = await res.json();
-          setActiveMembership(data);
-        } catch {
-          setActiveMembership(null);
-        }
-      };
-
-      fetchMembership();
-      fetchUserWorkouts();
-      fetchStats();
+      fetchAll();
     }
   }, [currentUser, isAdmin]);
 
@@ -128,17 +116,12 @@ export default function Home({ onLogout, currentUser }) {
 
     const fetchStatsByMonth = async () => {
       try {
-        let url = `http://localhost:3002/api/workout-stats/exercise-stats?user_id=${currentUser.id}`;
-        if (selectedMonth) {
-          url += `&month=${selectedMonth}`;
-        }
-
+        let url = "http://localhost:3002/api/workout-stats/exercise-stats";
+        if (selectedMonth) url += `?month=${selectedMonth}`;
         const res = await apiFetch(url);
-        if (!res.ok) throw new Error("Failed to fetch stats");
-        const data = await res.json();
-        setExerciseStats(data);
-      } catch (err) {
-        console.error(err);
+        if (res.ok) setExerciseStats(await res.json());
+        else setExerciseStats([]);
+      } catch {
         setExerciseStats([]);
       }
     };
@@ -289,7 +272,13 @@ export default function Home({ onLogout, currentUser }) {
       </button>
 
       <main className={classes.main}>
-        {isAdmin && adminStats && (
+        {loading && <LoadingSpinner text="טוען נתונים..." />}
+        {loadError && !loading && (
+          <div className={classes.errorBanner}>
+            <p>{loadError}</p>
+          </div>
+        )}
+        {!loading && isAdmin && adminStats && (
           <div className={classes.statsContainer}>
             <h2 className={classes.statsTitle}>סטטיסטיקות</h2>
 
@@ -412,7 +401,7 @@ export default function Home({ onLogout, currentUser }) {
           </div>
         )}
 
-        {!isAdmin && (
+        {!loading && !isAdmin && (
           <div className={classes.userWorkouts}>
             <div className={classes.membershipInfo}>
               <p className={classes.membershipTitle}>

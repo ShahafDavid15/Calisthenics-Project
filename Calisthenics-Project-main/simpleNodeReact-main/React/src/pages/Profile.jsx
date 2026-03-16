@@ -6,8 +6,9 @@
 
 import React, { useState, useEffect } from "react";
 import Cookies from "js-cookie";
-import { apiFetch } from "../utils/api";
+import { apiFetch, getErrorMessage } from "../utils/api";
 import Header from "../components/header/Header";
+import LoadingSpinner from "../components/loading/LoadingSpinner";
 import Footer from "../components/footer/Footer";
 import NavBar from "../components/navbar/NavBar";
 import MessageModal from "../components/messagemodal/MessageModal";
@@ -45,8 +46,8 @@ export default function Profile({ onLogout }) {
       try {
         const response = await apiFetch(`/api/users/${id}`);
         if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || "Failed to fetch user profile");
+          const errMsg = await getErrorMessage(response);
+          throw new Error(errMsg);
         }
         const data = await response.json();
         setFirstName(data.first_name || "");
@@ -66,7 +67,7 @@ export default function Profile({ onLogout }) {
         setUserName(storedUsername);
         setLoading(false);
       } catch (err) {
-        showError(`Error loading profile: ${err.message}`);
+        showError(err.message || "שגיאה בטעינת הפרופיל");
         setLoading(false);
       }
     };
@@ -74,7 +75,7 @@ export default function Profile({ onLogout }) {
     if (storedUsername && storedUserId) {
       fetchUserProfile(storedUserId);
     } else {
-      showError("User not logged in or user data missing. Please log in.");
+      showError("משתמש לא מחובר. אנא התחבר.");
       setLoading(false);
     }
   }, []);
@@ -183,7 +184,9 @@ export default function Profile({ onLogout }) {
       <div className={classes.container}>
         <Header />
         <NavBar />
-        <main className={classes.main}></main>
+        <main className={classes.main}>
+          <LoadingSpinner text="טוען פרופיל..." />
+        </main>
         <Footer />
       </div>
     );

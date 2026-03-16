@@ -44,6 +44,15 @@ export default function Login({ setUser }) {
     setShowPassword(false);
   }, [isRegistration]);
 
+  // Show message if session expired (redirected from 401)
+  useEffect(() => {
+    if (sessionStorage.getItem("session_expired")) {
+      sessionStorage.removeItem("session_expired");
+      setError("פג תוקף ההתחברות. אנא התחבר מחדש.");
+      setShowError(true);
+    }
+  }, []);
+
   // Form validation
   const validateForm = () => {
     setError("");

@@ -16,6 +16,17 @@
   position: relative;
 }
 
+/* Error banner */
+.errorBanner {
+  background-color: #fee;
+  color: #c00;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  margin: 1rem;
+  text-align: center;
+  direction: rtl;
+}
+
 /* Main content area */
 .main {
   display: flex;

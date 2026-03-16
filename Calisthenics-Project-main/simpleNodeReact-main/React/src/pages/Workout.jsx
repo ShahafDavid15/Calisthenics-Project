@@ -9,6 +9,7 @@
 import React, { useState, useEffect } from "react";
 import { apiFetch } from "../utils/api";
 import Header from "../components/header/Header";
+import LoadingSpinner from "../components/loading/LoadingSpinner";
 import Footer from "../components/footer/Footer";
 import NavBar from "../components/navbar/NavBar";
 import MessageModal from "../components/messagemodal/MessageModal";
@@ -57,6 +58,7 @@ export default function Workout({ onLogout, currentUser }) {
   const [newWorkoutTime, setNewWorkoutTime] = useState("");
   const [editingWorkout, setEditingWorkout] = useState(null);
   const [editWorkoutTime, setEditWorkoutTime] = useState("");
+  const [loading, setLoading] = useState(true);
 
   const isAdmin =
     currentUser?.name === "admin" || currentUser?.role === "admin";
@@ -79,7 +81,7 @@ export default function Workout({ onLogout, currentUser }) {
     const fetchMembership = async () => {
       try {
         const res = await apiFetch(
-          `http://localhost:3002/api/purchases/active-membership?user_id=${currentUser.id}`
+          "http://localhost:3002/api/purchases/active-membership"
         );
         if (!res.ok) throw new Error("Failed to fetch membership");
         const data = await res.json();
@@ -111,7 +113,7 @@ export default function Workout({ onLogout, currentUser }) {
       setRefreshKey((prev) => prev + 1);
     } catch (err) {
       setMessage({
-        text: err.message || "Error loading participants",
+        text: err.message || "שגיאה בטעינת מספר המשתתפים",
         type: "error",
         confirmable: false,
       });
@@ -158,7 +160,7 @@ export default function Workout({ onLogout, currentUser }) {
       setScheduleData(formatted);
     } catch (err) {
       setMessage({
-        text: err.message || "Error loading workouts",
+        text: err.message || "שגיאה בטעינת האימונים",
         type: "error",
         confirmable: false,
       });
@@ -169,21 +171,21 @@ export default function Workout({ onLogout, currentUser }) {
   /* Load user booked workouts and participant counts */
   useEffect(() => {
     if (!currentUser?.id) return;
-    const fetchUserWorkouts = async () => {
+    setLoading(true);
+    const loadAll = async () => {
       try {
-        const res = await apiFetch(
-          `http://localhost:3002/api/user-workouts?user_id=${currentUser.id}`
-        );
-        if (!res.ok) throw new Error(await res.text());
-        const data = await res.json();
-        setUserWorkouts(data);
+        const res = await apiFetch("http://localhost:3002/api/user-workouts");
+        if (res.ok) setUserWorkouts(await res.json());
+        else setUserWorkouts([]);
+        await loadParticipants();
+        await loadWorkoutsFromDB();
       } catch {
         setUserWorkouts([]);
+      } finally {
+        setLoading(false);
       }
     };
-    fetchUserWorkouts();
-    loadParticipants();
-    loadWorkoutsFromDB();
+    loadAll();
   }, [currentUser]);
 
   useEffect(() => {
@@ -292,7 +294,6 @@ export default function Workout({ onLogout, currentUser }) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          user_id: currentUser.id,
           workout_date: date,
           workout_time: hour,
           membership_name:
@@ -305,7 +306,7 @@ export default function Workout({ onLogout, currentUser }) {
 
       await loadParticipants();
       const userRes = await apiFetch(
-        `http://localhost:3002/api/user-workouts?user_id=${currentUser.id}`
+        "http://localhost:3002/api/user-workouts"
       );
       setUserWorkouts(await userRes.json());
 
@@ -536,6 +537,10 @@ export default function Workout({ onLogout, currentUser }) {
           />
         )}
 
+        {loading && <LoadingSpinner text="טוען אימונים..." />}
+
+        {!loading && (
+          <>
         <h2 className={classes.title}>אימונים</h2>
 
         {/* Add workout button */}
@@ -662,6 +667,8 @@ export default function Workout({ onLogout, currentUser }) {
             </div>
           ))}
         </div>
+          </>
+        )}
       </main>
       <Footer />
     </div>

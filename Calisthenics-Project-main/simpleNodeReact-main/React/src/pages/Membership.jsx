@@ -14,11 +14,13 @@ import NavBar from "../components/navbar/NavBar";
 import classes from "./membership.module.css";
 import { useState, useEffect } from "react";
 import React from "react";
-import { apiFetch } from "../utils/api";
+import { apiFetch, getErrorMessage } from "../utils/api";
+import LoadingSpinner from "../components/loading/LoadingSpinner";
 
 export default function Membership({ onLogout, currentUser }) {
   // State for all memberships
   const [memberships, setMemberships] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   // Error handling state
   const [showError, setShowError] = useState(false);
@@ -51,13 +53,17 @@ export default function Membership({ onLogout, currentUser }) {
     const fetchMemberships = async () => {
       try {
         const response = await apiFetch("/api/memberships");
-        if (!response.ok) throw new Error("Failed to fetch memberships");
+        if (!response.ok) {
+          showErrorMessage(await getErrorMessage(response));
+          return;
+        }
         const data = await response.json();
-        // Sort memberships by price ascending
         const sorted = data.sort((a, b) => a.price - b.price);
         setMemberships(sorted);
-      } catch (error) {
-        showErrorMessage("Failed to load memberships");
+      } catch {
+        showErrorMessage("שגיאה בטעינת המנויים. נסה לרענן את הדף.");
+      } finally {
+        setLoading(false);
       }
     };
     fetchMemberships();
@@ -273,6 +279,9 @@ export default function Membership({ onLogout, currentUser }) {
       <main className={classes.main}>
         <h2 className={classes.title}>ניהול מנויים</h2>
 
+        {loading && <LoadingSpinner text="טוען מנויים..." />}
+
+        {!loading && (
         <div className={classes.membershipsList}>
           <table className={classes.table}>
             <thead>
@@ -450,6 +459,7 @@ export default function Membership({ onLogout, currentUser }) {
             </tbody>
           </table>
         </div>
+        )}
 
         {/* Error modal */}
         {showError && (

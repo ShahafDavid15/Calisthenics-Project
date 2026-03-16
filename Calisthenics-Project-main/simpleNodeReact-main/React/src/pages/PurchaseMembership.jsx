@@ -6,6 +6,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { apiFetch } from "../utils/api";
 import Header from "../components/header/Header";
+import LoadingSpinner from "../components/loading/LoadingSpinner";
 import Footer from "../components/footer/Footer";
 import NavBar from "../components/navbar/NavBar";
 import classes from "./purchaseMembership.module.css";
@@ -17,6 +18,7 @@ export default function PurchaseMembership({ currentUser, onLogout }) {
   const [isPaypalLoaded, setIsPaypalLoaded] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [loadingSdk, setLoadingSdk] = useState(true);
+  const [loadingMemberships, setLoadingMemberships] = useState(true);
   const [activeMembership, setActiveMembership] = useState(null);
   const paypalRef = useRef();
 
@@ -29,23 +31,24 @@ export default function PurchaseMembership({ currentUser, onLogout }) {
 
   // Fetch memberships from backend
   useEffect(() => {
+    setLoadingMemberships(true);
     apiFetch("http://localhost:3002/api/memberships")
       .then((res) => res.json())
       .then((data) => {
         setMemberships(data);
         if (data.length > 0) setSelectedMembershipName(data[0].name);
       })
-      .catch((err) => console.error("Error fetching memberships:", err));
+      .catch((err) => {
+        setMessage("שגיאה בטעינת המנויים. נסה לרענן את הדף.");
+      })
+      .finally(() => setLoadingMemberships(false));
   }, []);
 
   // Fetch active membership for current user
   useEffect(() => {
-    if (!currentUser?.user_id && !currentUser?.id) return;
+    if (!currentUser?.id) return;
 
-    const userId = currentUser?.user_id || currentUser?.id;
-    apiFetch(
-      `http://localhost:3002/api/purchases/active-membership?user_id=${userId}`
-    )
+    apiFetch("http://localhost:3002/api/purchases/active-membership")
       .then((res) => res.json())
       .then((active) => {
         if (active) {
@@ -118,10 +121,9 @@ export default function PurchaseMembership({ currentUser, onLogout }) {
       createOrder: async () => {
         if (isCancelled) throw new Error("Payment cancelled");
 
-        const userId = currentUser?.user_id || currentUser?.id;
-        if (!userId) {
+        if (!currentUser?.id) {
           setMessage("שגיאה: משתמש לא מזוהה");
-          throw new Error("User ID missing");
+          throw new Error("User not identified");
         }
 
         if (activeMembership) {
@@ -168,14 +170,12 @@ export default function PurchaseMembership({ currentUser, onLogout }) {
           if (!captureRes.ok)
             throw new Error(captureData.error || "Failed to capture payment");
 
-          const userId = currentUser?.user_id || currentUser?.id;
           const purchaseRes = await apiFetch(
             "http://localhost:3002/api/purchases/purchase-membership",
             {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
-                user_id: userId,
                 membership_name: selectedMembershipName.trim(),
                 paypal_order_id: data.orderID,
                 payer_id: data.payerID || data.payerId,
@@ -253,8 +253,10 @@ export default function PurchaseMembership({ currentUser, onLogout }) {
         {message && <div className={classes.message}>{message}</div>}
 
         <div className={classes.membershipsList}>
-          {memberships.length === 0 ? (
-            <p>טוען מנויים...</p>
+          {loadingMemberships ? (
+            <LoadingSpinner text="טוען מנויים..." />
+          ) : memberships.length === 0 ? (
+            <p>לא נמצאו מנויים</p>
           ) : (
             <ul className={classes.membershipCards} role="radiogroup">
               {memberships.map((m) => (
@@ -296,7 +298,7 @@ export default function PurchaseMembership({ currentUser, onLogout }) {
           )}
         </div>
 
-        {loadingSdk && <p>טוען PayPal...</p>}
+        {loadingSdk && <LoadingSpinner text="טוען PayPal..." />}
         <div ref={paypalRef} className={classes.paypalButtons} />
       </main>
 

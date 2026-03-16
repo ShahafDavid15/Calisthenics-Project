@@ -7,8 +7,9 @@
  */
 
 import React, { useState, useEffect } from "react";
-import { apiFetch } from "../utils/api";
+import { apiFetch, getErrorMessage } from "../utils/api";
 import Header from "../components/header/Header";
+import LoadingSpinner from "../components/loading/LoadingSpinner";
 import NavBar from "../components/navbar/NavBar";
 import Footer from "../components/footer/Footer";
 import classes from "./members.module.css";
@@ -19,6 +20,7 @@ import MessageModal from "../components/messagemodal/MessageModal";
  */
 export default function Members({ currentUser, onLogout }) {
   const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [showMessage, setShowMessage] = useState(false);
   const [message, setMessage] = useState({
     text: "",
@@ -33,7 +35,15 @@ export default function Members({ currentUser, onLogout }) {
   const loadUsers = async () => {
     try {
       const res = await apiFetch("http://localhost:3002/api/users");
-      if (!res.ok) throw new Error(await res.text());
+      if (!res.ok) {
+        setMessage({
+          text: await getErrorMessage(res),
+          type: "error",
+          confirmable: false,
+        });
+        setShowMessage(true);
+        return;
+      }
       const data = await res.json();
       setUsers(data);
     } catch (err) {
@@ -43,6 +53,8 @@ export default function Members({ currentUser, onLogout }) {
         confirmable: false,
       });
       setShowMessage(true);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -72,6 +84,9 @@ export default function Members({ currentUser, onLogout }) {
 
         <h2 className={classes.title}>רשימת משתמשים ומנויים</h2>
 
+        {loading && <LoadingSpinner text="טוען משתמשים..." />}
+
+        {!loading && (
         <div className={classes.userWorkouts}>
           <table className={classes.statsTable}>
             <thead>
@@ -156,6 +171,7 @@ export default function Members({ currentUser, onLogout }) {
             </tbody>
           </table>
         </div>
+        )}
       </main>
       <Footer />
     </div>

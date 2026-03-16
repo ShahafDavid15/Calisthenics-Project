@@ -13,6 +13,7 @@ import Header from "../components/header/Header";
 import Footer from "../components/footer/Footer";
 import NavBar from "../components/navbar/NavBar";
 import MessageModal from "../components/messagemodal/MessageModal";
+import LoadingSpinner from "../components/loading/LoadingSpinner";
 import classes from "./workoutDetails.module.css";
 import { apiAxios } from "../utils/api";
 
@@ -28,6 +29,7 @@ export default function WorkoutEntry({ onLogout, currentUser }) {
 
   // Workouts list state
   const [workouts, setWorkouts] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   // Edit mode state
   const [editWorkoutId, setEditWorkoutId] = useState(null);
@@ -62,13 +64,15 @@ export default function WorkoutEntry({ onLogout, currentUser }) {
   useEffect(() => {
     if (!userId) return;
 
+    setLoading(true);
     const fetchData = async () => {
       try {
-        const response = await apiAxios.get(`${API_BASE}?user_id=${userId}`);
+        const response = await apiAxios.get(API_BASE);
         setWorkouts(response.data);
       } catch (error) {
-        console.error(error);
         showError("שגיאה בטעינת נתוני האימונים");
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -115,13 +119,12 @@ export default function WorkoutEntry({ onLogout, currentUser }) {
 
     try {
       await apiAxios.post(API_BASE, {
-        user_id: userId,
         exercise: selectedExercise,
         repetitions: repsValue,
         workout_date: workoutDate,
       });
 
-      const response = await apiAxios.get(`${API_BASE}?user_id=${userId}`);
+      const response = await apiAxios.get(API_BASE);
       setWorkouts(response.data);
 
       showSuccess("התרגיל נשלח ונשמר בהצלחה!");
@@ -140,7 +143,7 @@ export default function WorkoutEntry({ onLogout, currentUser }) {
   const handleDelete = async (workoutId) => {
     try {
       await apiAxios.delete(`${API_BASE}/${workoutId}`);
-      const response = await apiAxios.get(`${API_BASE}?user_id=${userId}`);
+      const response = await apiAxios.get(API_BASE);
       setWorkouts(response.data);
       showSuccess("האימון נמחק בהצלחה!");
       setFilteredWorkouts((prev) => prev.filter((w) => w.id !== workoutId));
@@ -191,7 +194,7 @@ export default function WorkoutEntry({ onLogout, currentUser }) {
         workout_date: editedDate,
       });
 
-      const response = await apiAxios.get(`${API_BASE}?user_id=${userId}`);
+      const response = await apiAxios.get(API_BASE);
       setWorkouts(response.data);
       setEditWorkoutId(null);
       showSuccess("העדכון נשמר בהצלחה!");
@@ -234,6 +237,10 @@ export default function WorkoutEntry({ onLogout, currentUser }) {
 
         <h2 className={classes.title}>הזנת נתוני אימון</h2>
 
+        {loading && <LoadingSpinner text="טוען נתוני אימון..." />}
+
+        {!loading && (
+        <>
         <div className={classes.inputContainer}>
           <select
             className={classes.input}
@@ -400,6 +407,8 @@ export default function WorkoutEntry({ onLogout, currentUser }) {
             </tbody>
           </table>
         </div>
+        </>
+        )}
       </main>
 
       <Footer />
