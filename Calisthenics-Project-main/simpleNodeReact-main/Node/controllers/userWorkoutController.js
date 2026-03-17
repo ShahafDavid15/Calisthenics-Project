@@ -1,4 +1,4 @@
-const { userWorkoutService, AppError } = require("../services/userWorkoutService");
+const { AppError } = require("../services/userWorkoutService");
 
 function handleError(res, err) {
   if (err instanceof AppError) {
@@ -9,9 +9,17 @@ function handleError(res, err) {
 }
 
 class UserWorkoutController {
+  constructor(service) {
+    this.service = service;
+    this.getAll = this.getAll.bind(this);
+    this.book = this.book.bind(this);
+    this.cancel = this.cancel.bind(this);
+    this.getParticipantCounts = this.getParticipantCounts.bind(this);
+  }
+
   async getAll(req, res) {
     try {
-      const workouts = await userWorkoutService.getByUserId(req.user.userId);
+      const workouts = await this.service.getByUserId(req.user.userId);
       return res.json(workouts);
     } catch (err) {
       return handleError(res, err);
@@ -21,7 +29,7 @@ class UserWorkoutController {
   async book(req, res) {
     try {
       const { workout_date, workout_time, membership_name } = req.body;
-      const result = await userWorkoutService.book(
+      const result = await this.service.book(
         req.user.userId,
         workout_date,
         workout_time,
@@ -36,7 +44,7 @@ class UserWorkoutController {
   async cancel(req, res) {
     try {
       const id = parseInt(req.params.id, 10);
-      const result = await userWorkoutService.cancel(id, req.user.userId);
+      const result = await this.service.cancel(id, req.user.userId);
       return res.json(result);
     } catch (err) {
       return handleError(res, err);
@@ -45,7 +53,7 @@ class UserWorkoutController {
 
   async getParticipantCounts(req, res) {
     try {
-      const counts = await userWorkoutService.getParticipantCounts();
+      const counts = await this.service.getParticipantCounts();
       return res.json(counts);
     } catch (err) {
       return handleError(res, err);
@@ -53,4 +61,4 @@ class UserWorkoutController {
   }
 }
 
-module.exports = new UserWorkoutController();
+module.exports = { UserWorkoutController };

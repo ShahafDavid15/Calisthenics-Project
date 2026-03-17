@@ -1,12 +1,13 @@
-/**
- * User-workout booking routes – routing only.
- * Business logic → userWorkoutService
- * DB queries     → userWorkoutRepository
- */
-
 const express = require("express");
 const router = express.Router();
-const userWorkoutController = require("../controllers/userWorkoutController");
+
+const userWorkoutRepository = require("../repositories/userWorkoutRepository");
+const { UserWorkoutService } = require("../services/userWorkoutService");
+const { UserWorkoutController } = require("../controllers/userWorkoutController");
+
+const userWorkoutService = new UserWorkoutService(userWorkoutRepository);
+const userWorkoutController = new UserWorkoutController(userWorkoutService);
+
 const { authMiddleware } = require("../middleware/authMiddleware");
 const {
   handleValidation,
@@ -16,24 +17,21 @@ const {
 
 router.use(authMiddleware);
 
-router.get("/", (req, res) => userWorkoutController.getAll(req, res));
-
-router.get("/all-participants", (req, res) =>
-  userWorkoutController.getParticipantCounts(req, res)
-);
+router.get("/", userWorkoutController.getAll);
+router.get("/all-participants", userWorkoutController.getParticipantCounts);
 
 router.post(
   "/",
   ...userWorkoutPostValidation,
   handleValidation,
-  (req, res) => userWorkoutController.book(req, res)
+  userWorkoutController.book
 );
 
 router.delete(
   "/:id",
   ...idParamValidation,
   handleValidation,
-  (req, res) => userWorkoutController.cancel(req, res)
+  userWorkoutController.cancel
 );
 
 module.exports = router;

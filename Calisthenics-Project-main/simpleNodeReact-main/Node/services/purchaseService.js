@@ -1,7 +1,6 @@
 const checkoutNodeJssdk = require("@paypal/checkout-server-sdk");
 const { client } = require("../utils/paypalClient");
 const { sendEmail } = require("../utils/sendEmail");
-const purchaseRepository = require("../repositories/purchaseRepository");
 
 class AppError extends Error {
   constructor(message, statusCode) {
@@ -10,10 +9,13 @@ class AppError extends Error {
   }
 }
 
-/** Membership names allowed for PayPal orders */
 const VALID_MEMBERSHIPS = ["Basic", "Standard", "Premium"];
 
 class PurchaseService {
+  constructor(repository) {
+    this.repository = repository;
+  }
+
   async createPaypalOrder(membership_name, price) {
     if (!membership_name || !VALID_MEMBERSHIPS.includes(membership_name)) {
       throw new AppError("שם מנוי לא תקין", 400);
@@ -58,17 +60,17 @@ class PurchaseService {
       throw new AppError("חסרים שדות חובה", 400);
     }
 
-    const active = await purchaseRepository.getActiveMembership(userId);
+    const active = await this.repository.getActiveMembership(userId);
     if (active) {
       throw new AppError(`יש לך כבר מנוי פעיל: ${active.membership_name}`, 409);
     }
 
-    const membership = await purchaseRepository.getMembershipByName(membership_name);
+    const membership = await this.repository.getMembershipByName(membership_name);
     if (!membership) {
       throw new AppError("המנוי לא נמצא", 404);
     }
 
-    const result = await purchaseRepository.createUserMembership({
+    const result = await this.repository.createUserMembership({
       userId,
       membership_id: membership.membership_id,
       duration: membership.duration_days,
@@ -76,7 +78,6 @@ class PurchaseService {
       payer_id,
     });
 
-    // Send confirmation email (non-blocking)
     this._sendConfirmationEmail(userId, {
       membership_name,
       price,
@@ -92,11 +93,11 @@ class PurchaseService {
   }
 
   async getActiveMembership(userId) {
-    return purchaseRepository.getActiveMembership(userId);
+    return this.repository.getActiveMembership(userId);
   }
 
   async _sendConfirmationEmail(userId, { membership_name, price, duration, paypal_order_id }) {
-    const user = await purchaseRepository.getUserEmailInfo(userId);
+    const user = await this.repository.getUserEmailInfo(userId);
     if (!user?.email) return;
 
     const startDate = new Date().toLocaleDateString("he-IL");
@@ -122,4 +123,4 @@ class PurchaseService {
   }
 }
 
-module.exports = { purchaseService: new PurchaseService(), AppError };
+module.exports = { PurchaseService, AppError };

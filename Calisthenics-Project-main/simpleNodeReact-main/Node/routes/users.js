@@ -1,6 +1,13 @@
 const express = require("express");
 const router = express.Router();
-const usersController = require("../controllers/usersController");
+
+const userRepository = require("../repositories/userRepository");
+const { UserService } = require("../services/userService");
+const { UsersController } = require("../controllers/usersController");
+
+const userService = new UserService(userRepository);
+const usersController = new UsersController(userService);
+
 const { authMiddleware, requireAdmin } = require("../middleware/authMiddleware");
 const {
   handleValidation,
@@ -14,16 +21,16 @@ const {
 } = require("../middleware/validators");
 
 // Public routes (no auth)
-router.post("/", ...registerValidation, handleValidation, (req, res) => usersController.register(req, res));
-router.post("/login", ...loginValidation, handleValidation, (req, res) => usersController.login(req, res));
-router.post("/forgot-password", ...forgotPasswordValidation, handleValidation, (req, res) => usersController.forgotPassword(req, res));
-router.post("/reset-password", ...resetPasswordValidation, handleValidation, (req, res) => usersController.resetPassword(req, res));
-router.post("/forgot-username", ...forgotUsernameValidation, handleValidation, (req, res) => usersController.forgotUsername(req, res));
+router.post("/",               ...registerValidation,       handleValidation, usersController.register);
+router.post("/login",          ...loginValidation,          handleValidation, usersController.login);
+router.post("/forgot-password",...forgotPasswordValidation, handleValidation, usersController.forgotPassword);
+router.post("/reset-password", ...resetPasswordValidation,  handleValidation, usersController.resetPassword);
+router.post("/forgot-username",...forgotUsernameValidation, handleValidation, usersController.forgotUsername);
 
 // Protected routes
-router.get("/:id", authMiddleware, (req, res) => usersController.getUserById(req, res));
-router.get("/", authMiddleware, requireAdmin, (req, res) => usersController.getAllUsers(req, res));
-router.put("/profile", authMiddleware, ...profileValidation, handleValidation, (req, res) => usersController.updateProfile(req, res));
-router.put("/password", authMiddleware, ...passwordValidation, handleValidation, (req, res) => usersController.updatePassword(req, res));
+router.get("/:id",    authMiddleware,                                                        usersController.getUserById);
+router.get("/",       authMiddleware, requireAdmin,                                          usersController.getAllUsers);
+router.put("/profile",authMiddleware, ...profileValidation,  handleValidation,               usersController.updateProfile);
+router.put("/password",authMiddleware,...passwordValidation, handleValidation,               usersController.updatePassword);
 
 module.exports = router;

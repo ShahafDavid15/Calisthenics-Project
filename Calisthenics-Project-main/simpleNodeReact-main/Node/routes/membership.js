@@ -1,12 +1,13 @@
-/**
- * Membership routes – routing only.
- * Business logic → membershipService
- * DB queries     → membershipRepository
- */
-
 const express = require("express");
 const router = express.Router();
-const membershipController = require("../controllers/membershipController");
+
+const membershipRepository = require("../repositories/membershipRepository");
+const { MembershipService } = require("../services/membershipService");
+const { MembershipController } = require("../controllers/membershipController");
+
+const membershipService = new MembershipService(membershipRepository);
+const membershipController = new MembershipController(membershipService);
+
 const { authMiddleware, requireAdmin } = require("../middleware/authMiddleware");
 const {
   handleValidation,
@@ -17,14 +18,14 @@ const {
 
 router.use(authMiddleware);
 
-router.get("/", (req, res) => membershipController.getAll(req, res));
+router.get("/", membershipController.getAll);
 
 router.post(
   "/",
   requireAdmin,
   ...membershipPostValidation,
   handleValidation,
-  (req, res) => membershipController.create(req, res)
+  membershipController.create
 );
 
 router.put(
@@ -32,7 +33,7 @@ router.put(
   requireAdmin,
   ...membershipPutValidation,
   handleValidation,
-  (req, res) => membershipController.update(req, res)
+  membershipController.update
 );
 
 router.delete(
@@ -40,7 +41,7 @@ router.delete(
   requireAdmin,
   ...idParamValidation,
   handleValidation,
-  (req, res) => membershipController.deleteById(req, res)
+  membershipController.deleteById
 );
 
 module.exports = router;

@@ -1,15 +1,15 @@
-/**
- * Admin statistics routes – routing only.
- * Business logic → adminStatsService
- */
-
 const express = require("express");
 const router = express.Router();
-const adminStatsController = require("../controllers/adminStatsController");
+
+const adminStatsRepository = require("../repositories/adminStatsRepository");
+const { AdminStatsService } = require("../services/adminStatsService");
+const { AdminStatsController } = require("../controllers/adminStatsController");
+
+const adminStatsService = new AdminStatsService(adminStatsRepository);
+const adminStatsController = new AdminStatsController(adminStatsService);
+
 const { authMiddleware, requireAdmin } = require("../middleware/authMiddleware");
 
-router.get("/", authMiddleware, requireAdmin, (req, res) =>
-  adminStatsController.getStats(req, res)
-);
+router.get("/", authMiddleware, requireAdmin, adminStatsController.getStats);
 
 module.exports = router;

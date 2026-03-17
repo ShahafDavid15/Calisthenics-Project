@@ -1,5 +1,3 @@
-const workoutRepository = require("../repositories/workoutRepository");
-
 class AppError extends Error {
   constructor(message, statusCode) {
     super(message);
@@ -12,8 +10,12 @@ function isSaturday(dateStr) {
 }
 
 class WorkoutService {
+  constructor(repository) {
+    this.repository = repository;
+  }
+
   async getAll() {
-    const workouts = await workoutRepository.getAll();
+    const workouts = await this.repository.getAll();
     return workouts.filter((w) => !isSaturday(w.workout_date));
   }
 
@@ -22,17 +24,17 @@ class WorkoutService {
       throw new AppError("לא ניתן ליצור אימון בשבת", 400);
     }
 
-    const duplicate = await workoutRepository.existsAtSlot(workout_date, workout_time);
+    const duplicate = await this.repository.existsAtSlot(workout_date, workout_time);
     if (duplicate) {
       throw new AppError("כבר קיים אימון בתאריך ושעה אלה", 409);
     }
 
-    await workoutRepository.create(workout_date, workout_time);
+    await this.repository.create(workout_date, workout_time);
     return { type: "success", text: "האימון נוסף בהצלחה" };
   }
 
   async updateTime(id, workout_time) {
-    const workout = await workoutRepository.findById(id);
+    const workout = await this.repository.findById(id);
     if (!workout) {
       throw new AppError("האימון לא נמצא", 404);
     }
@@ -41,7 +43,7 @@ class WorkoutService {
       throw new AppError("לא ניתן לעדכן אימון לשבת", 400);
     }
 
-    const duplicate = await workoutRepository.existsAtSlot(
+    const duplicate = await this.repository.existsAtSlot(
       workout.workout_date,
       workout_time,
       id
@@ -50,7 +52,7 @@ class WorkoutService {
       throw new AppError("כבר קיים אימון בשעה הזאת", 409);
     }
 
-    const result = await workoutRepository.updateTime(id, workout_time);
+    const result = await this.repository.updateTime(id, workout_time);
     if (result.affectedRows === 0) {
       throw new AppError("האימון לא נמצא", 404);
     }
@@ -58,7 +60,7 @@ class WorkoutService {
   }
 
   async deleteById(id) {
-    const result = await workoutRepository.deleteById(id);
+    const result = await this.repository.deleteById(id);
     if (result.affectedRows === 0) {
       throw new AppError("האימון לא נמצא", 404);
     }
@@ -66,4 +68,4 @@ class WorkoutService {
   }
 }
 
-module.exports = { workoutService: new WorkoutService(), AppError };
+module.exports = { WorkoutService, AppError };

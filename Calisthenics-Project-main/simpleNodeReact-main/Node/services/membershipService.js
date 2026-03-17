@@ -1,5 +1,3 @@
-const membershipRepository = require("../repositories/membershipRepository");
-
 const VAT_PERCENT = 18;
 
 class AppError extends Error {
@@ -10,14 +8,18 @@ class AppError extends Error {
 }
 
 class MembershipService {
+  constructor(repository) {
+    this.repository = repository;
+  }
+
   async getAll() {
-    return membershipRepository.getAll();
+    return this.repository.getAll();
   }
 
   async create({ name, price, duration_days, entry_count = 0 }) {
     const priceWithVat = parseFloat((price * (1 + VAT_PERCENT / 100)).toFixed(2));
 
-    const result = await membershipRepository.create({
+    const result = await this.repository.create({
       name,
       price,
       priceWithVat,
@@ -39,7 +41,7 @@ class MembershipService {
   async update(id, { name, price, duration_days, entry_count = 0 }) {
     const priceWithVat = parseFloat((price * (1 + VAT_PERCENT / 100)).toFixed(2));
 
-    const result = await membershipRepository.update(id, {
+    const result = await this.repository.update(id, {
       name,
       price,
       priceWithVat,
@@ -63,7 +65,7 @@ class MembershipService {
   }
 
   async deleteById(id) {
-    const result = await membershipRepository.deleteById(id);
+    const result = await this.repository.deleteById(id);
     if (result.affectedRows === 0) {
       throw new AppError("המנוי לא נמצא", 404);
     }
@@ -71,4 +73,4 @@ class MembershipService {
   }
 }
 
-module.exports = { membershipService: new MembershipService(), AppError };
+module.exports = { MembershipService, AppError };

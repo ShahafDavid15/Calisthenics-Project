@@ -1,5 +1,3 @@
-const workoutExerciseRepository = require("../repositories/workoutExerciseRepository");
-
 class AppError extends Error {
   constructor(message, statusCode) {
     super(message);
@@ -13,8 +11,12 @@ function isFutureDate(dateStr) {
 }
 
 class WorkoutExerciseService {
+  constructor(repository) {
+    this.repository = repository;
+  }
+
   async getByUserId(userId) {
-    return workoutExerciseRepository.getByUserId(userId);
+    return this.repository.getByUserId(userId);
   }
 
   async create(userId, { exercise, repetitions, workout_date }) {
@@ -22,12 +24,7 @@ class WorkoutExerciseService {
       throw new AppError("לא ניתן להוסיף אימון בעתיד", 400);
     }
 
-    const result = await workoutExerciseRepository.create(
-      userId,
-      exercise,
-      repetitions,
-      workout_date
-    );
+    const result = await this.repository.create(userId, exercise, repetitions, workout_date);
     return { message: "התרגיל נוסף בהצלחה", id: result.insertId };
   }
 
@@ -36,13 +33,7 @@ class WorkoutExerciseService {
       throw new AppError("לא ניתן לעדכן אימון לעתיד", 400);
     }
 
-    const result = await workoutExerciseRepository.update(
-      id,
-      userId,
-      exercise,
-      repetitions,
-      workout_date
-    );
+    const result = await this.repository.update(id, userId, exercise, repetitions, workout_date);
 
     if (result.affectedRows === 0) {
       throw new AppError("התרגיל לא נמצא", 404);
@@ -51,7 +42,7 @@ class WorkoutExerciseService {
   }
 
   async deleteById(id, userId) {
-    const result = await workoutExerciseRepository.deleteById(id, userId);
+    const result = await this.repository.deleteById(id, userId);
     if (result.affectedRows === 0) {
       throw new AppError("התרגיל לא נמצא", 404);
     }
@@ -59,4 +50,4 @@ class WorkoutExerciseService {
   }
 }
 
-module.exports = { workoutExerciseService: new WorkoutExerciseService(), AppError };
+module.exports = { WorkoutExerciseService, AppError };

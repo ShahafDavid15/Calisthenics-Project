@@ -1,12 +1,13 @@
-const workoutStatsService = require("../services/workoutStatsService");
-
 class WorkoutStatsController {
+  constructor(service) {
+    this.service = service;
+    this.getExerciseStats = this.getExerciseStats.bind(this);
+    this.getGeneralStats = this.getGeneralStats.bind(this);
+  }
+
   async getExerciseStats(req, res) {
     try {
-      const stats = await workoutStatsService.getExerciseStats(
-        req.user.userId,
-        req.query.month
-      );
+      const stats = await this.service.getExerciseStats(req.user.userId, req.query.month);
       return res.json(stats);
     } catch (err) {
       console.error("Exercise stats error:", err);
@@ -16,7 +17,7 @@ class WorkoutStatsController {
 
   async getGeneralStats(req, res) {
     try {
-      const stats = await workoutStatsService.getGeneralStats();
+      const stats = await this.service.getGeneralStats();
       return res.json(stats);
     } catch (err) {
       console.error("General stats error:", err);
@@ -25,4 +26,4 @@ class WorkoutStatsController {
   }
 }
 
-module.exports = new WorkoutStatsController();
+module.exports = { WorkoutStatsController };

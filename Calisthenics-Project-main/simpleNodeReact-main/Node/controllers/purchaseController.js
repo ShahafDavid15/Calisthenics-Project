@@ -1,4 +1,4 @@
-const { purchaseService, AppError } = require("../services/purchaseService");
+const { AppError } = require("../services/purchaseService");
 
 function handleError(res, err) {
   if (err instanceof AppError) {
@@ -9,10 +9,18 @@ function handleError(res, err) {
 }
 
 class PurchaseController {
+  constructor(service) {
+    this.service = service;
+    this.createOrder = this.createOrder.bind(this);
+    this.captureOrder = this.captureOrder.bind(this);
+    this.purchaseMembership = this.purchaseMembership.bind(this);
+    this.getActiveMembership = this.getActiveMembership.bind(this);
+  }
+
   async createOrder(req, res) {
     try {
       const { membership_name, price } = req.body;
-      const result = await purchaseService.createPaypalOrder(membership_name, price);
+      const result = await this.service.createPaypalOrder(membership_name, price);
       return res.json(result);
     } catch (err) {
       return handleError(res, err);
@@ -22,7 +30,7 @@ class PurchaseController {
   async captureOrder(req, res) {
     try {
       const { orderID } = req.body;
-      const result = await purchaseService.capturePaypalOrder(orderID);
+      const result = await this.service.capturePaypalOrder(orderID);
       return res.json(result);
     } catch (err) {
       return handleError(res, err);
@@ -32,7 +40,7 @@ class PurchaseController {
   async purchaseMembership(req, res) {
     try {
       const { membership_name, paypal_order_id, payer_id, price } = req.body;
-      const result = await purchaseService.purchaseMembership(req.user.userId, {
+      const result = await this.service.purchaseMembership(req.user.userId, {
         membership_name,
         paypal_order_id,
         payer_id,
@@ -46,7 +54,7 @@ class PurchaseController {
 
   async getActiveMembership(req, res) {
     try {
-      const membership = await purchaseService.getActiveMembership(req.user.userId);
+      const membership = await this.service.getActiveMembership(req.user.userId);
       return res.json(membership);
     } catch (err) {
       return handleError(res, err);
@@ -54,4 +62,4 @@ class PurchaseController {
   }
 }
 
-module.exports = new PurchaseController();
+module.exports = { PurchaseController };

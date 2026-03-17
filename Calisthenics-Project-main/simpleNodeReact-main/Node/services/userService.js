@@ -1,7 +1,6 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { sendEmail } = require("../utils/sendEmail");
-const userRepository = require("../repositories/userRepository");
 
 class AppError extends Error {
   constructor(message, statusCode) {
@@ -47,21 +46,22 @@ function verifyJwt(token) {
 }
 
 class UserService {
+  constructor(repository) {
+    this.repository = repository;
+  }
+
   async registerUser({ username, password }) {
     if (!username || !password) {
       throw new AppError("Username and password are required", 400);
     }
 
-    const existing = await userRepository.findUserByUsername(username);
+    const existing = await this.repository.findUserByUsername(username);
     if (existing) {
       throw new AppError("Username already exists", 409);
     }
 
     const passwordHash = await hashPassword(password);
-    const result = await userRepository.createUser({
-      username,
-      passwordHash,
-    });
+    const result = await this.repository.createUser({ username, passwordHash });
 
     return {
       message: "User registered",
@@ -75,7 +75,7 @@ class UserService {
       throw new AppError("Username and password are required", 400);
     }
 
-    const user = await userRepository.findUserByUsername(username);
+    const user = await this.repository.findUserByUsername(username);
     if (!user) {
       throw new AppError("Username or password is incorrect", 401);
     }
@@ -100,7 +100,7 @@ class UserService {
   }
 
   async getUserById(userId) {
-    const user = await userRepository.findUserById(userId);
+    const user = await this.repository.findUserById(userId);
     if (!user) {
       throw new AppError("User not found", 404);
     }
@@ -108,18 +108,17 @@ class UserService {
   }
 
   async getAllUsersWithMembership() {
-    return userRepository.getAllUsersWithLatestMembership();
+    return this.repository.getAllUsersWithLatestMembership();
   }
 
   async updateUserProfile(data) {
-    const { username, firstName, lastName, phone, email, birthDate, gender } =
-      data;
+    const { username, firstName, lastName, phone, email, birthDate, gender } = data;
 
     if (!username || !firstName || !lastName || !phone || !email || !gender) {
       throw new AppError("Missing required fields", 400);
     }
 
-    const result = await userRepository.updateUserProfile({
+    const result = await this.repository.updateUserProfile({
       username,
       firstName,
       lastName,
@@ -133,20 +132,11 @@ class UserService {
       throw new AppError("User not found", 404);
     }
 
-    // Try to send email, but do not fail the main operation if email fails
     try {
-      await sendEmail(
-        email,
-        "עדכון פרופיל",
-        `שלום ${firstName}, הפרופיל עודכן`
-      );
-      return {
-        message: "Profile updated and email sent successfully",
-      };
+      await sendEmail(email, "עדכון פרופיל", `שלום ${firstName}, הפרופיל עודכן`);
+      return { message: "Profile updated and email sent successfully" };
     } catch (err) {
-      return {
-        message: "Profile updated, but failed to send email",
-      };
+      return { message: "Profile updated, but failed to send email" };
     }
   }
 
@@ -155,15 +145,12 @@ class UserService {
       throw new AppError("Email is required", 400);
     }
 
-    const user = await userRepository.findUserByEmail(email);
+    const user = await this.repository.findUserByEmail(email);
     if (!user) {
       throw new AppError("No user with that email", 404);
     }
 
-    const token = await signJwt(
-      { userId: user.user_id },
-      { expiresIn: "15m" }
-    );
+    const token = await signJwt({ userId: user.user_id }, { expiresIn: "15m" });
     const resetLink = `http://localhost:3000/reset-password?token=${token}`;
 
     try {
@@ -176,9 +163,7 @@ class UserService {
       throw new AppError("Failed to send reset email", 500);
     }
 
-    return {
-      message: "Reset email sent",
-    };
+    return { message: "Reset email sent" };
   }
 
   async resetPassword({ token, newPassword }) {
@@ -194,14 +179,9 @@ class UserService {
     }
 
     const passwordHash = await hashPassword(newPassword);
-    await userRepository.updateUserPasswordById(
-      decoded.userId,
-      passwordHash
-    );
+    await this.repository.updateUserPasswordById(decoded.userId, passwordHash);
 
-    return {
-      message: "Password reset successful",
-    };
+    return { message: "Password reset successful" };
   }
 
   async updatePasswordFromProfile({ username, currentPassword, newPassword }) {
@@ -209,7 +189,7 @@ class UserService {
       throw new AppError("Missing required fields", 400);
     }
 
-    const user = await userRepository.findUserByUsername(username);
+    const user = await this.repository.findUserByUsername(username);
     if (!user) {
       throw new AppError("User not found", 404);
     }
@@ -220,7 +200,7 @@ class UserService {
     }
 
     const passwordHash = await hashPassword(newPassword);
-    await userRepository.updateUserPasswordByUsername(username, passwordHash);
+    await this.repository.updateUserPasswordByUsername(username, passwordHash);
 
     if (user.email) {
       try {
@@ -234,9 +214,7 @@ class UserService {
       }
     }
 
-    return {
-      message: "Password updated successfully",
-    };
+    return { message: "Password updated successfully" };
   }
 
   async sendForgotUsernameEmail(email) {
@@ -244,7 +222,7 @@ class UserService {
       throw new AppError("Email is required", 400);
     }
 
-    const result = await userRepository.getUsernameByEmail(email);
+    const result = await this.repository.getUsernameByEmail(email);
     if (!result) {
       throw new AppError("No user with that email", 404);
     }
@@ -252,22 +230,13 @@ class UserService {
     const { username } = result;
 
     try {
-      await sendEmail(
-        email,
-        "Your Username",
-        `Hello,\nYour username is: ${username}`
-      );
+      await sendEmail(email, "Your Username", `Hello,\nYour username is: ${username}`);
     } catch (e) {
       throw new AppError("Failed to send username email", 500);
     }
 
-    return {
-      message: "Username sent to your email",
-    };
+    return { message: "Username sent to your email" };
   }
 }
 
-module.exports = {
-  userService: new UserService(),
-  AppError,
-};
+module.exports = { UserService, AppError };

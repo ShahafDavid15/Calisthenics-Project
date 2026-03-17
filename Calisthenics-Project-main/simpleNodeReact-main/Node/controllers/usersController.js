@@ -1,4 +1,4 @@
-const { userService, AppError } = require("../services/userService");
+const { AppError } = require("../services/userService");
 
 function handleError(res, err) {
   if (err instanceof AppError) {
@@ -9,9 +9,22 @@ function handleError(res, err) {
 }
 
 class UsersController {
+  constructor(service) {
+    this.service = service;
+    this.register = this.register.bind(this);
+    this.login = this.login.bind(this);
+    this.getUserById = this.getUserById.bind(this);
+    this.getAllUsers = this.getAllUsers.bind(this);
+    this.updateProfile = this.updateProfile.bind(this);
+    this.forgotPassword = this.forgotPassword.bind(this);
+    this.resetPassword = this.resetPassword.bind(this);
+    this.updatePassword = this.updatePassword.bind(this);
+    this.forgotUsername = this.forgotUsername.bind(this);
+  }
+
   async register(req, res) {
     try {
-      const result = await userService.registerUser(req.body);
+      const result = await this.service.registerUser(req.body);
       return res.status(201).json(result);
     } catch (err) {
       return handleError(res, err);
@@ -20,7 +33,7 @@ class UsersController {
 
   async login(req, res) {
     try {
-      const result = await userService.loginUser(req.body);
+      const result = await this.service.loginUser(req.body);
       return res.json(result);
     } catch (err) {
       return handleError(res, err);
@@ -34,7 +47,7 @@ class UsersController {
       if (requestedId !== userId && role !== "admin") {
         return res.status(403).json({ error: "אין הרשאה לצפות בפרופיל זה" });
       }
-      const user = await userService.getUserById(requestedId);
+      const user = await this.service.getUserById(requestedId);
       return res.json(user);
     } catch (err) {
       return handleError(res, err);
@@ -43,7 +56,7 @@ class UsersController {
 
   async getAllUsers(req, res) {
     try {
-      const users = await userService.getAllUsersWithMembership();
+      const users = await this.service.getAllUsersWithMembership();
       return res.json(users);
     } catch (err) {
       return handleError(res, err);
@@ -53,7 +66,7 @@ class UsersController {
   async updateProfile(req, res) {
     try {
       const data = { ...req.body, username: req.user.username };
-      const result = await userService.updateUserProfile(data);
+      const result = await this.service.updateUserProfile(data);
       return res.json(result);
     } catch (err) {
       return handleError(res, err);
@@ -62,7 +75,7 @@ class UsersController {
 
   async forgotPassword(req, res) {
     try {
-      const result = await userService.requestPasswordReset(req.body.email);
+      const result = await this.service.requestPasswordReset(req.body.email);
       return res.json(result);
     } catch (err) {
       return handleError(res, err);
@@ -71,7 +84,7 @@ class UsersController {
 
   async resetPassword(req, res) {
     try {
-      const result = await userService.resetPassword(req.body);
+      const result = await this.service.resetPassword(req.body);
       return res.json(result);
     } catch (err) {
       return handleError(res, err);
@@ -81,7 +94,7 @@ class UsersController {
   async updatePassword(req, res) {
     try {
       const data = { ...req.body, username: req.user.username };
-      const result = await userService.updatePasswordFromProfile(data);
+      const result = await this.service.updatePasswordFromProfile(data);
       return res.json(result);
     } catch (err) {
       return handleError(res, err);
@@ -90,7 +103,7 @@ class UsersController {
 
   async forgotUsername(req, res) {
     try {
-      const result = await userService.sendForgotUsernameEmail(req.body.email);
+      const result = await this.service.sendForgotUsernameEmail(req.body.email);
       return res.json(result);
     } catch (err) {
       return handleError(res, err);
@@ -98,4 +111,4 @@ class UsersController {
   }
 }
 
-module.exports = new UsersController();
+module.exports = { UsersController };

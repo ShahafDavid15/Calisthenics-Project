@@ -1,9 +1,12 @@
-const adminStatsService = require("../services/adminStatsService");
-
 class AdminStatsController {
+  constructor(service) {
+    this.service = service;
+    this.getStats = this.getStats.bind(this);
+  }
+
   async getStats(req, res) {
     try {
-      const stats = await adminStatsService.getStats();
+      const stats = await this.service.getStats();
       return res.json(stats);
     } catch (err) {
       console.error("Admin stats error:", err);
@@ -12,4 +15,4 @@ class AdminStatsController {
   }
 }
 
-module.exports = new AdminStatsController();
+module.exports = { AdminStatsController };

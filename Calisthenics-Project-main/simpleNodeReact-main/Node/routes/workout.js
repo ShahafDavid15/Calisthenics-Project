@@ -1,12 +1,13 @@
-/**
- * Workout routes – routing only.
- * Business logic → workoutService
- * DB queries     → workoutRepository
- */
-
 const express = require("express");
 const router = express.Router();
-const workoutController = require("../controllers/workoutController");
+
+const workoutRepository = require("../repositories/workoutRepository");
+const { WorkoutService } = require("../services/workoutService");
+const { WorkoutController } = require("../controllers/workoutController");
+
+const workoutService = new WorkoutService(workoutRepository);
+const workoutController = new WorkoutController(workoutService);
+
 const { authMiddleware, requireAdmin } = require("../middleware/authMiddleware");
 const {
   handleValidation,
@@ -17,14 +18,14 @@ const {
 
 router.use(authMiddleware);
 
-router.get("/", (req, res) => workoutController.getAll(req, res));
+router.get("/", workoutController.getAll);
 
 router.post(
   "/",
   requireAdmin,
   ...workoutPostValidation,
   handleValidation,
-  (req, res) => workoutController.create(req, res)
+  workoutController.create
 );
 
 router.put(
@@ -32,7 +33,7 @@ router.put(
   requireAdmin,
   ...workoutPutValidation,
   handleValidation,
-  (req, res) => workoutController.updateTime(req, res)
+  workoutController.updateTime
 );
 
 router.delete(
@@ -40,7 +41,7 @@ router.delete(
   requireAdmin,
   ...idParamValidation,
   handleValidation,
-  (req, res) => workoutController.deleteById(req, res)
+  workoutController.deleteById
 );
 
 module.exports = router;
