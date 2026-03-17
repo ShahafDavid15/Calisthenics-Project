@@ -18,14 +18,15 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-/** Sends an email to a specific recipient. */
-async function sendEmail(to, subject, text) {
+/** Sends an email to a specific recipient. Supports plain text or HTML. */
+async function sendEmail(to, subject, textOrHtml) {
+  const isHtml = textOrHtml.trimStart().startsWith("<");
   try {
     await transporter.sendMail({
       from: `"Calisthenics Website" <${process.env.EMAIL_USER}>`,
       to,
       subject,
-      text,
+      ...(isHtml ? { html: textOrHtml } : { text: textOrHtml }),
     });
   } catch (err) {
     console.error(`Error sending email to ${to}:`, err);

@@ -6,6 +6,7 @@
 
 require("dotenv").config();
 const mysql = require("mysql2");
+const logger = require("./utils/logger");
 
 const pool = mysql.createPool({
   host: process.env.DB_HOST || "localhost",
@@ -19,9 +20,9 @@ const pool = mysql.createPool({
 
 pool.getConnection((err, conn) => {
   if (err) {
-    console.error("MySQL connection error:", err.message);
+    logger.error("MySQL connection error: " + err.message);
   } else {
-    console.log("Connected to MySQL database (pool).");
+    logger.info("Connected to MySQL database (pool).");
     conn.release();
   }
 });

@@ -1,7 +1,6 @@
-require("dotenv").config();
 const checkoutNodeJssdk = require("@paypal/checkout-server-sdk");
-const nodemailer = require("nodemailer");
 const { client } = require("../utils/paypalClient");
+const { sendEmail } = require("../utils/sendEmail");
 const purchaseRepository = require("../repositories/purchaseRepository");
 
 class AppError extends Error {
@@ -13,14 +12,6 @@ class AppError extends Error {
 
 /** Membership names allowed for PayPal orders */
 const VALID_MEMBERSHIPS = ["Basic", "Standard", "Premium"];
-
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
 
 class PurchaseService {
   async createPaypalOrder(membership_name, price) {
@@ -113,24 +104,21 @@ class PurchaseService {
       new Date().setDate(new Date().getDate() + duration)
     ).toLocaleDateString("he-IL");
 
-    await transporter.sendMail({
-      from: `"Calisthenics Website" <${process.env.EMAIL_USER}>`,
-      to: user.email,
-      subject: "קבלה על רכישת מנוי",
-      html: `
-        <div dir="rtl" style="text-align: right; font-family: Arial, sans-serif; color: #333;">
-          <h2>תודה על רכישת מנוי!</h2>
-          <p>שלום ${user.first_name || ""}, הרכישה שלך נקלטה בהצלחה.</p>
-          <p><b>מנוי:</b> ${membership_name}</p>
-          <p><b>מחיר (כולל מע"מ):</b> ₪${price}</p>
-          <p><b>תאריך התחלה:</b> ${startDate}</p>
-          <p><b>תאריך סיום:</b> ${endDate}</p>
-          <p><b>מספר הזמנה (PayPal):</b> ${paypal_order_id}</p>
-          <br/>
-          <p>תודה שבחרת בנו!</p>
-        </div>
-      `,
-    });
+    const html = `
+      <div dir="rtl" style="text-align: right; font-family: Arial, sans-serif; color: #333;">
+        <h2>תודה על רכישת מנוי!</h2>
+        <p>שלום ${user.first_name || ""}, הרכישה שלך נקלטה בהצלחה.</p>
+        <p><b>מנוי:</b> ${membership_name}</p>
+        <p><b>מחיר (כולל מע"מ):</b> ₪${price}</p>
+        <p><b>תאריך התחלה:</b> ${startDate}</p>
+        <p><b>תאריך סיום:</b> ${endDate}</p>
+        <p><b>מספר הזמנה (PayPal):</b> ${paypal_order_id}</p>
+        <br/>
+        <p>תודה שבחרת בנו!</p>
+      </div>
+    `;
+
+    await sendEmail(user.email, "קבלה על רכישת מנוי", html);
   }
 }
 

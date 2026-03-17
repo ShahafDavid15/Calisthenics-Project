@@ -13,11 +13,14 @@ const cors = require("cors");
 const cron = require("node-cron");
 const insertWorkouts = require("./utils/seedWorkouts");
 const { notifyExpiringMemberships } = require("./utils/sendEmail");
+const logger = require("./utils/logger");
 const app = express();
 const PORT = process.env.PORT || 3002;
 
 // Enable CORS for all routes to allow cross-origin requests
-app.use(cors());
+app.use(cors({
+  origin: process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:3000'],
+}));
 
 // Middleware to parse incoming JSON request bodies
 app.use(express.json());
@@ -51,17 +54,22 @@ insertWorkouts();
 
 // Schedule a daily job at 2:00 AM to automatically insert workouts
 cron.schedule("0 2 * * *", () => {
-  console.log("Running daily workout insertion...");
+  logger.info("Running daily workout insertion...");
   insertWorkouts();
 });
 
 // Schedule a daily job at 8:00 AM to notify expiring memberships
 cron.schedule("0 8 * * *", () => {
-  console.log("Checking expiring memberships...");
+  logger.info("Checking expiring memberships...");
   notifyExpiringMemberships();
 });
 
-// Start the Express server and listen on the defined port
-app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
+// Global error handler
+app.use((err, req, res, next) => {
+  const statusCode = err.statusCode || 500;
+  const message = err.message || "שגיאת שרת פנימית";
+  logger.error(`[${statusCode}] ${req.method} ${req.path} – ${message}`, { stack: err.stack });
+  res.status(statusCode).json({ error: message });
 });
+
+module.exports = app;

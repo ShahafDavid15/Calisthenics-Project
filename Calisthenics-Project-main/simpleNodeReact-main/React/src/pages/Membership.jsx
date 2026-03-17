@@ -114,7 +114,10 @@ export default function Membership({ onLogout, currentUser }) {
         }),
       });
 
-      if (!response.ok) throw new Error("Failed to add membership");
+      if (!response.ok) {
+        showErrorMessage(await getErrorMessage(response));
+        return;
+      }
 
       // Refresh the memberships list
       const res = await apiFetch("/api/memberships");
@@ -221,7 +224,10 @@ export default function Membership({ onLogout, currentUser }) {
         }),
       });
 
-      if (!response.ok) throw new Error("Failed to update membership");
+      if (!response.ok) {
+        showErrorMessage(await getErrorMessage(response));
+        return;
+      }
 
       // Refresh memberships list after update
       const res = await apiFetch("/api/memberships");
@@ -241,7 +247,10 @@ export default function Membership({ onLogout, currentUser }) {
       const response = await apiFetch(`/api/memberships/${id}`, {
         method: "DELETE",
       });
-      if (!response.ok) throw new Error("Failed to delete membership");
+      if (!response.ok) {
+        showErrorMessage(await getErrorMessage(response));
+        return;
+      }
 
       // Refresh memberships list
       const res = await apiFetch("/api/memberships");

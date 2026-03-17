@@ -94,8 +94,8 @@ const membershipPostValidation = [
   body("price").isFloat({ min: 0.01 }).withMessage("מחיר חייב להיות חיובי"),
   body("duration_days")
     .isInt({ min: 1 })
-    .withMessage("מספר ימים חייב להיות מספר חיובי"),
-  body("entry_count").optional().isInt({ min: 0 }).withMessage("מספר כניסות לא תקין"),
+    .withMessage("מספר הימים חייב להיות חיובי"),
+  body("entry_count").optional().isInt({ min: 0 }).withMessage("מספר כניסות חייב להיות חיובי"),
 ];
 
 const membershipPutValidation = [
@@ -104,8 +104,8 @@ const membershipPutValidation = [
   body("price").isFloat({ min: 0.01 }).withMessage("מחיר חייב להיות חיובי"),
   body("duration_days")
     .isInt({ min: 1 })
-    .withMessage("מספר ימים חייב להיות מספר חיובי"),
-  body("entry_count").optional().isInt({ min: 0 }).withMessage("מספר כניסות לא תקין"),
+    .withMessage("מספר הימים חייב להיות חיובי"),
+  body("entry_count").optional().isInt({ min: 0 }).withMessage("מספר כניסות חייב להיות חיובי"),
 ];
 
 // --- User Workouts ---
