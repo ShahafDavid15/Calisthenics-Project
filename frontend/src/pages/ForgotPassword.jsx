@@ -60,31 +60,33 @@ export default function ForgotPassword() {
     <div className={classes.pageWrapper}>
       <Header />
 
-      {/* Link to navigate back to login page */}
-      <Link to="/" className={classes.link}>
-        Back to Login
-      </Link>
+      <main className={classes.main}>
+        <div className={classes.container}>
+          <h2 className={classes.title}>Forgot Password</h2>
 
-      <main className={classes.container}>
-        <h2>Forgot Password</h2>
+          {/* Email input field */}
+          <input
+            type="email"
+            placeholder="Enter your email"
+            className={classes.input}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
 
-        {/* Email input field */}
-        <input
-          type="email"
-          placeholder="Enter your email"
-          className={classes.input}
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
+          {/* Submit button */}
+          <button className={classes.button} onClick={handleSubmit}>
+            Send Password Reset Email
+          </button>
 
-        {/* Submit button */}
-        <button className={classes.button} onClick={handleSubmit}>
-          Send Password Reset Email
-        </button>
+          {/* Display messages */}
+          {message && <p className={classes.success}>{message}</p>}
+          {error && <p className={classes.error}>{error}</p>}
 
-        {/* Display messages */}
-        {message && <p className={classes.success}>{message}</p>}
-        {error && <p className={classes.error}>{error}</p>}
+          {/* Link to navigate back to login page */}
+          <p className={classes.redirectLink}>
+            <Link to="/" className={classes.link}>Back to Login</Link>
+          </p>
+        </div>
       </main>
 
       <Footer />

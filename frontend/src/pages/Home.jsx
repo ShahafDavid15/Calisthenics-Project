@@ -378,8 +378,9 @@ export default function Home({ onLogout, currentUser }) {
                     />
                     <YAxis
                       tickFormatter={(v) => Number(v).toLocaleString()}
-                      tick={{ className: classes.axisTick, dx: -8 }}
-                      width={70}
+                      tick={{ className: classes.axisTick }}
+                      tickMargin={10}
+                      width={100}
                       domain={[0, yAxisMax]}
                       ticks={yAxisTicks}
                     />

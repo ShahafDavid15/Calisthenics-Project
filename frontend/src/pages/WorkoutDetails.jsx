@@ -44,7 +44,6 @@ export default function WorkoutEntry({ onLogout, currentUser }) {
 
   // Search state
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredWorkouts, setFilteredWorkouts] = useState([]);
 
   const API_BASE = "http://localhost:3002/api/workout_exercises";
 
@@ -93,6 +92,10 @@ export default function WorkoutEntry({ onLogout, currentUser }) {
     setShowModal(true);
   };
 
+  // Extract error message from server response or fallback
+  const extractError = (error, fallback) =>
+    error?.response?.data?.error || fallback;
+
   // Add new workout
   const handleSubmitExercise = async () => {
     if (!selectedExercise || !repetitions || !workoutDate) {
@@ -130,12 +133,10 @@ export default function WorkoutEntry({ onLogout, currentUser }) {
       showSuccess("התרגיל נשלח ונשמר בהצלחה!");
       setSelectedExercise("");
       setRepetitions("");
-      setWorkoutDate(today);
+      setWorkoutDate(new Date().toISOString().slice(0, 10));
       setSearchTerm("");
-      setFilteredWorkouts([]);
     } catch (error) {
-      console.error(error);
-      showError("שגיאה בשליחה לשרת");
+      showError(extractError(error, "שגיאה בשליחה לשרת"));
     }
   };
 
@@ -146,10 +147,8 @@ export default function WorkoutEntry({ onLogout, currentUser }) {
       const response = await apiAxios.get(API_BASE);
       setWorkouts(response.data);
       showSuccess("האימון נמחק בהצלחה!");
-      setFilteredWorkouts((prev) => prev.filter((w) => w.id !== workoutId));
     } catch (error) {
-      console.error(error);
-      showError("שגיאה במחיקת האימון");
+      showError(extractError(error, "שגיאה במחיקת האימון"));
     }
   };
 
@@ -199,31 +198,21 @@ export default function WorkoutEntry({ onLogout, currentUser }) {
       setEditWorkoutId(null);
       showSuccess("העדכון נשמר בהצלחה!");
     } catch (error) {
-      console.error(error);
-      showError("שגיאה בעדכון הנתונים");
+      showError(extractError(error, "שגיאה בעדכון הנתונים"));
     }
   };
 
-  // Search workouts by exercise
-  const handleSearch = () => {
-    const trimmed = searchTerm.trim();
-    if (!trimmed) {
-      setFilteredWorkouts([]);
-      return;
-    }
-    const results = workouts.filter((w) => w.exercise === trimmed);
-    setFilteredWorkouts(results);
-  };
-
-  // Clear search input and results
+  // Clear search input
   const handleClear = () => {
     setSearchTerm("");
-    setFilteredWorkouts([]);
   };
 
-  // Determine which workouts to display
-  const displayedWorkouts =
-    filteredWorkouts.length > 0 ? filteredWorkouts : workouts;
+  // Filter workouts live as user types – match from the start of the exercise name
+  const displayedWorkouts = searchTerm.trim()
+    ? workouts.filter((w) =>
+        w.exercise.toLowerCase().startsWith(searchTerm.trim().toLowerCase())
+      )
+    : workouts;
 
   return (
     <div className={classes.container} dir="rtl">
@@ -288,24 +277,21 @@ export default function WorkoutEntry({ onLogout, currentUser }) {
             <input
               type="text"
               className={classes.searchInput}
-              placeholder="חפש תרגיל"
+              placeholder="חפש תרגיל..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-            <button
-              className={`${classes.actionButton} ${classes.updateButton}`}
-              onClick={handleSearch}
-            >
-              חפש
-            </button>
-            <button
-              className={`${classes.actionButton} ${classes.deleteButton}`}
-              onClick={handleClear}
-            >
-              נקה
-            </button>
+            {searchTerm && (
+              <button
+                className={`${classes.actionButton} ${classes.deleteButton}`}
+                onClick={handleClear}
+              >
+                נקה
+              </button>
+            )}
           </div>
 
+          <div className={classes.tableScrollWrapper}>
           <table className={classes.table}>
             <thead>
               <tr>
@@ -316,10 +302,17 @@ export default function WorkoutEntry({ onLogout, currentUser }) {
               </tr>
             </thead>
             <tbody>
-              {displayedWorkouts.length === 0 && (
+              {displayedWorkouts.length === 0 && searchTerm.trim() && (
                 <tr>
                   <td colSpan="4" className={classes.noResultsCell}>
-                    לא נמצאו תוצאות לתרגיל "{searchTerm}"
+                    לא נמצאו תוצאות לחיפוש &quot;{searchTerm}&quot;
+                  </td>
+                </tr>
+              )}
+              {displayedWorkouts.length === 0 && !searchTerm.trim() && (
+                <tr>
+                  <td colSpan="4" className={classes.noResultsCell}>
+                    אין נתוני אימון עדיין
                   </td>
                 </tr>
               )}
@@ -406,6 +399,7 @@ export default function WorkoutEntry({ onLogout, currentUser }) {
               ))}
             </tbody>
           </table>
+          </div>
         </div>
         </>
         )}

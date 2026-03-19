@@ -12,6 +12,7 @@ import {
 } from "react-router-dom";
 import { useState, useEffect } from "react";
 import React from "react";
+import "./App.css";
 
 // Import pages/components
 import Login from "./pages/Login";

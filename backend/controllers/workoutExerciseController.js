@@ -12,9 +12,19 @@ class WorkoutExerciseController {
   constructor(service) {
     this.service = service;
     this.getAll = this.getAll.bind(this);
+    this.getRegisteredDates = this.getRegisteredDates.bind(this);
     this.create = this.create.bind(this);
     this.update = this.update.bind(this);
     this.deleteById = this.deleteById.bind(this);
+  }
+
+  async getRegisteredDates(req, res) {
+    try {
+      const dates = await this.service.getPastRegisteredDates(req.user.userId);
+      return res.json(dates.map((d) => d.workout_date));
+    } catch (err) {
+      return handleError(res, err);
+    }
   }
 
   async getAll(req, res) {

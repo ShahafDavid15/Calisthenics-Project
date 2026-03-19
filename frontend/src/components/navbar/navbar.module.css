@@ -1,37 +1,39 @@
-/* Container for all links in the navbar */
 .linkList {
   display: flex;
-  gap: 0.1rem;
-  padding: 0;
-  margin: 0 auto;
+  gap: 0;
   list-style: none;
   justify-content: center;
   direction: ltr;
+  background-color: var(--bg-card);
+  border-bottom: 1px solid var(--border-color);
+  padding: 0 1rem;
 }
 
-/* Individual link item */
 .linkItem {
   max-width: 220px;
+  position: relative;
 }
 
-/* Styling for each link */
 .link {
-  box-sizing: border-box;
   display: block;
-  width: 100%;
-  padding: 1rem;
-  font-size: 1.2rem;
-  color: #129990;
-  background-color: #fffbde;
-  text-align: center;
+  padding: 1.2rem 1.8rem;
+  font-size: 1.4rem;
+  font-weight: 500;
+  color: var(--text-muted);
   direction: rtl;
-  transition: all 0.3s ease;
-  text-decoration: none;
+  transition: color 0.2s, background-color 0.2s;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
 }
 
-/* Hover effect for links */
 .link:hover {
-  color: #096b68;
-  transform: translateY(-3px);
-  text-decoration: underline;
+  color: var(--accent);
+  background-color: rgba(255, 107, 53, 0.08);
+}
+
+.link.active,
+:global(.active) .link {
+  color: var(--accent);
+  font-weight: 700;
+  border-bottom: 2px solid var(--accent);
 }

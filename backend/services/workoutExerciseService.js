@@ -11,17 +11,27 @@ function isFutureDate(dateStr) {
 }
 
 class WorkoutExerciseService {
-  constructor(repository) {
+  constructor(repository, userWorkoutRepository) {
     this.repository = repository;
+    this.userWorkoutRepository = userWorkoutRepository;
   }
 
   async getByUserId(userId) {
     return this.repository.getByUserId(userId);
   }
 
+  async getPastRegisteredDates(userId) {
+    return this.userWorkoutRepository.getPastDates(userId);
+  }
+
   async create(userId, { exercise, repetitions, workout_date }) {
     if (isFutureDate(workout_date)) {
       throw new AppError("לא ניתן להוסיף אימון בעתיד", 400);
+    }
+
+    const canLog = await this.userWorkoutRepository.hasEndedOnDay(userId, workout_date);
+    if (!canLog) {
+      throw new AppError("ניתן להזין נתוני אימון רק לאחר סיום האימון", 400);
     }
 
     const result = await this.repository.create(userId, exercise, repetitions, workout_date);
@@ -31,6 +41,11 @@ class WorkoutExerciseService {
   async update(id, userId, { exercise, repetitions, workout_date }) {
     if (isFutureDate(workout_date)) {
       throw new AppError("לא ניתן לעדכן אימון לעתיד", 400);
+    }
+
+    const canLog = await this.userWorkoutRepository.hasEndedOnDay(userId, workout_date);
+    if (!canLog) {
+      throw new AppError("ניתן להזין נתוני אימון רק לאחר סיום האימון", 400);
     }
 
     const result = await this.repository.update(id, userId, exercise, repetitions, workout_date);

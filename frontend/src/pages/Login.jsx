@@ -174,107 +174,107 @@ export default function Login({ setUser }) {
   );
 
   return (
-    <div className={classes.container}>
+    <div className={classes.pageWrapper}>
       <Header />
       {showNavBar && <NavBar currentUser={null} />}
 
       <main className={classes.main}>
-        <h2 className={classes.title}>
-          {isRegistration ? "Register" : "Login"}
-        </h2>
+        <div className={classes.card}>
+          <h2 className={classes.title}>
+            {isRegistration ? "Register" : "Login"}
+          </h2>
 
-        {/* Username input */}
-        <div className={classes.inputContainer}>
-          <input
-            id="username"
-            type="text"
-            placeholder="Username"
-            className={classes.input}
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
-        </div>
-
-        {/* Password input */}
-        <div className={classes.inputContainer}>
-          <input
-            id="password"
-            type={showPassword ? "text" : "password"}
-            placeholder="Password"
-            className={classes.input}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </div>
-
-        {/* Confirm password input (registration only) */}
-        {isRegistration && (
+          {/* Username input */}
           <div className={classes.inputContainer}>
             <input
-              id="confirmPassword"
-              type={showPassword ? "text" : "password"}
-              placeholder="Confirm Password"
+              id="username"
+              type="text"
+              placeholder="Username"
               className={classes.input}
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
             />
           </div>
-        )}
 
-        {/* Show/hide password toggle */}
-        <div className={classes.inputContainer}>
-          <label>
+          {/* Password input */}
+          <div className={classes.inputContainer}>
             <input
-              type="checkbox"
-              checked={showPassword}
-              onChange={() => setShowPassword(!showPassword)}
-            />{" "}
-            Show Password
-          </label>
-        </div>
-
-        {/* Submit button */}
-        <button className={classes.button} onClick={handleSubmit}>
-          {isRegistration ? "Register" : "Login"}
-        </button>
-
-        {/* Link to switch between login and signup */}
-        <p>
-          <Link to={isRegistration ? "/" : "/signup"} className={classes.link}>
-            {isRegistration
-              ? "Already have an account? Login"
-              : "Don't have an account? Create one"}
-          </Link>
-        </p>
-
-        {/* Forgot password username links */}
-        {!isRegistration && (
-          <>
-            <p>
-              <Link to="/forgot-password" className={classes.link}>
-                Forgot your password?
-              </Link>
-            </p>
-            <p>
-              <Link to="/forgot-username" className={classes.link}>
-                Forgot your username?
-              </Link>
-            </p>
-          </>
-        )}
-
-        {/* Error modal */}
-        {showError && (
-          <div className={classes.errorModel}>
-            <div className={classes.errorContent}>
-              <h3>Error</h3>
-              <p>{error}</p>
-              <button onClick={closeErrorModal}>Close</button>
-            </div>
+              id="password"
+              type={showPassword ? "text" : "password"}
+              placeholder="Password"
+              className={classes.input}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
           </div>
-        )}
+
+          {/* Confirm password input (registration only) */}
+          {isRegistration && (
+            <div className={classes.inputContainer}>
+              <input
+                id="confirmPassword"
+                type={showPassword ? "text" : "password"}
+                placeholder="Confirm Password"
+                className={classes.input}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+              />
+            </div>
+          )}
+
+          {/* Show/hide password toggle */}
+          <div className={classes.inputContainer}>
+            <label className={classes.checkboxLabel}>
+              <input
+                type="checkbox"
+                checked={showPassword}
+                onChange={() => setShowPassword(!showPassword)}
+              />
+              Show Password
+            </label>
+          </div>
+
+          {/* Submit button */}
+          <button className={classes.button} onClick={handleSubmit}>
+            {isRegistration ? "Register" : "Login"}
+          </button>
+
+          <hr className={classes.divider} />
+
+          {/* Links group */}
+          <div className={classes.linksGroup}>
+            <Link to={isRegistration ? "/" : "/signup"} className={classes.link}>
+              {isRegistration
+                ? "Already have an account? Login"
+                : "Don't have an account? Create one"}
+            </Link>
+
+            {!isRegistration && (
+              <>
+                <Link to="/forgot-password" className={classes.link}>
+                  Forgot your password?
+                </Link>
+                <Link to="/forgot-username" className={classes.link}>
+                  Forgot your username?
+                </Link>
+              </>
+            )}
+          </div>
+        </div>
       </main>
+
       <Footer />
+
+      {/* Error modal */}
+      {showError && (
+        <div className={classes.errorModel}>
+          <div className={classes.errorContent}>
+            <h3>Error</h3>
+            <p>{error}</p>
+            <button onClick={closeErrorModal}>Close</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

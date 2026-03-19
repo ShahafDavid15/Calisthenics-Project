@@ -32,6 +32,20 @@ class UserWorkoutRepository {
     ).then((rows) => rows[0].count > 0);
   }
 
+  hasEndedOnDay(userId, workout_date) {
+    return query(
+      `SELECT COUNT(*) AS count
+       FROM user_workouts
+       WHERE user_id = ?
+         AND workout_date = ?
+         AND (
+           workout_date < CURDATE()
+           OR (workout_date = CURDATE() AND ADDTIME(workout_time, '01:00:00') <= CURTIME())
+         )`,
+      [userId, workout_date]
+    ).then((rows) => rows[0].count > 0);
+  }
+
   countThisWeek(userId, workout_date) {
     return query(
       `SELECT COUNT(*) AS count
@@ -52,6 +66,16 @@ class UserWorkoutRepository {
     return query(
       "DELETE FROM user_workouts WHERE id = ? AND user_id = ?",
       [id, userId]
+    );
+  }
+
+  getPastDates(userId) {
+    return query(
+      `SELECT DISTINCT DATE_FORMAT(workout_date, '%Y-%m-%d') AS workout_date
+       FROM user_workouts
+       WHERE user_id = ? AND workout_date <= CURDATE()
+       ORDER BY workout_date DESC`,
+      [userId]
     );
   }
 

@@ -10,6 +10,25 @@
 
 :root {
   font-size: 62.5%;
+
+  /* ── Dark Athletic Design Tokens ── */
+  --bg-primary:   #0d1117;
+  --bg-card:      #161b22;
+  --bg-input:     #21262d;
+  --accent:       #ff6b35;
+  --accent-hover: #e55a25;
+  --accent-glow:  rgba(255, 107, 53, 0.25);
+  --text:         #e6edf3;
+  --text-muted:   #7d8590;
+  --border-color: rgba(255, 255, 255, 0.08);
+  --border-accent:rgba(255, 107, 53, 0.2);
+  --danger:       #f85149;
+  --danger-hover: #da3633;
+  --success:      #3fb950;
+  --radius-btn:   50px;
+  --radius-card:  12px;
+  --shadow-card:  0 4px 24px rgba(0,0,0,0.4);
+  --shadow-glow:  0 0 16px rgba(255, 107, 53, 0.18);
 }
 
 body {
@@ -17,10 +36,12 @@ body {
   font-weight: 400;
   line-height: 1.5;
   height: 100vh;
-  /* variables for common colors */
-  --h-color: rgb(18, 30, 75);
-  --a-color: #ff8000;
-  --border: 2px solid green;
+  background-color: var(--bg-primary);
+  color: var(--text);
+  /* legacy variables kept for compatibility */
+  --h-color: var(--text);
+  --a-color: var(--accent);
+  --border: 2px solid var(--accent);
 }
 
 .container {
@@ -361,7 +382,7 @@ a {
 
 .active {
   font-weight: bold;
-  color: red;
+  color: var(--accent);
 }
 #root {
   height: 100%;
@@ -374,10 +395,10 @@ a {
 .main {
   flex-grow: 1;
 }
-header,
 footer {
-  background-color: beige;
-  padding: 3rem 2rem;
+  background-color: var(--bg-card);
+  border-top: 1px solid var(--border-color);
+  padding: 1.8rem 2rem;
 }
 .header__wrap,
 .footer__wrap {
@@ -394,15 +415,21 @@ footer {
   height: 5rem;
 }
 .logo span {
-  color: chocolate;
+  color: var(--accent);
   font-size: 3rem;
+  font-weight: 700;
+  letter-spacing: 1px;
 }
 .menu {
   display: flex;
   gap: 1rem;
 }
 .menu li a {
-  color: chocolate;
+  color: var(--text);
+  transition: color 0.2s;
+}
+.menu li a:hover {
+  color: var(--accent);
 }
 .post__btns {
   display: flex;
@@ -426,36 +453,36 @@ footer {
   display: inline-block;
 }
 .back__btn a {
-  background-color: cornsilk;
+  background-color: var(--bg-card);
   padding: 1rem 2rem 1rem 0.7rem;
   display: flex;
-  color: black;
+  color: var(--text);
   font-size: 2rem;
   align-items: center;
-  border-radius: 2rem;
+  border-radius: var(--radius-btn);
+  border: 1px solid var(--border-color);
   transition: all 0.3s;
 }
-
 .back__btn a:hover {
-  transform: scale(1.09);
-  transition: all 0.3s;
+  transform: scale(1.05);
+  border-color: var(--accent);
+  color: var(--accent);
 }
 .btn_form {
-  background-color: chocolate;
+  background-color: var(--accent);
   border: 1px solid transparent;
-  padding: 1rem 2rem;
-  border-radius: 1rem;
-  color: antiquewhite;
-  font-size: 2rem;
+  padding: 1rem 2.4rem;
+  border-radius: var(--radius-btn);
+  color: #fff;
+  font-size: 1.6rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.25s;
 }
 .btn_form:hover {
-  background-color: antiquewhite;
-  border: 1px solid chocolate;
-  color: chocolate;
-  transition: all 0.3s;
+  background-color: var(--accent-hover);
+  transform: scale(1.03);
 }
 .error {
-  color: red;
+  color: var(--danger);
 }

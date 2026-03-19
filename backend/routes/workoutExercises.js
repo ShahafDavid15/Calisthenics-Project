@@ -2,10 +2,11 @@ const express = require("express");
 const router = express.Router();
 
 const workoutExerciseRepository = require("../repositories/workoutExerciseRepository");
+const userWorkoutRepository = require("../repositories/userWorkoutRepository");
 const { WorkoutExerciseService } = require("../services/workoutExerciseService");
 const { WorkoutExerciseController } = require("../controllers/workoutExerciseController");
 
-const workoutExerciseService = new WorkoutExerciseService(workoutExerciseRepository);
+const workoutExerciseService = new WorkoutExerciseService(workoutExerciseRepository, userWorkoutRepository);
 const workoutExerciseController = new WorkoutExerciseController(workoutExerciseService);
 
 const { authMiddleware } = require("../middleware/authMiddleware");
@@ -19,6 +20,7 @@ const {
 router.use(authMiddleware);
 
 router.get("/", workoutExerciseController.getAll);
+router.get("/registered-dates", workoutExerciseController.getRegisteredDates);
 
 router.post(
   "/",

@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "test": "jest --runInBand",
-    "start": "nodemon --watch .env --ext js,json,env server.js"
+    "start": "nodemon --ext js,json,env server.js"
   },
   "keywords": [],
   "author": "",

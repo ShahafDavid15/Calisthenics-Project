@@ -1,158 +1,195 @@
-/* Main container for the login/register page */
-.container {
+.pageWrapper {
+  min-height: 100vh;
+  background-color: var(--bg-primary);
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 50vh;
-  padding: 2rem;
-  background-color: #fffbde;
 }
 
-/* Main content area inside the container */
 .main {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  padding: 1rem 2rem;
-  width: 100%;
+  padding: 4rem 2rem 2rem;
 }
 
-/* Page title styling */
-.title {
-  text-align: center;
-  font-size: 2rem;
-  margin-bottom: 1rem;
-  color: #129990;
-}
-
-/* Container for input field and show/hide password button */
-.inputContainer {
+.card {
   width: 100%;
-  max-width: 300px;
+  max-width: 400px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-accent);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card), var(--shadow-glow);
+  padding: 3rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 1rem;
 }
 
-/* Input field styling */
-.input {
-  width: 100%;
-  font-size: 1rem;
-  padding: 0.5rem 1rem;
-  border: 2px solid #9c9b9b;
-  border-radius: 6px;
-  box-sizing: border-box;
-  min-width: 0;
-  margin-bottom: 0.3rem;
-}
-
-/* Button to toggle password visibility */
-.togglePasswordButton {
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  color: #129990;
-  font-weight: bold;
-  font-size: 1rem;
-  padding: 0;
-  user-select: none;
-  transition: color 0.3s;
+.title {
+  font-size: 2.4rem;
+  font-weight: 800;
+  color: var(--accent);
+  margin-bottom: 2rem;
+  letter-spacing: 0.5px;
   text-align: center;
 }
 
-/* Hover/focus effect for password toggle button */
-.togglePasswordButton:hover,
-.togglePasswordButton:focus {
-  color: #096b68;
-  outline: none;
+.inputContainer {
+  width: 100%;
+  margin-bottom: 1.2rem;
+  position: relative;
 }
 
-/* Fullscreen overlay for error modal */
+.input {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 1.5rem;
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  direction: ltr;
+  text-align: left;
+}
+
+.input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.input::placeholder {
+  color: var(--text-muted);
+}
+
+.input:-webkit-autofill,
+.input:-webkit-autofill:hover,
+.input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px var(--bg-input) inset;
+  -webkit-text-fill-color: var(--text);
+  border-color: var(--border-color);
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.3rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  direction: ltr;
+}
+
+.checkboxLabel input[type="checkbox"] {
+  accent-color: var(--accent);
+  width: 15px;
+  height: 15px;
+  cursor: pointer;
+}
+
+.button {
+  width: 100%;
+  background-color: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-btn);
+  padding: 12px 24px;
+  font-size: 1.6rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s;
+  margin-top: 1rem;
+  letter-spacing: 0.5px;
+}
+
+.button:hover {
+  background-color: var(--accent-hover);
+  transform: scale(1.03);
+  box-shadow: var(--shadow-glow);
+}
+
+.divider {
+  width: 100%;
+  border: none;
+  border-top: 1px solid var(--border-color);
+  margin: 1.6rem 0 1.2rem;
+}
+
+.link {
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 1.4rem;
+  transition: color 0.2s;
+}
+
+.link:hover {
+  color: var(--accent-hover);
+  text-decoration: underline;
+}
+
+.linksGroup {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+  width: 100%;
+  margin-top: 0.4rem;
+}
+
 .errorModel {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  background-color: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
   z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* Error modal content box */
 .errorContent {
-  background-color: white;
-  padding: 20px;
-  border-radius: 5px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-accent);
+  padding: 2.4rem;
+  border-radius: var(--radius-card);
   max-width: 400px;
   width: 90%;
-  text-align: center;
   direction: rtl;
+  box-shadow: var(--shadow-card);
+  color: var(--text);
 }
 
-/* Error modal title */
 .errorContent h3 {
-  color: #e74c3c;
-  margin-top: 0;
+  color: var(--danger);
+  margin-bottom: 1rem;
+  font-size: 1.8rem;
 }
 
-/* Hover effect for close button in error modal */
-.errorContent button:hover {
-  background-color: #096b68;
+.errorContent p {
+  font-size: 1.4rem;
+  margin-bottom: 1.4rem;
 }
 
-/* Button inside error modal */
 .errorContent button {
-  background-color: #129990;
-  color: white;
+  background-color: var(--danger);
+  color: #fff;
   border: none;
-  padding: 8px 16px;
-  border-radius: 4px;
+  border-radius: var(--radius-btn);
+  padding: 8px 20px;
+  font-size: 1.4rem;
+  font-weight: 600;
   cursor: pointer;
-  margin-top: 10px;
-  font-weight: bold;
+  transition: all 0.22s;
 }
 
-/* Submit/login/register button */
-.button {
-  width: 100%;
-  max-width: 250px;
-  padding: 0.5rem 1rem;
-  background-color: #129990;
-  color: white;
-  font-size: 1rem;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-/* Hover effect for main button */
-.button:hover {
-  background-color: #096b68;
-}
-
-/* Link styling (e.g., for forgot password or switch login/register) */
-.link {
-  margin-top: 1rem;
-  color: #129990;
-  text-decoration: none;
-  font-size: 1.2rem;
-}
-
-/* Hover effect for links */
-.link:hover {
-  text-decoration: underline;
-}
-
-/* Container for link to redirect (used in text like "Don't have an account?") */
-.redirectLink {
-  margin-top: 1rem;
-  text-align: center;
-  font-size: 1rem;
+.errorContent button:hover {
+  background-color: var(--danger-hover);
+  transform: scale(1.03);
 }
