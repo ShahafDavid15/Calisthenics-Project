@@ -12,9 +12,17 @@ const mockRepository = {
   deleteById: jest.fn(),
 };
 
-const workoutExerciseService = new WorkoutExerciseService(mockRepository);
+const mockUserWorkoutRepository = {
+  hasEndedOnDay: jest.fn().mockResolvedValue(true),
+  getPastDates: jest.fn().mockResolvedValue([]),
+};
 
-beforeEach(() => jest.clearAllMocks());
+const workoutExerciseService = new WorkoutExerciseService(mockRepository, mockUserWorkoutRepository);
+
+beforeEach(() => {
+  jest.clearAllMocks();
+  mockUserWorkoutRepository.hasEndedOnDay.mockResolvedValue(true);
+});
 
 describe("workoutExerciseService.create", () => {
   test("throws 400 for a future date", async () => {
