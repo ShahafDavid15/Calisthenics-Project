@@ -86,15 +86,14 @@ mysql -u root -p < database/schema.sql
 ### 3. Create the admin user
 
 ```bash
-cd Calisthenics-Project-main/simpleNodeReact-main/Node
-node ../../database/create-admin.js
+node database/create-admin.js
 # Default credentials: admin / Admin1234
 ```
 
 ### 4. Configure environment variables
 
 ```bash
-cd Calisthenics-Project-main/simpleNodeReact-main/Node
+cd backend
 cp .env.example .env
 # Edit .env with your values (DB credentials, JWT secret, email, PayPal)
 ```
@@ -102,7 +101,7 @@ cp .env.example .env
 ### 5. Run the backend
 
 ```bash
-cd Calisthenics-Project-main/simpleNodeReact-main/Node
+cd backend
 npm install
 npm start
 # Server runs at http://localhost:3002
@@ -111,10 +110,17 @@ npm start
 ### 6. Run the frontend
 
 ```bash
-cd Calisthenics-Project-main/simpleNodeReact-main/React
+cd frontend
 npm install
 npm start
 # App runs at http://localhost:3000
+```
+
+### Or run both together from the root
+
+```bash
+npm install
+npm start
 ```
 
 ---
@@ -122,7 +128,7 @@ npm start
 ## Running Tests
 
 ```bash
-cd Calisthenics-Project-main/simpleNodeReact-main/Node
+cd backend
 npm test
 ```
 
@@ -155,7 +161,7 @@ npm test
 
 ## Environment Variables
 
-See [`.env.example`](Calisthenics-Project-main/simpleNodeReact-main/Node/.env.example) for all required variables.
+See [`.env.example`](backend/.env.example) for all required variables.
 
 | Variable | Description |
 |----------|-------------|

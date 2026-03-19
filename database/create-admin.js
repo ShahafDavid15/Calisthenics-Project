@@ -8,7 +8,7 @@
  */
 
 require("dotenv").config({
-  path: require("path").join(__dirname, "../Calisthenics-Project-main/simpleNodeReact-main/Node/.env"),
+  path: require("path").join(__dirname, "../backend/.env"),
 });
 
 const mysql = require("mysql2");

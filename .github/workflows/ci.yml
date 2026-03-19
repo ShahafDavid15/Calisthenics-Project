@@ -20,11 +20,11 @@ jobs:
           node-version: 20
 
       - name: Install dependencies
-        working-directory: Calisthenics-Project-main/simpleNodeReact-main/Node
+        working-directory: backend
         run: npm install
 
       - name: Run tests
-        working-directory: Calisthenics-Project-main/simpleNodeReact-main/Node
+        working-directory: backend
         run: npm test
         env:
           JWT_SECRET: test_secret_key
