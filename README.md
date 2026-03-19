@@ -42,7 +42,7 @@ Route → Controller → Service → Repository → Database
 ## Project Structure
 
 ```
-Node/
+backend/
 ├── controllers/     # HTTP request handlers
 ├── services/        # Business logic
 ├── repositories/    # Database queries
@@ -53,11 +53,11 @@ Node/
 ├── server.js        # Entry point
 └── app.js           # Express app (exported for testing)
 
-React/
+frontend/
 └── src/
     ├── pages/       # Main page components
     ├── components/  # Reusable UI components
-    └── api.js       # Axios API client
+    └── utils/       # API client (api.js)
 ```
 
 ---

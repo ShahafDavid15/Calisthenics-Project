@@ -10,12 +10,17 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
+const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
 const cron = require("node-cron");
 const insertWorkouts = require("./utils/seedWorkouts");
 const { notifyExpiringMemberships } = require("./utils/sendEmail");
 const logger = require("./utils/logger");
 const app = express();
 const PORT = process.env.PORT || 3002;
+
+// Security headers
+app.use(helmet());
 
 // Enable CORS for all routes to allow cross-origin requests
 app.use(cors({
@@ -25,8 +30,17 @@ app.use(cors({
 // Middleware to parse incoming JSON request bodies
 app.use(express.json());
 
-// Route for user-related API endpoints
-app.use("/api/users", require("./routes/users"));
+// Rate limiter for login/register – max 20 requests per 15 minutes per IP
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "יותר מדי ניסיונות התחברות, נסה שוב בעוד 15 דקות" },
+});
+
+// Route for user-related API endpoints (rate-limited for auth endpoints)
+app.use("/api/users", authLimiter, require("./routes/users"));
 
 // Route for workouts management
 app.use("/api/workouts", require("./routes/workout"));
