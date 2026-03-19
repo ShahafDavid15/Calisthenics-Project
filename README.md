@@ -2,9 +2,9 @@
 
 [![CI](https://github.com/ShahafDavid15/Calisthenics-Project/actions/workflows/ci.yml/badge.svg)](https://github.com/ShahafDavid15/Calisthenics-Project/actions/workflows/ci.yml)
 
-אפליקציית ניהול חדר כושר – Full Stack.  
-מאפשרת לחברי המועדון להירשם לאימונים, לרכוש מנויים, ולעקוב אחר התקדמות האימונים שלהם.  
-למנהל: ניהול מנויים, אימונים, ודשבורד סטטיסטיקות.
+אפליקציית ניהול אימוני כושר – Full Stack  
+.מאפשרת לחברי המועדון להירשם לאימונים, לרכוש מנויים, ולעקוב אחר התקדמות האימונים שלהם 
+.למנהל: ניהול מנויים, אימונים, ודשבורד סטטיסטיקות
 
 ---
 

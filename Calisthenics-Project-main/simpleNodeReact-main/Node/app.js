@@ -35,7 +35,7 @@ app.use("/api/workouts", require("./routes/workout"));
 app.use("/api/memberships", require("./routes/membership"));
 
 // Route for workout exercises CRUD
-app.use("/api/workout_exercises", require("./routes/workout_exercises"));
+app.use("/api/workout_exercises", require("./routes/workoutExercises"));
 
 // Route for user workout registrations
 app.use("/api/user-workouts", require("./routes/userWorkouts"));
