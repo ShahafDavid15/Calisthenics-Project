@@ -70,8 +70,3 @@ describe("GET /api/workouts – requires auth", () => {
     expect(res.status).toBe(401);
   });
 });
-
-afterAll((done) => {
-  const db = require("../db");
-  db.end(done);
-});

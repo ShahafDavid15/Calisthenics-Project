@@ -14,8 +14,3 @@ describe("GET /api/purchases/paypal-client-id", () => {
     expect(typeof res.body.currency).toBe("string");
   });
 });
-
-afterAll((done) => {
-  const db = require("../db");
-  db.end(done);
-});

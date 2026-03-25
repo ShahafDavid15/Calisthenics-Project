@@ -33,6 +33,7 @@
   "jest": {
     "testEnvironment": "node",
     "testTimeout": 10000,
-    "forceExit": true
+    "forceExit": true,
+    "globalTeardown": "<rootDir>/jest.globalTeardown.js"
   }
 }

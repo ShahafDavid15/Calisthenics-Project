@@ -18,13 +18,16 @@ const pool = mysql.createPool({
   queueLimit: 0,
 });
 
-pool.getConnection((err, conn) => {
-  if (err) {
-    logger.error("MySQL connection error: " + err.message);
-  } else {
-    logger.info("Connected to MySQL database (pool).");
-    conn.release();
-  }
-});
+// Skip startup ping in Jest — avoids long timeouts when CI has no MySQL and keeps the pool open for all test files.
+if (process.env.NODE_ENV !== "test") {
+  pool.getConnection((err, conn) => {
+    if (err) {
+      logger.error("MySQL connection error: " + err.message);
+    } else {
+      logger.info("Connected to MySQL database (pool).");
+      conn.release();
+    }
+  });
+}
 
 module.exports = pool;

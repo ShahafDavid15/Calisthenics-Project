@@ -92,8 +92,3 @@ describe("DELETE /api/memberships/:id – authentication", () => {
     expect(res.status).toBe(401);
   });
 });
-
-afterAll((done) => {
-  const db = require("../db");
-  db.end(done);
-});

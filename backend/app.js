@@ -56,20 +56,20 @@ app.use("/api/workout-stats", require("./routes/workoutStats"));
 // Route for admin statistics
 app.use("/api/admin-stats", require("./routes/adminStats"));
 
-// Insert initial workouts into the database when server starts
-insertWorkouts();
-
-// Schedule a daily job at 2:00 AM to automatically insert workouts
-cron.schedule("0 2 * * *", () => {
-  logger.info("Running daily workout insertion...");
+// Skip DB seeding and cron during Jest (NODE_ENV=test) — avoids async queries after pool.end() in tests and allows CI without MySQL.
+if (process.env.NODE_ENV !== "test") {
   insertWorkouts();
-});
 
-// Schedule a daily job at 8:00 AM to notify expiring memberships
-cron.schedule("0 8 * * *", () => {
-  logger.info("Checking expiring memberships...");
-  notifyExpiringMemberships();
-});
+  cron.schedule("0 2 * * *", () => {
+    logger.info("Running daily workout insertion...");
+    insertWorkouts();
+  });
+
+  cron.schedule("0 8 * * *", () => {
+    logger.info("Checking expiring memberships...");
+    notifyExpiringMemberships();
+  });
+}
 
 // Global error handler
 app.use((err, req, res, next) => {
