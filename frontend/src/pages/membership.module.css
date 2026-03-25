@@ -1,0 +1,309 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+  direction: rtl;
+  position: relative;
+}
+
+.main {
+  flex: 1;
+  padding: 2rem 2rem 3rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  align-self: stretch;
+}
+
+.title {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: var(--accent);
+  font-size: 2.4rem;
+  font-weight: 800;
+}
+
+.membershipsList {
+  margin-bottom: 2rem;
+}
+
+.table {
+  width: 80%;
+  margin: 1rem auto;
+  border-collapse: collapse;
+  background-color: var(--bg-card);
+  box-shadow: var(--shadow-card);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+}
+
+.table th,
+.table td {
+  padding: 12px 14px;
+  text-align: right;
+  border-bottom: 1px solid var(--border-color);
+  vertical-align: middle;
+  color: var(--text);
+  font-size: 1.4rem;
+}
+
+.table th {
+  background-color: rgba(255, 107, 53, 0.1);
+  color: var(--accent);
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+.table th:first-child { border-top-right-radius: var(--radius-card); }
+
+.table th:last-child {
+  border-top-left-radius: var(--radius-card);
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-left: 0.8rem;
+  padding-right: 0.8rem;
+  direction: ltr;
+}
+
+.table th span { display: inline-block; }
+
+.table tr:last-child td { border-bottom: none; }
+
+.table tr:hover td { background-color: rgba(255, 107, 53, 0.04); }
+
+.inlineInput {
+  width: 90%;
+  padding: 6px 10px;
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 1.3rem;
+  box-sizing: border-box;
+  margin: 0.1rem 0;
+  outline: none;
+}
+
+.inlineInput:focus {
+  border-color: var(--accent);
+}
+
+.actionButton {
+  background-color: var(--accent);
+  color: #fff;
+  padding: 7px 14px;
+  border: none;
+  border-radius: var(--radius-btn);
+  cursor: pointer;
+  margin-bottom: 5px;
+  font-size: 1.3rem;
+  font-weight: 600;
+  display: block;
+  width: 100%;
+  text-align: center;
+  transition: all 0.22s;
+}
+
+.actionButton:hover {
+  background-color: var(--accent-hover);
+  transform: scale(1.03);
+}
+
+.saveButton {
+  background-color: var(--success);
+  color: #fff;
+}
+
+.saveButton:hover {
+  background-color: #2da044;
+}
+
+.cancelActionButton {
+  background-color: transparent;
+  color: var(--danger);
+  border: 1px solid var(--danger);
+  padding: 7px 14px;
+  border-radius: var(--radius-btn);
+  cursor: pointer;
+  margin-bottom: 5px;
+  font-size: 1.3rem;
+  font-weight: 600;
+  display: block;
+  width: 100%;
+  text-align: center;
+  transition: all 0.22s;
+}
+
+.cancelActionButton:hover {
+  background-color: var(--danger);
+  color: #fff;
+}
+
+.actionButtonAdd {
+  background-color: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 26px;
+  height: 26px;
+  font-size: 1.4rem;
+  cursor: pointer;
+  vertical-align: middle;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.22s;
+  font-weight: 700;
+}
+
+.actionButtonAdd:hover {
+  background-color: var(--accent-hover);
+  transform: scale(1.1);
+}
+
+.editButton {
+  background-color: var(--accent);
+  color: #fff;
+  padding: 7px 14px;
+  border: none;
+  border-radius: var(--radius-btn);
+  cursor: pointer;
+  margin-bottom: 5px;
+  font-size: 1.3rem;
+  font-weight: 600;
+  display: block;
+  width: 100%;
+  text-align: center;
+  transition: all 0.22s;
+}
+
+.editButton:hover {
+  background-color: var(--accent-hover);
+  transform: scale(1.03);
+}
+
+.deleteButton {
+  background-color: transparent;
+  color: var(--danger);
+  border: 1px solid var(--danger);
+  padding: 7px 14px;
+  border-radius: var(--radius-btn);
+  cursor: pointer;
+  margin-bottom: 5px;
+  font-size: 1.3rem;
+  font-weight: 600;
+  display: block;
+  width: 100%;
+  text-align: center;
+  transition: all 0.22s;
+}
+
+.deleteButton:hover {
+  background-color: var(--danger);
+  color: #fff;
+}
+
+.errorModal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.errorContent {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-accent);
+  padding: 2.4rem;
+  border-radius: var(--radius-card);
+  text-align: center;
+  box-shadow: var(--shadow-card);
+  color: var(--text);
+  max-width: 400px;
+  width: 90%;
+}
+
+.errorContent button {
+  margin-top: 1rem;
+  padding: 9px 22px;
+  background-color: var(--danger);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-btn);
+  cursor: pointer;
+  font-size: 1.4rem;
+  font-weight: 600;
+  transition: all 0.22s;
+}
+
+.errorContent button:hover {
+  background-color: var(--danger-hover);
+  transform: scale(1.04);
+}
+
+.navButton {
+  background-color: var(--accent);
+  color: #fff;
+  padding: 9px 20px;
+  border: none;
+  border-radius: var(--radius-btn);
+  cursor: pointer;
+  font-size: 1.4rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.25s;
+}
+
+.navButton:hover {
+  background-color: var(--accent-hover);
+  transform: scale(1.03);
+}
+
+.logoutButton {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background-color: transparent;
+  color: var(--text-muted);
+  padding: 7px 16px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-btn);
+  font-size: 1.2rem;
+  cursor: pointer;
+  z-index: 1000;
+  transition: all 0.25s;
+}
+
+.logoutButton:hover {
+  color: var(--danger);
+  border-color: var(--danger);
+}
+
+.topLink {
+  display: block;
+  width: 100%;
+  padding: 1rem;
+  font-size: 1.4rem;
+  color: var(--text-muted);
+  text-align: center;
+  transition: all 0.25s;
+  text-decoration: none;
+}
+
+.topLink:hover {
+  color: var(--accent);
+  transform: translateY(-2px);
+  text-decoration: underline;
+}

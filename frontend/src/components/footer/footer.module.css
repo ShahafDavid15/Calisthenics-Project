@@ -1,0 +1,22 @@
+.footer {
+  width: 100%;
+  text-align: center;
+  padding: 16px 20px;
+  background-color: var(--bg-card);
+  border-top: 1px solid var(--border-color);
+  flex-shrink: 0;
+}
+
+.myP,
+.footer p,
+.footer span {
+  color: var(--text-muted);
+  margin: 0;
+  direction: ltr;
+  font-size: 1.3rem;
+}
+
+.footer span {
+  font-size: 1.8rem;
+  color: var(--accent);
+}

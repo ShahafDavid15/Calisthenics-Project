@@ -1,0 +1,304 @@
+/* Chart color variables */
+:global(:root) {
+  --chart-primary:   #ff6b35;
+  --chart-secondary: #a855f7;
+  --pie-color-0: #ff6b35;
+  --pie-color-1: #a855f7;
+  --pie-color-2: #38bdf8;
+  --pie-color-3: #3fb950;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  position: relative;
+  background-color: var(--bg-primary);
+}
+
+.errorBanner {
+  background-color: rgba(248, 81, 73, 0.12);
+  color: var(--danger);
+  border: 1px solid rgba(248, 81, 73, 0.3);
+  padding: 1rem 1.5rem;
+  border-radius: 10px;
+  margin: 1rem;
+  text-align: center;
+  direction: rtl;
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding-bottom: 50px;
+  flex: 1;
+}
+
+.logoutButton {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background-color: transparent;
+  color: var(--text-muted);
+  padding: 7px 16px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-btn);
+  font-size: 1.2rem;
+  cursor: pointer;
+  z-index: 1000;
+  transition: all 0.25s;
+}
+
+.logoutButton:hover {
+  color: var(--danger);
+  border-color: var(--danger);
+}
+
+.userWorkouts {
+  margin-top: 2rem;
+  background-color: var(--bg-card);
+  padding: 1.8rem 2rem;
+  border-radius: var(--radius-card);
+  border: 1px solid var(--border-color);
+  max-width: 920px;
+  width: 95%;
+  text-align: right;
+  direction: rtl;
+  box-sizing: border-box;
+  box-shadow: var(--shadow-card);
+}
+
+.membershipInfo p {
+  margin: 0.3rem 0;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.membershipTitle {
+  color: var(--text-muted);
+  font-size: 1.4rem;
+  margin-bottom: 0.5rem;
+}
+
+.label {
+  color: var(--text-muted);
+  font-size: 1.4rem;
+}
+
+.value {
+  color: var(--text);
+  font-weight: 700;
+  font-size: 1.4rem;
+}
+
+.workoutsTitle {
+  color: var(--accent);
+  margin-bottom: 1rem;
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+.workoutList {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.workoutList li {
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 0.9rem 1.2rem;
+  margin-bottom: 0.8rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  direction: rtl;
+  color: var(--text);
+  font-size: 1.4rem;
+  transition: border-color 0.2s;
+}
+
+.workoutList li:hover {
+  border-color: var(--border-accent);
+}
+
+.cancelButton {
+  background-color: transparent;
+  border: 1px solid var(--danger);
+  color: var(--danger);
+  cursor: pointer;
+  padding: 5px 12px;
+  border-radius: var(--radius-btn);
+  font-size: 1.2rem;
+  font-weight: 600;
+  transition: all 0.22s;
+}
+
+.cancelButton:hover {
+  background-color: var(--danger);
+  color: #fff;
+}
+
+.pastWorkout {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.workoutItemPast {
+  opacity: 0.45;
+}
+
+.statsContainer {
+  margin: 2rem 0;
+  padding: 1.8rem 2rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-card);
+  background-color: var(--bg-card);
+  text-align: right;
+  direction: rtl;
+  max-width: 920px;
+  width: 95%;
+  box-sizing: border-box;
+  overflow: visible;
+  box-shadow: var(--shadow-card);
+}
+
+.statsTitle {
+  color: var(--accent);
+  margin-bottom: 1.5rem;
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.statsCards {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.statCard {
+  background: var(--bg-input);
+  border: 1px solid var(--border-accent);
+  border-radius: var(--radius-card);
+  padding: 1.2rem 1.8rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 140px;
+  flex: 1;
+  box-shadow: 0 2px 12px rgba(255, 107, 53, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.statCard:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-glow);
+}
+
+.statNumber {
+  font-size: 2.4rem;
+  font-weight: 800;
+  color: var(--accent);
+  line-height: 1;
+}
+
+.statLabel {
+  font-size: 1.2rem;
+  color: var(--text-muted);
+  margin-top: 0.5rem;
+  text-align: center;
+}
+
+.chartTitle {
+  color: var(--text);
+  margin: 1.8rem 0 0.8rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  border-bottom: 2px solid var(--border-accent);
+  padding-bottom: 0.4rem;
+}
+
+.filterLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+  font-size: 1.4rem;
+  color: var(--text-muted);
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+}
+
+.filterSelect {
+  padding: 0.4rem 0.8rem;
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 1.3rem;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.filterSelect:focus {
+  border-color: var(--accent);
+}
+
+.axisTick {
+  font-size: 12px;
+  fill: var(--text-muted);
+}
+
+.pieLabel {
+  fill: #fff;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.barLabel {
+  fill: var(--text-muted);
+  font-size: 11px;
+  font-weight: bold;
+}
+
+.statsContainer :global(.recharts-legend-item-text) {
+  margin-right: 8px;
+  color: var(--text-muted) !important;
+}
+
+.statsContainer :global(.recharts-legend-item) {
+  margin-left: 16px;
+}
+
+.statsContainer :global(.recharts-cartesian-grid-horizontal line),
+.statsContainer :global(.recharts-cartesian-grid-vertical line) {
+  stroke: rgba(255, 255, 255, 0.06);
+}
+
+.statsContainer :global(.recharts-tooltip-wrapper .recharts-default-tooltip) {
+  background-color: var(--bg-card) !important;
+  border: 1px solid var(--border-accent) !important;
+  color: var(--text) !important;
+  border-radius: 8px !important;
+}
+
+.noProgressMsg {
+  color: var(--text-muted);
+  font-size: 1.4rem;
+  text-align: center;
+  margin: 1rem 0;
+}
+
+.progressChartWrap {
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  margin-top: 0.5rem;
+}

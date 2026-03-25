@@ -1,0 +1,275 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+  direction: rtl;
+}
+
+.main {
+  flex: 1;
+  padding: 10px 20px 30px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  direction: rtl;
+  width: 100%;
+}
+
+.title {
+  color: var(--accent);
+  font-size: 2.4rem;
+  font-weight: 800;
+  margin-bottom: 20px;
+  letter-spacing: 0.5px;
+}
+
+.addWorkoutButton {
+  background-color: var(--accent);
+  color: #fff;
+  padding: 10px 24px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  border: none;
+  border-radius: var(--radius-btn);
+  cursor: pointer;
+  margin-bottom: 18px;
+  transition: all 0.25s;
+  letter-spacing: 0.3px;
+}
+
+.addWorkoutButton:hover {
+  background-color: var(--accent-hover);
+  transform: scale(1.04);
+  box-shadow: var(--shadow-glow);
+}
+
+.logoutButton {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background-color: transparent;
+  color: var(--text-muted);
+  padding: 7px 16px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-btn);
+  font-size: 1.2rem;
+  cursor: pointer;
+  z-index: 1000;
+  transition: all 0.25s;
+}
+
+.logoutButton:hover {
+  color: var(--danger);
+  border-color: var(--danger);
+}
+
+.scheduleGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  max-width: 720px;
+}
+
+.dayRow {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 14px;
+}
+
+.dayLabel {
+  font-weight: 700;
+  font-size: 1.7rem;
+  color: var(--accent);
+  text-align: right;
+}
+
+.hoursRow {
+  display: flex;
+  justify-content: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.hourContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.hourBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: 1px solid var(--border-accent);
+  border-radius: 12px;
+  padding: 0.6rem 1rem;
+  min-width: 110px;
+  min-height: 64px;
+  background-color: rgba(255, 107, 53, 0.07);
+  color: var(--text);
+  font-weight: 600;
+  transition: all 0.25s;
+}
+
+.hourBox:hover {
+  background-color: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-glow);
+}
+
+.full {
+  background-color: rgba(248, 81, 73, 0.1);
+  color: var(--text-muted);
+  cursor: not-allowed;
+  border: 1px solid rgba(248, 81, 73, 0.25);
+}
+
+.bookedByUser {
+  background-color: rgba(63, 185, 80, 0.12);
+  color: var(--success);
+  border-color: rgba(63, 185, 80, 0.4);
+}
+
+.timeText {
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.participantsText {
+  font-size: 1.2rem;
+  margin-top: 3px;
+  color: var(--text-muted);
+}
+
+.adminButtons {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+}
+
+.editBtn {
+  padding: 6px 12px;
+  font-size: 1.2rem;
+  border: none;
+  border-radius: var(--radius-btn);
+  cursor: pointer;
+  font-weight: 600;
+  background-color: var(--accent);
+  color: #fff;
+  transition: all 0.22s;
+}
+
+.editBtn:hover {
+  background-color: var(--accent-hover);
+  transform: scale(1.05);
+}
+
+.deleteBtn {
+  padding: 6px 12px;
+  font-size: 1.2rem;
+  border: 1px solid var(--danger);
+  border-radius: var(--radius-btn);
+  cursor: pointer;
+  font-weight: 600;
+  background-color: transparent;
+  color: var(--danger);
+  transition: all 0.22s;
+}
+
+.deleteBtn:hover {
+  background-color: var(--danger);
+  color: #fff;
+  transform: scale(1.05);
+}
+
+.addWorkoutForm {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+  padding: 16px;
+  border: 1px solid var(--border-accent);
+  border-radius: var(--radius-card);
+  background-color: var(--bg-card);
+  align-items: center;
+  box-shadow: var(--shadow-card);
+}
+
+.addWorkoutForm input[type="date"],
+.addWorkoutForm input[type="time"] {
+  padding: 8px 12px;
+  font-size: 1.4rem;
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text);
+  outline: none;
+  width: 140px;
+  text-align: center;
+  transition: border-color 0.2s;
+}
+
+.addWorkoutForm input[type="date"]:focus,
+.addWorkoutForm input[type="time"]:focus {
+  border-color: var(--accent);
+}
+
+.editButtons {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 4px;
+}
+
+.editButtons .saveBtn {
+  padding: 8px 18px;
+  font-size: 1.3rem;
+  border: none;
+  border-radius: var(--radius-btn);
+  cursor: pointer;
+  font-weight: 700;
+  background-color: var(--success);
+  color: #fff;
+  transition: all 0.22s;
+}
+
+.editButtons .saveBtn:hover {
+  background-color: #2da044;
+  transform: scale(1.05);
+}
+
+.editButtons .cancelBtn {
+  padding: 8px 18px;
+  font-size: 1.3rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-btn);
+  cursor: pointer;
+  font-weight: 600;
+  background-color: transparent;
+  color: var(--text-muted);
+  transition: all 0.22s;
+}
+
+.editButtons .cancelBtn:hover {
+  color: var(--text);
+  border-color: var(--text-muted);
+}
+
+.hourBox.passed:hover,
+.hourBox.bookedByUser:hover,
+.hourBox.full:hover {
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
